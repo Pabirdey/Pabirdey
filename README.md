@@ -1,4 +1,4 @@
-<<form>
+<form>
             <div class="col-md-6">
                 <div class="row">
                     <label for="fname" class="col-sm-1 col-form-label">PileNO:</label>
