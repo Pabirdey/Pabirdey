@@ -1,26 +1,38 @@
- <div class="row mb-2">
-                <div class="col-md-2 d-flex align-items-center">
-                    <label class="me-2 mb-0">NOA FINES</label>
-                    <input class="form-control w-50" type="text">
-                </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <label class="me-2 mb-0">JODA FINES</label>
-                    <input class="form-control w-50" type="text">
-                </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <label class="me-2 mb-0">KB FINES</label>
-                    <input class="form-control w-50" type="text">
-                </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <label class="me-2 mb-0">YARD FINES</label>
-                    <input class="form-control w-50" type="text">
-                </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <label class="me-2 mb-0">BHJ</label>
-                    <input class="form-control w-50" type="text">
-                </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <label class="me-2 mb-0">Namisa</label>
-                    <input class="form-control w-50" type="text">
-                </div>
-            </div>
+<div class="row mb-2">
+    <div class="col-md-2">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0 flex-shrink-0" style="width: 70px;">NOA FINES</label>
+            <input class="form-control" type="text">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0 flex-shrink-0" style="width: 70px;">JODA FINES</label>
+            <input class="form-control" type="text">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0 flex-shrink-0" style="width: 70px;">KB FINES</label>
+            <input class="form-control" type="text">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0 flex-shrink-0" style="width: 80px;">YARD FINES</label>
+            <input class="form-control" type="text">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0 flex-shrink-0" style="width: 50px;">BHJ</label>
+            <input class="form-control" type="text">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0 flex-shrink-0" style="width: 60px;">Namisa</label>
+            <input class="form-control" type="text">
+        </div>
+    </div>
+</div>
