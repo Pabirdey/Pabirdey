@@ -7,12 +7,18 @@
         .form-label {
             font-weight: 500;
         }
+        hr.section-divider {
+            border-top: 2px solid #bbb;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container mt-4">
         <h4 class="mb-4">Raw Material Quantity</h4>
 
+        <!-- Section 1 -->
         <form>
             <div class="row mb-3">
                 <div class="col-md-2">
@@ -21,7 +27,7 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Source:</label>
-                    <input type="text" class="form-control" placeholder="Source">
+                    <input type="text" class="form-control" value="RMBB" readonly>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Shift:</label>
@@ -32,6 +38,13 @@
                         <option>3</option>
                     </select>
                 </div>
+            </div>
+
+            <!-- Horizontal line (section divider) -->
+            <hr class="section-divider">
+
+            <!-- Section 2 -->
+            <div class="row mb-3">
                 <div class="col-md-2">
                     <label class="form-label">Start Date:</label>
                     <input type="date" class="form-control">
@@ -45,8 +58,8 @@
                     <input type="date" class="form-control">
                 </div>
             </div>
-            <!-- Add more rows here if needed -->
 
+            <!-- Submit -->
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
