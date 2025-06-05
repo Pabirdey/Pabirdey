@@ -1,87 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pile Chemistry</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .form-label {
-            font-weight: 600;
-            font-family: Georgia;
-        }
-        .chem-section {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-    </style>
+    <title>Textbox Sum</title>
 </head>
 <body>
-<div class="container mt-4">
+    <label>Number 1:</label>
+    <input type="number" id="num1" onblur="calculateSum()" /><br><br>
 
-    <!-- Pile Chemistry -->
-    <div class="chem-section">
-        <h6>Pile Chemistry</h6>
-        <div class="row mb-2">
-            <div class="col-md-2">
-                <label class="form-label text-primary">SiO2</label>
-                <input type="text" class="form-control" value="4.38">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label text-primary">MgO</label>
-                <input type="text" class="form-control" value="1.59">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">CaO</label>
-                <input type="text" class="form-control" value="9.95">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Phos</label>
-                <input type="text" class="form-control" value=".063">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Al2O3</label>
-                <input type="text" class="form-control" value="2.17">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">FeO</label>
-                <input type="text" class="form-control">
-            </div>
-        </div>
-    </div>
+    <label>Number 2:</label>
+    <input type="number" id="num2" onblur="calculateSum()" /><br><br>
 
-    <!-- Pile Chemistry LOI -->
-    <div class="chem-section">
-        <h6>Pile Chemistry_LOI</h6>
-        <div class="row mb-2">
-            <div class="col-md-2">
-                <label class="form-label text-primary">SiO2</label>
-                <input type="text" class="form-control" value="4.97">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label text-primary">MgO</label>
-                <input type="text" class="form-control" value="1.8">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">CaO</label>
-                <input type="text" class="form-control" value="11.3">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Phos</label>
-                <input type="text" class="form-control" value=".072">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Al2O3</label>
-                <input type="text" class="form-control" value="2.46">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">FeO</label>
-                <input type="text" class="form-control">
-            </div>
-        </div>
-    </div>
+    <label>Sum:</label>
+    <input type="text" id="sum" readonly />
 
-</div>
+    <script>
+        function calculateSum() {
+            var n1 = parseFloat(document.getElementById("num1").value) || 0;
+            var n2 = parseFloat(document.getElementById("num2").value) || 0;
+            var total = n1 + n2;
+            document.getElementById("sum").value = total;
+        }
+    </script>
 </body>
 </html>
