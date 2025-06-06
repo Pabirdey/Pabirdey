@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Textbox Sum</title>
+    <title>Live Sum</title>
 </head>
 <body>
     <label>Number 1:</label>
-    <input type="number" id="num1" onblur="calculateSum()" /><br><br>
+    <input type="number" id="num1" oninput="calculateSum()" /><br><br>
 
     <label>Number 2:</label>
-    <input type="number" id="num2" onblur="calculateSum()" /><br><br>
+    <input type="number" id="num2" oninput="calculateSum()" /><br><br>
 
     <label>Sum:</label>
     <input type="text" id="sum" readonly />
