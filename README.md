@@ -259,3 +259,90 @@ public class RawMaterialController : Controller
 </div>
 </body>
 </html>
+
+
+
+[HttpPost]
+public ActionResult Index(RawMaterialQuantityModel model)
+{
+    if (!string.IsNullOrEmpty(model.Source))
+    {
+        using (var con = new OracleConnection("your Oracle connection string"))
+        {
+            con.Open();
+            using (var cmd = new OracleCommand("SELECT * FROM RAW_MATERIAL_TABLE WHERE SOURCE = :source", con))
+            {
+                cmd.Parameters.Add(new OracleParameter("source", model.Source));
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        model.PileNo = reader["PILE_NO"].ToString(); // optional
+                        model.NoaFines = reader["NOA_FINES"].ToString();
+                        model.JodaFines = reader["JODA_FINES"].ToString();
+                        model.KBFines = reader["KB_FINES"].ToString();
+                        model.YardFines = reader["YARD_FINES"].ToString();
+                        // Continue mapping other fields...
+                    }
+                }
+            }
+        }
+    }
+
+    return View(model);
+}
+
+
+
+@model YourNamespace.Models.RawMaterialQuantityModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raw Material Quantity</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h4>Raw Material Quantity</h4>
+
+    <form method="post" action="/RawMaterial/Index" id="rawMaterialForm">
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <input type="text" name="PileNo" class="form-control" placeholder="Pile No" value="@Model?.PileNo">
+            </div>
+            <div class="col-md-2">
+                <select name="Source" class="form-control" onchange="document.getElementById('rawMaterialForm').submit();">
+                    <option value="">Select Source</option>
+                    <option value="RMBB_KNR" @(Model?.Source == "RMBB_KNR" ? "selected" : "")>RMBB_KNR</option>
+                    <option value="SOURCE_2" @(Model?.Source == "SOURCE_2" ? "selected" : "")>SOURCE_2</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Example Row -->
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <label>Noa Fines</label>
+                <input type="text" name="NoaFines" class="form-control" value="@Model?.NoaFines">
+            </div>
+            <div class="col-md-2">
+                <label>Joda Fines</label>
+                <input type="text" name="JodaFines" class="form-control" value="@Model?.JodaFines">
+            </div>
+            <div class="col-md-2">
+                <label>KB Fines</label>
+                <input type="text" name="KBFines" class="form-control" value="@Model?.KBFines">
+            </div>
+            <div class="col-md-2">
+                <label>Yard Fines</label>
+                <input type="text" name="YardFines" class="form-control" value="@Model?.YardFines">
+            </div>
+        </div>
+
+        <!-- Add rest of the fields based on your image -->
+    </form>
+</div>
+</body>
+</html>
