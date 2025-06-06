@@ -145,3 +145,117 @@ public class RawMaterialController : Controller
 
     <!-- Repeat this .row for every group of 6 fields shown in the image -->
 </form>
+
+
+
+
+
+
+public class RawMaterialQuantityModel
+{
+    public string PileNo { get; set; }
+    public string Source { get; set; }
+
+    public string NoaFines { get; set; }
+    public string JodaFines { get; set; }
+    public string KBFines { get; set; }
+    public string YardFines { get; set; }
+    public string BHJ { get; set; }
+    public string Namisa { get; set; }
+    
+    // Add all other properties as per your image...
+}
+
+
+public class RawMaterialController : Controller
+{
+    [HttpGet]
+    public ActionResult Index()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public ActionResult Index(RawMaterialQuantityModel model)
+    {
+        if (!string.IsNullOrEmpty(model.PileNo) && !string.IsNullOrEmpty(model.Source))
+        {
+            using (var con = new OracleConnection("your connection string"))
+            {
+                con.Open();
+                using (var cmd = new OracleCommand("SELECT * FROM RAW_MATERIAL_TABLE WHERE PILE_NO = :pileNo AND SOURCE = :source", con))
+                {
+                    cmd.Parameters.Add(new OracleParameter("pileNo", model.PileNo));
+                    cmd.Parameters.Add(new OracleParameter("source", model.Source));
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            model.NoaFines = reader["NOA_FINES"].ToString();
+                            model.JodaFines = reader["JODA_FINES"].ToString();
+                            model.KBFines = reader["KB_FINES"].ToString();
+                            // Populate all other fields...
+                        }
+                    }
+                }
+            }
+        }
+
+        return View(model); // Return updated model
+    }
+}
+
+
+
+
+@model YourNamespace.Models.RawMaterialQuantityModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raw Material Quantity</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h4>Raw Material Quantity</h4>
+
+    <form method="post" action="/RawMaterial/Index" id="rawMaterialForm">
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <input type="text" name="PileNo" class="form-control" value="@Model?.PileNo" onchange="document.getElementById('rawMaterialForm').submit();" placeholder="Pile No">
+            </div>
+            <div class="col-md-2">
+                <select name="Source" class="form-control" onchange="document.getElementById('rawMaterialForm').submit();">
+                    <option value="">Select Source</option>
+                    <option value="RMBB_KNR" @(Model?.Source == "RMBB_KNR" ? "selected" : "")>RMBB_KNR</option>
+                    <option value="SOURCE2" @(Model?.Source == "SOURCE2" ? "selected" : "")>SOURCE2</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <label>Noa Fines</label>
+                <input type="text" name="NoaFines" class="form-control" value="@Model?.NoaFines">
+            </div>
+            <div class="col-md-2">
+                <label>Joda Fines</label>
+                <input type="text" name="JodaFines" class="form-control" value="@Model?.JodaFines">
+            </div>
+            <div class="col-md-2">
+                <label>KB Fines</label>
+                <input type="text" name="KBFines" class="form-control" value="@Model?.KBFines">
+            </div>
+            <div class="col-md-2">
+                <label>Yard Fines</label>
+                <input type="text" name="YardFines" class="form-control" value="@Model?.YardFines">
+            </div>
+        </div>
+
+        <!-- Add more rows like the image -->
+    </form>
+</div>
+</body>
+</html>
