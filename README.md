@@ -15,10 +15,16 @@
 
     <script>
         function calculateSum() {
-            var n1 = parseFloat(document.getElementById("num1").value) || 0;
-            var n2 = parseFloat(document.getElementById("num2").value) || 0;
+            var n1 = parseFloat(document.getElementById("num1").value);
+            var n2 = parseFloat(document.getElementById("num2").value);
+
+            if (isNaN(n1) || isNaN(n2)) {
+                document.getElementById("sum").value = "";
+                return;
+            }
+
             var total = n1 + n2;
-            document.getElementById("sum").value = total;
+            document.getElementById("sum").value = total.toFixed(2); // 2 decimal places
         }
     </script>
 </body>
