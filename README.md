@@ -1,2 +1,1 @@
-<input type="datetime-local" class="form-control" name="EndDate"
-       value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
+model.Cons_st_date = reader["CONS_ST_DATE"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["CONS_ST_DATE"]);
