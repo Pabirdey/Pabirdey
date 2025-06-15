@@ -1,2 +1,2 @@
-<input type="date" name="YourDate" class="form-control"
-       value="@Model.YourDate?.ToString("yyyy-MM-dd")" />
+<input type="datetime-local" name="EntryTime" class="form-control"
+       value="@(Model.EntryTime.HasValue ? Model.EntryTime.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
