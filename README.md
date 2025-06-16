@@ -1,34 +1,51 @@
-[HttpPost]
-public ActionResult SaveRawMaterial(RawMaterialQuantity model)
-{
-    string conString = ConfigurationManager.ConnectionStrings["OracleDbContext"].ConnectionString;
+ <div class="row material-row mb-2">               
+                <div class="col-md-2">
+                    <label class="form-label">Mgo</label>
+                    <input class="form-control" type="text" value="@Model.PileChemMgo" name="PileChemMgo" autocomplete="off">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">C</label>
+                    <input class="form-control" type="text" value="@Model.PileChemC" name="PileChemC" autocomplete="off">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Oil</label>
+                    <input class="form-control" type="text" value="@Model.PileChemOil" name="PileChemOil" autocomplete="off">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Feo</label>
+                    <input class="form-control" type="text" value="@Model.PileChemFeo" name="PileChemFeo" autocomplete="off">
+                </div>
+                <div class="col-md-2">                                        
+                    <input type="submit" value="Save" name="SaveRawMaterial" class="btn btn-primary"/>                    
+                </div>
+            </div>
 
-    using (OracleConnection conn = new OracleConnection(conString))
-    {
-        conn.Open();
+               public ActionResult SaveRawMaterial(RawMaterialQuantity model)
+        {           
 
-        using (OracleCommand cmd = new OracleCommand("SAVE_RAW_MATERIAL_QTY", conn))
-        {
-            cmd.CommandType = CommandType.StoredProcedure;
+            using (OracleConnection conn = new OracleConnection(mycon))
+            {
+                conn.Open();
 
-            // Required header fields
-            cmd.Parameters.Add("P_PILE_NO", OracleDbType.Varchar2).Value = model.PileNo ?? "";
-            cmd.Parameters.Add("P_SOURCE", OracleDbType.Varchar2).Value = model.Source ?? "";
-            cmd.Parameters.Add("P_SHIFT", OracleDbType.Varchar2).Value = model.Shift ?? "";
-            cmd.Parameters.Add("P_START_DATE", OracleDbType.Date).Value = model.StartDate ?? (object)DBNull.Value;
-            cmd.Parameters.Add("P_END_DATE", OracleDbType.Date).Value = model.EndDate ?? (object)DBNull.Value;
-            cmd.Parameters.Add("P_CONS_SL_DATE", OracleDbType.Date).Value = model.ConsSlDate ?? (object)DBNull.Value;
+                using (OracleCommand cmd = new OracleCommand("Proc_Save_Pile_RawMat_Quantity_Entry", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    
+                    cmd.Parameters.Add("P_PileNo", OracleDbType.Varchar2).Value = model.PileNo ?? "";
+                    cmd.Parameters.Add("P_Source", OracleDbType.Varchar2).Value = model.Source ?? "";                    
+                    cmd.Parameters.Add("P_StartDate", OracleDbType.Date).Value = model.StartDate ?? (object)DBNull.Value;
+                    cmd.Parameters.Add("P_EndDate", OracleDbType.Date).Value = model.EndDate ?? (object)DBNull.Value;
+                    cmd.Parameters.Add("P_ConsStartDate", OracleDbType.Date).Value = model.ConsStartDate ?? (object)DBNull.Value;                    
+                    cmd.Parameters.Add("P_JodaFines", OracleDbType.Decimal).Value = model.JodaFines ?? 0;
+                    cmd.Parameters.Add("P_KBFines", OracleDbType.Decimal).Value = model.KBFines ?? 0;
+                    cmd.Parameters.Add("P_NoaFines", OracleDbType.Decimal).Value = model.NoaFines ?? 0;
+                    cmd.Parameters.Add("P_YardFines", OracleDbType.Decimal).Value = model.YardFines ?? 0;
 
-            // Sample material entries (only a few — add all as required)
-            cmd.Parameters.Add("P_JODA_FINES", OracleDbType.Decimal).Value = model.JodaFines ?? 0;
-            cmd.Parameters.Add("P_KB_FINES", OracleDbType.Decimal).Value = model.KbFines ?? 0;
-            cmd.Parameters.Add("P_SOLID_WASTE", OracleDbType.Decimal).Value = model.SolidWaste ?? 0;
-            // Add all 40+ other material fields like above...
+                    cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
 
-            cmd.ExecuteNonQuery();
+            ViewBag.Message = "Data Saved Successfully";
+            return View("RawMaterialQuantity",model); 
         }
-    }
-
-    TempData["Success"] = "Data saved successfully!";
-    return RedirectToAction("RawMaterialEntry"); // or your view
-}
