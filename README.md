@@ -1,27 +1,33 @@
-CREATE OR REPLACE PROCEDURE SAVE_RAW_MATERIAL (
-    P_PILE_NO     IN VARCHAR2,
-    P_SOURCE      IN VARCHAR2,
-    P_SHIFT       IN VARCHAR2,
-    P_START_DATE  IN DATE,
-    P_END_DATE    IN DATE,
-    P_CONS_DATE   IN DATE,
-    P_ITEM_CODE   IN VARCHAR2,
-    P_QUANTITY    IN NUMBER
-)
-IS
-BEGIN
-    -- Try to update existing
-    UPDATE T_PILE_RAWMAT_QUANTITY_NEW
-    SET QUANTITY = P_QUANTITY,
-        UPDATED_DATE = SYSDATE
-    WHERE PILE_NO = P_PILE_NO
-      AND ITEM_CODE = P_ITEM_CODE;
+[HttpPost]
+public ActionResult SaveMultipleRawMaterials(RawMaterialQuantityViewModel viewModel)
+{
+    string conStr = ConfigurationManager.ConnectionStrings["OracleDbContext"].ConnectionString;
 
-    IF SQL%ROWCOUNT = 0 THEN
-        -- Insert new record
-        INSERT INTO T_PILE_RAWMAT_QUANTITY_NEW
-            (PILE_NO, SOURCE, SHIFT, START_DATE, END_DATE, CONS_DATE, ITEM_CODE, QUANTITY, CREATED_DATE)
-        VALUES
-            (P_PILE_NO, P_SOURCE, P_SHIFT, P_START_DATE, P_END_DATE, P_CONS_DATE, P_ITEM_CODE, P_QUANTITY, SYSDATE);
-    END IF;
-END;
+    using (OracleConnection conn = new OracleConnection(conStr))
+    {
+        conn.Open();
+
+        foreach (var item in viewModel.Items)
+        {
+            using (OracleCommand cmd = new OracleCommand("YOUR_PACKAGE.SAVE_OR_UPDATE_RAWMAT", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("P_PILENO", OracleDbType.Varchar2).Value = item.PileNo;
+                cmd.Parameters.Add("P_SOURCE", OracleDbType.Varchar2).Value = item.Source;
+                cmd.Parameters.Add("P_QTY1", OracleDbType.Decimal).Value = item.Quantity1;
+                cmd.Parameters.Add("P_QTY2", OracleDbType.Decimal).Value = item.Quantity2;
+                cmd.Parameters.Add("P_QTY3", OracleDbType.Decimal).Value = item.Quantity3;
+
+                cmd.Parameters.Add("P_STATUS", OracleDbType.Varchar2, 200).Direction = ParameterDirection.Output;
+
+                cmd.ExecuteNonQuery();
+                string status = cmd.Parameters["P_STATUS"].Value.ToString();
+                // Optionally: log or collect status
+            }
+        }
+    }
+
+    ViewBag.Message = "All rows saved/updated successfully.";
+    return View("RawMaterialForm", viewModel); // or RedirectToAction("Index")
+}
