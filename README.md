@@ -71,3 +71,46 @@ public class Blast_FurnaceController : Controller
         return View("RawMaterial_M", model);
     }
 }
+CREATE OR REPLACE PROCEDURE Proc_Save_Pile_Rawmat_Quantity_Entry (
+    p_PileNo     IN VARCHAR2,
+    p_Source     IN VARCHAR2,
+    p_StartDate  IN DATE,
+    p_EndDate    IN DATE,
+    p_ConstStartDate IN DATE,
+    p_NoaFines   IN NUMBER,
+    p_JodaFines  IN NUMBER,
+    p_KBFines    IN NUMBER,
+    p_YardFines  IN NUMBER
+)
+AS
+BEGIN
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_DATE_FORMAT=''DD-MON-YYYY HH24:MI:SS''';
+
+    MERGE INTO imtg.T_PILE_RAWMAT_QUANTITY_NEW t
+    USING (
+        SELECT p_PileNo AS Pile_No, p_Source AS Source FROM dual
+    ) d
+    ON (t.PILE_NO = d.Pile_No AND t.Source = d.Source)
+    WHEN MATCHED THEN
+        UPDATE SET
+            PREP_START_DATE = p_StartDate,
+            PREP_END_DATE = p_EndDate,
+            CONS_ST_DATE = p_ConstStartDate,
+            NOA_FINES = p_NoaFines,
+            JODA_FINES = p_JodaFines,
+            KB_FINES = p_KBFines,
+            YARD_FINES = p_YardFines
+    WHEN NOT MATCHED THEN
+        INSERT (
+            PILE_NO, SOURCE, PREP_START_DATE, PREP_END_DATE, CONS_ST_DATE,
+            NOA_FINES, JODA_FINES, KB_FINES, YARD_FINES
+        )
+        VALUES (
+            p_PileNo, p_Source, p_StartDate, p_EndDate, p_ConstStartDate,
+            p_NoaFines, p_JodaFines, p_KBFines, p_YardFines
+        );
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
