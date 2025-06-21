@@ -81,3 +81,16 @@ public ActionResult RawMaterialEntry(RawMaterialQuantity input, string SaveRawMa
 
     return View(model);
 }
+
+<script>
+    // Convert server data (passed via ViewBag) to JS array
+    var pileList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PileList));
+</script>
+
+<select id="pileDropdown" name="PileNo">
+    <script>
+        for (var i = 0; i < pileList.length; i++) {
+            document.write("<option value='" + pileList[i] + "'>" + pileList[i] + "</option>");
+        }
+    </script>
+</select>
