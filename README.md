@@ -1,18 +1,19 @@
-function rawMaterialForm() {
+  function DisplayPswBlock() {
         debugger;
         var source = document.getElementById("SourceSelect").value;
-        var block = document.getElementById("pswBlock");
+        var block1 = document.getElementById("pswBlock1");
+        var block2 = document.getElementById("pswBlock2");
+        var block3 = document.getElementById("pswBlock3");
+        var block4 = document.getElementById("pswBlock4");
         if (source === 'RMBB_KNR') {
-            block.style.display = "block";
+            block1.style.display = "block1";
+            block2.style.display = "block2";
+            block3.style.display = "block3";
+            block4.style.display = "block4";
         } else {
-            block.style.display = "none";
+            block1.style.display = "none";
+            block2.style.display = "none";
+            block3.style.display = "none";
+            block4.style.display = "none";
         }
-
     }
-
-     <select name="Source" id="SourceSelect" class="form-control" onchange="document.getElementById('rawMaterialForm').submit();">
-                            <option value="">Select Source</option>
-                            <option value="RMBB_KNR" @(Model !=null && Model.Source == "RMBB_KNR" ? "selected" : "")>RMBB_KNR</option>
-                            <option value="RMBB" @(Model != null && Model.Source == "RMBB" ? "selected" : "")>RMBB</option>
-                            <option value="RMBBN" @(Model != null && Model.Source == "RMBBN" ? "selected" : "")>RMBBN</option>
-                        </select>
