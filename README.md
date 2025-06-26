@@ -1,31 +1,35 @@
-$.post('@Url.Action("Get_Voilin_Chart")', {
-    pTimestamp: pDate,
-    pOvenNo: pOvenNo,
-    pBatteryNo: pBatteryNo,                
-    pPlantName: Area
-})
-.done(function (data) {
-    if (data.error) {
-        alert("Server error: " + data.error); // Show error from server
-        return;
-    }
+[HttpPost]
+public JsonResult Get_Voilin_Chart(string pTimestamp, string pOvenNo, string pBatteryNo, string pPlantName)
+{
+    try
+    {
+        string sql = "";
+        DataTable dt = new DataTable();
+        Dictionary<string, object> param = new Dictionary<string, object>();
 
-    let pushForces = data.map(row => parseFloat(row.PUSH_FORCE));
-    let trace = {
-        type: 'violin',
-        y: pushForces,
-        box: { visible: true },
-        line: { color: 'blue' },
-        meanline: { visible: true },
-        name: 'Push Force',
-    };
-    let layout = {
-        title: 'Violin Chart - Push Force',
-        yaxis: { title: 'Push Force (kg)' }
-    };
-    Plotly.newPlot('modalPushCurrentChart1', [trace], layout);
-})
-.fail(function (xhr, status, error) {
-    alert("AJAX Error: " + error); // show client-side error
-    console.error(xhr.responseText);
-});
+        if (pPlantName == "B10")
+        {
+            if (pBatteryNo == "10" || pBatteryNo == "11")
+            {
+                sql = "SELECT O.ID_OVEN AS OVEN_NO, TRUNC(O.ST_TIME) AS DATETIME, ROUND(O.DURATION, 2) AS PUSH_FORCE " +
+                      "FROM imtg.t_cp_fugitive_emission O " +
+                      "WHERE TRUNC(O.ST_TIME) > (TO_DATE(:pTimestamp, 'dd/mm/yyyy') - 30) " +
+                      "AND TRUNC(O.ST_TIME) <= TO_DATE(:pTimestamp, 'dd/mm/yyyy') " +
+                      "AND O.ID_BATTERY = :pBatteryNo AND ID_OVEN = :pOvenNo ORDER BY O.ST_TIME";
+
+                param.Add("pTimestamp", pTimestamp);
+                param.Add("pOvenNo", pOvenNo);
+                param.Add("pBatteryNo", pBatteryNo);
+
+                dt = DAL.GetRecords(sql, param);
+            }
+        }
+
+        return Json(dt, JsonRequestBehavior.AllowGet);
+    }
+    catch (Exception ex)
+    {
+        // 🔴 LOG or return the error message for debugging
+        return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+    }
+}
