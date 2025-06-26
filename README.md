@@ -5,12 +5,20 @@ $.post('@Url.Action("Get_Voilin_Chart")', {
     pPlantName: Area
 })
 .done(function (data) {
-    if (data.error) {
-        alert("Server error: " + data.error); // Show error from server
-        return;
+    // ✅ Check if data is a string; if so, parse it
+    if (typeof data === "string") {
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            alert("Data parse error: " + e.message);
+            console.error(data);
+            return;
+        }
     }
 
+    // ✅ Now you can safely call .map()
     let pushForces = data.map(row => parseFloat(row.PUSH_FORCE));
+
     let trace = {
         type: 'violin',
         y: pushForces,
@@ -19,13 +27,15 @@ $.post('@Url.Action("Get_Voilin_Chart")', {
         meanline: { visible: true },
         name: 'Push Force',
     };
+
     let layout = {
         title: 'Violin Chart - Push Force',
         yaxis: { title: 'Push Force (kg)' }
     };
+
     Plotly.newPlot('modalPushCurrentChart1', [trace], layout);
 })
 .fail(function (xhr, status, error) {
-    alert("AJAX Error: " + error); // show client-side error
+    alert("AJAX Error: " + error);
     console.error(xhr.responseText);
 });
