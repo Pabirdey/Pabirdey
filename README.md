@@ -1,31 +1,48 @@
-<!-- Include Flatpickr CSS & JS (if not already included) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+ function Get_CP_Fugitivity_Voilin_Chart(pOvenNo, pDate) {
+            debugger;
+            var modal = $('#FugitiveModal');
+            modal.modal('show');
+            modal.find('.modal-title').text("Oven No " + pOvenNo);
+            var pBatteryNo = $('#battery_no').val();
+            var pPlantName = $('#Area').val();
+            Plotly.purge('modalPushCurrentChart1');
+            $.post('@Url.Action("Get_cp_fugitive_Voilin_Chart")', {
+                pTimestamp: pDate,
+                pOvenNo: pOvenNo,
+                pBatteryNo: pBatteryNo,
+                pPlantName: Area
+            })
+           .done(function (data) {
+               if (typeof data === "string") {
+                   try {
+                       data = JSON.parse(data);
+                   } catch (e) {
+                       alert("Data parse error: " + e.message);
+                       console.error(data);
+                       return;
+                   }
+              }
 
-<!-- Font Awesome for the calendar icon -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+       let pushForces = data.map(row => parseFloat(row.PUSH_FORCE));
 
-<!-- Your updated form field -->
-<div style="width: 12%; position: relative;">
-    <label class="form-label fw-bold" style="margin-left: 40px;">Start Date</label>
-    
-    <input type="text" class="form-control" name="StartDate" id="StartDate"
-           value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("dd-MMM-yyyy HH:mm") : "")"
-           style="padding-left: 35px;" />
-    
-    <!-- Calendar icon inside input -->
-    <i class="fa fa-calendar" style="
-        position: absolute;
-        left: 10px;
-        top: 55%;
-        transform: translateY(-50%);
-        color: #888;"></i>
-</div>
+       let trace = {
+           type: 'violin',
+           y: pushForces,
+           box: { visible: true },
+           line: { color: 'orange' },
+           meanline: { visible: true },
+           name: 'Fugitive',
+       };
 
-<!-- Flatpickr script -->
-<script>
-    flatpickr("#StartDate", {
-        enableTime: true,
-        dateFormat: "d-M-Y H:i"
-    });
-</script>
+       let layout = {
+           title: 'Violin Chart - Fugitive',
+           yaxis: { title: 'Fugitive' }
+       };
+
+       Plotly.newPlot('modalPushCurrentChart1', [trace], layout);
+   })
+   .fail(function (xhr, status, error) {
+       alert("AJAX Error: " + error);
+       console.error(xhr.responseText);
+   });
+        }
