@@ -1,4 +1,6 @@
-$(document).ready(function () {        
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
         $.ajax({
             url: '@Url.Action("LoadCastData", "CastHouse")',
             type: 'GET',
@@ -15,6 +17,7 @@ $(document).ready(function () {
                     tableBody += `<td><input class='form-control form-control-sm' value='${data[i].OT}' /></td>`;
                     tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Ready}' /></td>`;
                     tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Wetness}' /></td>`;
+
                     tableBody += `<td><select class='form-select form-select-sm'>
                                     <option ${data[i].CastType === 'Normal' ? 'selected' : ''}>Normal</option>
                                     <option ${data[i].CastType === 'Emergency' ? 'selected' : ''}>Emergency</option>
@@ -32,7 +35,6 @@ $(document).ready(function () {
                                     <option ${data[i].Taphole === 'Blocked' ? 'selected' : ''}>Blocked</option>
                                     <option ${data[i].Taphole === 'Leakage' ? 'selected' : ''}>Leakage</option>
                                   </select></td>`;
-
                     tableBody += "</tr>";
                 }
 
@@ -43,3 +45,4 @@ $(document).ready(function () {
             }
         });
     });
+</script>
