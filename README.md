@@ -1,70 +1,45 @@
-<!-- Scrollable Container 1 -->
-<div id="scrollDiv1" style="max-height: 260px; overflow-y: auto; border: 1px solid #ccc;">
-    <table id="castTable1" class="table table-bordered table-sm text-center align-middle mb-0">
-        <thead class="table-light sticky-top">
-            <tr>
-                <th>Cast No</th>
-                <th>Trough No</th>
-                <th>Cast Start</th>
-                <th>Duration</th>
-                <th>Rate</th>
-                <th>TLC</th>
-                <th>OT</th>
-                <th>Ready Time</th>
-                <th>Wetness</th>
-                <th>Cast Type</th>
-                <th>Clay</th>
-                <th>Taphole</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+$(document).ready(function () {        
+        $.ajax({
+            url: '@Url.Action("LoadCastData", "CastHouse")',
+            type: 'GET',
+            success: function (data) {
+                var tableBody = "";
+                for (var i = 0; i < data.length; i++) {
+                    tableBody += "<tr>";
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CastNo}' readonly/></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TroughNo}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CastStart}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Duration}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Rate}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TLC}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].OT}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Ready}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Wetness}' /></td>`;
+                    tableBody += `<td><select class='form-select form-select-sm'>
+                                    <option ${data[i].CastType === 'Normal' ? 'selected' : ''}>Normal</option>
+                                    <option ${data[i].CastType === 'Emergency' ? 'selected' : ''}>Emergency</option>
+                                    <option ${data[i].CastType === 'Test' ? 'selected' : ''}>Test</option>
+                                  </select></td>`;
 
-<!-- Scrollable Container 2 -->
-<div id="scrollDiv2" style="max-height: 260px; overflow-y: auto; border: 1px solid #ccc;">
-    <table id="castTable2" class="table table-bordered table-sm text-center align-middle mb-0">
-        <thead class="table-light sticky-top">
-            <tr>
-                <th>Cast No</th>
-                <th>Trough No</th>
-                <th>Cast Start</th>
-                <th>Duration</th>
-                <th>Rate</th>
-                <th>TLC</th>
-                <th>OT</th>
-                <th>Ready Time</th>
-                <th>Wetness</th>
-                <th>Cast Type</th>
-                <th>Clay</th>
-                <th>Taphole</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+                    tableBody += `<td><select class='form-select form-select-sm'>
+                                    <option ${data[i].Clay === 'Good' ? 'selected' : ''}>Good</option>
+                                    <option ${data[i].Clay === 'Soft' ? 'selected' : ''}>Soft</option>
+                                    <option ${data[i].Clay === 'Cracked' ? 'selected' : ''}>Cracked</option>
+                                  </select></td>`;
 
-<!-- Scroll Sync Script -->
-<script>
-    const div1 = document.getElementById('scrollDiv1');
-    const div2 = document.getElementById('scrollDiv2');
+                    tableBody += `<td><select class='form-select form-select-sm'>
+                                    <option ${data[i].Taphole === 'Normal' ? 'selected' : ''}>Normal</option>
+                                    <option ${data[i].Taphole === 'Blocked' ? 'selected' : ''}>Blocked</option>
+                                    <option ${data[i].Taphole === 'Leakage' ? 'selected' : ''}>Leakage</option>
+                                  </select></td>`;
 
-    let isSyncing1 = false;
-    let isSyncing2 = false;
+                    tableBody += "</tr>";
+                }
 
-    div1.addEventListener('scroll', () => {
-        if (!isSyncing1) {
-            isSyncing2 = true;
-            div2.scrollTop = div1.scrollTop;
-        }
-        isSyncing1 = false;
+                $("#castTable tbody").html(tableBody);
+            },
+            error: function () {
+                alert("Failed to load data.");
+            }
+        });
     });
-
-    div2.addEventListener('scroll', () => {
-        if (!isSyncing2) {
-            isSyncing1 = true;
-            div1.scrollTop = div2.scrollTop;
-        }
-        isSyncing2 = false;
-    });
-</script>
