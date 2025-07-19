@@ -1,48 +1,18 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $.ajax({
-            url: '@Url.Action("LoadCastData", "CastHouse")',
-            type: 'GET',
-            success: function (data) {
-                var tableBody = "";
-                for (var i = 0; i < data.length; i++) {
-                    tableBody += "<tr>";
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CastNo}' readonly/></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TroughNo}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CastStart}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Duration}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Rate}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TLC}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].OT}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Ready}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Wetness}' /></td>`;
-
-                    tableBody += `<td><select class='form-select form-select-sm'>
-                                    <option ${data[i].CastType === 'Normal' ? 'selected' : ''}>Normal</option>
-                                    <option ${data[i].CastType === 'Emergency' ? 'selected' : ''}>Emergency</option>
-                                    <option ${data[i].CastType === 'Test' ? 'selected' : ''}>Test</option>
-                                  </select></td>`;
-
-                    tableBody += `<td><select class='form-select form-select-sm'>
-                                    <option ${data[i].Clay === 'Good' ? 'selected' : ''}>Good</option>
-                                    <option ${data[i].Clay === 'Soft' ? 'selected' : ''}>Soft</option>
-                                    <option ${data[i].Clay === 'Cracked' ? 'selected' : ''}>Cracked</option>
-                                  </select></td>`;
-
-                    tableBody += `<td><select class='form-select form-select-sm'>
-                                    <option ${data[i].Taphole === 'Normal' ? 'selected' : ''}>Normal</option>
-                                    <option ${data[i].Taphole === 'Blocked' ? 'selected' : ''}>Blocked</option>
-                                    <option ${data[i].Taphole === 'Leakage' ? 'selected' : ''}>Leakage</option>
-                                  </select></td>`;
-                    tableBody += "</tr>";
-                }
-
-                $("#castTable tbody").html(tableBody);
-            },
-            error: function () {
-                alert("Failed to load data.");
-            }
-        });
-    });
-</script>
+<label class="form-label">Blend-II</label>                    
+                    <select id="blend1" class="form-control">
+                        <option value="">Select Blend-I</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                    </select>
