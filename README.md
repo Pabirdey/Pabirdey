@@ -1,18 +1,11 @@
- $.ajax({
-            url: '@Url.Action("LoadOtherDetails", "CastHouse")',
-            type: 'GET',
-            success: function (data) {
-                var tableBody = "";
-                for (var i = 0; i < data.length; i++) {
-                    tableBody += "<tr>";
-                    tableBody += "<td>" + data[i].CastNo + "</td>";
-                    tableBody += "<td>" + data[i].Date + "</td>";
-                    tableBody += "<td>" + data[i].Furnace + "</td>";
-                    tableBody += "<td>" + data[i].MainRunnerHMAmt + "</td>";
-                    tableBody += "<td>" + data[i].TiltingRunnerHMAmt + "</td>";
-                    tableBody += "<td>" + data[i].Remarks + "</td>";
-                    tableBody += "</tr>";
-                }
-                $("#otherDetailsBody").html(tableBody);
-            }
-        });
+public JsonResult LoadOtherDetails()
+{
+    var data = new List<object>
+    {
+        new { CastNo = "1001", Date = "2025-07-20", Furnace = "Furnace A", MainRunnerHMAmt = 250.50, TiltingRunnerHMAmt = 130.75, Remarks = "OK" },
+        new { CastNo = "1002", Date = "2025-07-19", Furnace = "Furnace B", MainRunnerHMAmt = 260.00, TiltingRunnerHMAmt = 140.25, Remarks = "Review" },
+        new { CastNo = "1003", Date = "2025-07-18", Furnace = "Furnace C", MainRunnerHMAmt = 245.75, TiltingRunnerHMAmt = 125.50, Remarks = "Done" }
+    };
+
+    return Json(data, JsonRequestBehavior.AllowGet);
+}
