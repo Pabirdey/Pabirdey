@@ -1,84 +1,83 @@
-<style>
-    .scrollable-tbody {
-        display: block;
-        max-height: 210px; /* Adjust based on row height */
-        overflow-y: auto;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Side by Side Tables with Shared Scroll</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .scroll-wrapper {
+            max-height: 300px; /* scrollable height */
+            overflow-y: auto;
+            display: flex;
+        }
 
-    .scrollable-tbody tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed;
-    }
+        .table-container {
+            min-width: 300px;
+        }
 
-    .table thead,
-    .table tbody tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed;
-    }
-</style>
+        table {
+            margin: 0;
+        }
 
-<div class="row align-items-stretch">
-    <!-- Tap Hole Details -->
-    <div class="col-md-8 d-flex">
-        <div class="card w-100">
-            <div class="card-header bg-primary text-white">Tap Hole Details</div>
-            <div class="card-body table-responsive" style="overflow-x:auto;">
-                <table class="table table-bordered text-center align-middle" style="min-width:1200px;">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Cast No</th>
-                            <th>Trough</th>
-                            <th>Cast Start</th>
-                            <th>Cast End</th>
-                            <th>Gutko</th>
-                            <th class="long-header">Cast Duration</th>
-                            <th class="long-header">Casting Rate(t/min)</th>
-                            <th>TLC</th>
-                            <th>OT</th>
-                            <th class="long-header">Cast Ready Time</th>
-                            <th class="long-header">Splashing Wetness Time</th>
-                            <th class="long-header">Cast Type</th>
-                            <th class="long-header">Clay Condition</th>
-                            <th class="long-header">Taphole Behaviour at End Cast</th>
-                        </tr>
-                    </thead>
-                    <tbody class="scrollable-tbody">
-                        <!-- Sample rows -->
-                        <tr><td colspan="14">Row 1</td></tr>
-                        <tr><td colspan="14">Row 2</td></tr>
-                        <tr><td colspan="14">Row 3</td></tr>
-                        <tr><td colspan="14">Row 4</td></tr>
-                        <tr><td colspan="14">Row 5</td></tr>
-                        <tr><td colspan="14">Row 6</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+        }
+
+        td, th {
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <div class="scroll-wrapper border">
+        <!-- First Table -->
+        <div class="table-container">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>Item A1</th>
+                        <th>Item A2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Repeat rows as needed -->
+                    <tr><td>1</td><td>One</td></tr>
+                    <tr><td>2</td><td>Two</td></tr>
+                    <tr><td>3</td><td>Three</td></tr>
+                    <tr><td>4</td><td>Four</td></tr>
+                    <tr><td>5</td><td>Five</td></tr>
+                    <tr><td>6</td><td>Six</td></tr>
+                </tbody>
+            </table>
         </div>
-    </div>
 
-    <!-- Hot Metal Details -->
-    <div class="col-md-4 d-flex">
-        <div class="card w-100">
-            <div class="card-header bg-secondary text-white">Hot Metal Details</div>
-            <div class="card-body table-responsive">
-                <table class="table table-bordered table-sm text-center">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="long-header">HMT Before Slag</th>
-                            <th class="long-header">HMT After Slag</th>
-                            <th>Final HM Temp</th>
-                            <th>HM Weight</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Sample rows -->
-                        <tr><td colspan="4">HM 1</td></tr>
-                        <tr><td colspan="4">HM 2</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <!-- Second Table -->
+        <div class="table-container">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>Item B1</th>
+                        <th>Item B2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Repeat rows as needed -->
+                    <tr><td>A</td><td>Alpha</td></tr>
+                    <tr><td>B</td><td>Beta</td></tr>
+                    <tr><td>C</td><td>Gamma</td></tr>
+                    <tr><td>D</td><td>Delta</td></tr>
+                    <tr><td>E</td><td>Epsilon</td></tr>
+                    <tr><td>F</td><td>Zeta</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+</body>
+</html>
