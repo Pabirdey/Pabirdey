@@ -2,27 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Side by Side Tables with Shared Scroll</title>
+    <title>Two Tables Shared Scroll</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        .scroll-wrapper {
-            max-height: 300px; /* scrollable height */
-            overflow-y: auto;
+        .scroll-container {
+            max-height: 300px; /* Set the height for vertical scroll */
+            overflow-y: auto; /* Enable vertical scroll */
             display: flex;
+            border: 1px solid #ccc;
         }
 
-        .table-container {
+        .table-wrapper {
+            flex: 1;
             min-width: 300px;
         }
 
         table {
+            width: 100%;
             margin: 0;
         }
 
         th {
             position: sticky;
             top: 0;
-            background: #f8f9fa;
+            background-color: #f8f9fa;
         }
 
         td, th {
@@ -34,45 +38,45 @@
 <body>
 
 <div class="container mt-4">
-    <div class="scroll-wrapper border">
-        <!-- First Table -->
-        <div class="table-container">
-            <table class="table table-bordered mb-0">
+    <div class="scroll-container">
+        <!-- Table 1 -->
+        <div class="table-wrapper">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Item A1</th>
-                        <th>Item A2</th>
+                        <th>Sr</th>
+                        <th>Name</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Repeat rows as needed -->
-                    <tr><td>1</td><td>One</td></tr>
-                    <tr><td>2</td><td>Two</td></tr>
-                    <tr><td>3</td><td>Three</td></tr>
-                    <tr><td>4</td><td>Four</td></tr>
-                    <tr><td>5</td><td>Five</td></tr>
-                    <tr><td>6</td><td>Six</td></tr>
+                    <tr><td>1</td><td>John</td></tr>
+                    <tr><td>2</td><td>Jane</td></tr>
+                    <tr><td>3</td><td>Alex</td></tr>
+                    <tr><td>4</td><td>Maria</td></tr>
+                    <tr><td>5</td><td>Mike</td></tr>
+                    <tr><td>6</td><td>Linda</td></tr>
+                    <tr><td>7</td><td>Steve</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Second Table -->
-        <div class="table-container">
-            <table class="table table-bordered mb-0">
+        <!-- Table 2 -->
+        <div class="table-wrapper">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Item B1</th>
-                        <th>Item B2</th>
+                        <th>ID</th>
+                        <th>City</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Repeat rows as needed -->
-                    <tr><td>A</td><td>Alpha</td></tr>
-                    <tr><td>B</td><td>Beta</td></tr>
-                    <tr><td>C</td><td>Gamma</td></tr>
-                    <tr><td>D</td><td>Delta</td></tr>
-                    <tr><td>E</td><td>Epsilon</td></tr>
-                    <tr><td>F</td><td>Zeta</td></tr>
+                    <tr><td>101</td><td>New York</td></tr>
+                    <tr><td>102</td><td>London</td></tr>
+                    <tr><td>103</td><td>Tokyo</td></tr>
+                    <tr><td>104</td><td>Sydney</td></tr>
+                    <tr><td>105</td><td>Paris</td></tr>
+                    <tr><td>106</td><td>Berlin</td></tr>
+                    <tr><td>107</td><td>Mumbai</td></tr>
                 </tbody>
             </table>
         </div>
