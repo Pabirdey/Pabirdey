@@ -2,86 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Two Tables Shared Scroll</title>
+    <title>Dashboard Layout</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
-        .scroll-container {
-            max-height: 300px; /* Set the height for vertical scroll */
-            overflow-y: auto; /* Enable vertical scroll */
-            display: flex;
-            border: 1px solid #ccc;
-        }
-
-        .table-wrapper {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        table {
-            width: 100%;
-            margin: 0;
-        }
-
-        th {
-            position: sticky;
-            top: 0;
+        body {
             background-color: #f8f9fa;
         }
 
-        td, th {
-            text-align: center;
+        .scroll-box {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .table th, .table td {
             vertical-align: middle;
+            text-align: center;
+        }
+
+        /* Sync Scroll between two divs */
+        .scroll-sync {
+            overflow-y: scroll;
+            height: 400px;
+        }
+
+        .scroll-sync::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-sync::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-
-<div class="container mt-4">
-    <div class="scroll-container">
-        <!-- Table 1 -->
-        <div class="table-wrapper">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Sr</th>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>1</td><td>John</td></tr>
-                    <tr><td>2</td><td>Jane</td></tr>
-                    <tr><td>3</td><td>Alex</td></tr>
-                    <tr><td>4</td><td>Maria</td></tr>
-                    <tr><td>5</td><td>Mike</td></tr>
-                    <tr><td>6</td><td>Linda</td></tr>
-                    <tr><td>7</td><td>Steve</td></tr>
-                </tbody>
-            </table>
+    <div class="container-fluid p-3">
+        <!-- Header -->
+        <div class="mb-4">
+            <h2 class="text-center">Dashboard Layout</h2>
         </div>
 
-        <!-- Table 2 -->
-        <div class="table-wrapper">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>City</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>101</td><td>New York</td></tr>
-                    <tr><td>102</td><td>London</td></tr>
-                    <tr><td>103</td><td>Tokyo</td></tr>
-                    <tr><td>104</td><td>Sydney</td></tr>
-                    <tr><td>105</td><td>Paris</td></tr>
-                    <tr><td>106</td><td>Berlin</td></tr>
-                    <tr><td>107</td><td>Mumbai</td></tr>
-                </tbody>
-            </table>
+        <!-- Side by side tables with shared scroll -->
+        <div class="row">
+            <!-- Left Panel -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Panel A</div>
+                    <div class="card-body p-0 scroll-sync" id="scrollLeft">
+                        <table class="table table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item A1</th>
+                                    <th>Item A2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample rows -->
+                                <tr><td>1</td><td>Data A1</td><td>Data A2</td></tr>
+                                <tr><td>2</td><td>Data A1</td><td>Data A2</td></tr>
+                                <tr><td>3</td><td>Data A1</td><td>Data A2</td></tr>
+                                <!-- Add more rows as needed -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Panel B</div>
+                    <div class="card-body p-0 scroll-sync" id="scrollRight">
+                        <table class="table table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item B1</th>
+                                    <th>Item B2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample rows -->
+                                <tr><td>1</td><td>Data B1</td><td>Data B2</td></tr>
+                                <tr><td>2</td><td>Data B1</td><td>Data B2</td></tr>
+                                <tr><td>3</td><td>Data B1</td><td>Data B2</td></tr>
+                                <!-- Add more rows as needed -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
+    <!-- Scroll sync logic -->
+    <script>
+        const left = document.getElementById("scrollLeft");
+        const right = document.getElementById("scrollRight");
+
+        left.addEventListener("scroll", () => {
+            right.scrollTop = left.scrollTop;
+        });
+
+        right.addEventListener("scroll", () => {
+            left.scrollTop = right.scrollTop;
+        });
+    </script>
 </body>
 </html>
