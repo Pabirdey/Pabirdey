@@ -1,4 +1,7 @@
- <div class="form-section">
+<div class="form-section">
+    <div class="row">
+        <!-- Left Side: Tap Hole Details -->
+        <div class="col-md-6">
             <div class="section-title">Tap Hole Details</div>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm text-center align-middle">
@@ -19,10 +22,16 @@
                             <th>Clay Condition</th>
                             <th>Taphole Behaviour at End Cast</th>                            
                         </tr>
-                    </thead>                  
-
+                    </thead>
+                    <tbody>
+                        <!-- Your rows here -->
+                    </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Right Side: Hot Metal Details -->
+        <div class="col-md-6">
             <div class="section-title">Hot Metal Details</div>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm text-center align-middle">
@@ -34,6 +43,11 @@
                             <th>HM Weight</th>                            
                         </tr>
                     </thead>
+                    <tbody>
+                        <!-- Your rows here -->
+                    </tbody>
                 </table>
             </div>
         </div>
+    </div>
+</div>
