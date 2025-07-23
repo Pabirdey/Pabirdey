@@ -1,22 +1,39 @@
-sql ="select DATE_TIME,FUR_NAME,SHIFT,CAST_NO,CH_READY_TIME,CAST_ST_TIME,SLAG_START_TIME,CAST_END_TIME,GUTKO,";
-            sql +="CAST_DURATION,SPEED,SLAG_TIME_RATIO,TAPHOLE_LENGTH,HM_TEMP,DRILL_DIA,MG_CLAY_USED,CAST_CLAY_COND,DELAY_REASON,";
-            sql +="NO_TLC,NO_OT,NO_LANCING_PIPE,SLAG_LADLE,HM_AFTER_SLAG,HM_BEFORE_SLAG,NO_DRILL_BAR,DRILL_TYPE,DRILL_TIME,";
-            sql +="NO_SHAFT_USED,CAST_TYPE,CLOSURE_MODE,MUDGUN_HOLD_TIME,MAX_PLUGIN_PRESSURE,CLAY_QUANTITY,PRESS_ON_FORCE,";
-            sql += "CLAY_LEAKAGE,NO_CINDER_GRANULATION,GRANULATION_PERC,CINDER_THEORETICAL_WT,TROUGH_NO,SPLACING_WETNESS_TIME,";
-            sql += "LEN_DRILL_HAMMER,HM_WEIGHT ,SLAG_RETENTION,MNOZZLE_BEF_CLOSING,MNOZZLE_AFT_CLOSING,MAIN_RUNNER_HM_AMOUNT,";
-            sql += "TILT_RUNNER_HM_AMOUNT,CASTING_RATIO ,WET_DRILL,DRILL_MC_AIR_PRESSURE,MUDGUN_NOZZLE,CLAY_WETNESS,MG_PRESSURE ,";
-            sql += "NO_OF_BAGS,TAPHOLE_BEHAVIOUR,INIT_PLUGIN_PRESSURE,FINAL_PLUGIN_PRESSURE,COLOR_FUME_DRILLING,PLUGIN_PRESSURE,";
-            sql += "SI ,HMRTYPE_SI ,HMREMARKS_SI,S ,HMRTYPE_S,HMREMARKS_S,LOT_NO,NO_DRILL_BIT,DRILL_BAR_FLAG,BACK_FIRE,SLAG_RATE,TOTAL_SLAG";
-            sql += " from demo.t_cast_details where  fur_name = 'I' AND date_time = '17-JUL-2025' and CAST_END_TIME is null";
-            sql += "Union";
-            sql += "select DATE_TIME,FUR_NAME,SHIFT,CAST_NO,CH_READY_TIME,CAST_ST_TIME,SLAG_START_TIME,CAST_END_TIME,GUTKO,";
-            sql += " CAST_DURATION,SPEED,SLAG_TIME_RATIO,TAPHOLE_LENGTH,HM_TEMP,DRILL_DIA,MG_CLAY_USED,CAST_CLAY_COND,DELAY_REASON,";
-            sql += "NO_TLC,NO_OT,NO_LANCING_PIPE,SLAG_LADLE,HM_AFTER_SLAG,HM_BEFORE_SLAG,NO_DRILL_BAR,DRILL_TYPE,DRILL_TIME,";
-            sql += "NO_SHAFT_USED,CAST_TYPE,CLOSURE_MODE,MUDGUN_HOLD_TIME,MAX_PLUGIN_PRESSURE,CLAY_QUANTITY,PRESS_ON_FORCE,";
-            sql += "CLAY_LEAKAGE,NO_CINDER_GRANULATION,GRANULATION_PERC,CINDER_THEORETICAL_WT,TROUGH_NO,SPLACING_WETNESS_TIME,";
-            sql += "LEN_DRILL_HAMMER,HM_WEIGHT ,SLAG_RETENTION,MNOZZLE_BEF_CLOSING,MNOZZLE_AFT_CLOSING,MAIN_RUNNER_HM_AMOUNT,";
-            sql += "TILT_RUNNER_HM_AMOUNT,CASTING_RATIO ,WET_DRILL,DRILL_MC_AIR_PRESSURE,MUDGUN_NOZZLE,CLAY_WETNESS,MG_PRESSURE,";
-            sql += "NO_OF_BAGS,TAPHOLE_BEHAVIOUR,INIT_PLUGIN_PRESSURE,FINAL_PLUGIN_PRESSURE,COLOR_FUME_DRILLING,PLUGIN_PRESSURE,SI,";
-            sql += "HMRTYPE_SI ,HMREMARKS_SI,S ,HMRTYPE_S,HMREMARKS_S,LOT_NO,NO_DRILL_BIT,DRILL_BAR_FLAG,BACK_FIRE,SLAG_RATE,TOTAL_SLAG";
-            sql += "from demo.t_cast_details where date_time = '18-JUL-2025' and fur_name = 'I'";
+ <div class="form-section">
+            <div class="section-title">Tap Hole Details</div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cast No</th>
+                            <th>Trough No</th>
+                            <th>Cast Start</th>
+                            <th>Cast End</th>
+                            <th>Gutko</th>
+                            <th>Cast Duration</th>
+                            <th>Casting Rate(t/min)</th>
+                            <th>TLC</th>
+                            <th>OT</th>
+                            <th>Cast Ready Time</th>
+                            <th>Splashing/Wetness Time</th>
+                            <th>Cast Type</th>
+                            <th>Clay Condition</th>
+                            <th>Taphole Behaviour at End Cast</th>                            
+                        </tr>
+                    </thead>                  
 
+                </table>
+            </div>
+            <div class="section-title">Hot Metal Details</div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>HMT Before Slag</th>
+                            <th>HMT After Slag</th>
+                            <th>Final HM Temp</th>
+                            <th>HM Weight</th>                            
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
