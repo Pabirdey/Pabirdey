@@ -30,6 +30,7 @@
             margin-bottom: 10px;
             font-weight: bold;
             border-radius: 4px;
+            text-align:center;
         }
 
         .form-control-sm {
@@ -37,7 +38,7 @@
         }
         th{
             font-family:Courier New, Courier, monospace;
-        }
+        }        
     </style>
 </head>
 <body>
@@ -61,7 +62,7 @@
             </select>
         </div>
         <div class="form-section">
-            <div class="row">                
+            <div class="row g-0">                
                 <div class="col-md-8">
                     <div class="section-title">Tap Hole Details</div>
                     <div class="table-responsive">
@@ -95,10 +96,10 @@
                         <table class="table table-bordered table-sm text-center align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th>HMT Before Slag</th>
-                                    <th>HMT After Slag</th>
-                                    <th>Final HM Temp</th>
-                                    <th>HM Weight</th>
+                                    <th class="Long_Heading">HMT Before Slag</th>
+                                    <th class="Long_Heading">HMT After Slag</th>
+                                    <th class="Long_Heading">Final HM Temp</th>
+                                    <th class="Long_Heading">HM Weight</th>
                                 </tr>
                             </thead>
                             <tbody>                               
@@ -110,7 +111,7 @@
         </div>
         <!-- Drilling Details -->
         <div class="form-section">
-            <div class="row">
+            <div class="row g-0">
                 <div class="col-md-6">
                     <div class="section-title">Drilling Details</div>
                     <table class="table table-bordered table-sm text-center align-middle">
@@ -184,7 +185,7 @@
         </div>
         <!--Other Details-->
         <div class="form-section">
-            <div class="row">
+            <div class="row g-0">
                 <div class="col-md-4">
                     <div class="section-title">Other Details</div>
                     <table class="table table-bordered table-sm text-center align-middle">
@@ -243,52 +244,4 @@
     </div>
 </body>
 </html>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $.ajax({
-            url: '@Url.Action("Get_CastDetails", "CastHouse")',
-            type: 'GET',
-            success: function (result) {
-                var tableBody = "";
-                for (var i = 0; i < result.length; i++) {
-                    tableBody += "<tr>";
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CAST_NO}' readonly/></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TroughNo}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CastStart}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Duration}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Rate}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TLC}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].OT}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Ready}' /></td>`;
-                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Wetness}' /></td>`;
-                    tableBody += `<td><select class='form-select form-select-sm'>
-                        <option ${data[i].CastType === 'Normal' ? 'selected' : ''}>Normal</option>
-                        <option ${data[i].CastType === 'Emergency' ? 'selected' : ''}>Emergency</option>
-                        <option ${data[i].CastType === 'Test' ? 'selected' : ''}>Test</option>
-                        </select></td>`;
 
-                    tableBody += `<td><select class='form-select form-select-sm'>
-                                    <option ${data[i].Clay === 'Good' ? 'selected' : ''}>Good</option>
-                                    <option ${data[i].Clay === 'Soft' ? 'selected' : ''}>Soft</option>
-                                    <option ${data[i].Clay === 'Cracked' ? 'selected' : ''}>Cracked</option>
-                                  </select></td>`;
-
-                    tableBody += `<td><select class='form-select form-select-sm'>
-                                    <option ${data[i].Taphole === 'Normal' ? 'selected' : ''}>Normal</option>
-                                    <option ${data[i].Taphole === 'Blocked' ? 'selected' : ''}>Blocked</option>
-                                    <option ${data[i].Taphole === 'Leakage' ? 'selected' : ''}>Leakage</option>
-                                  </select></td>`;
-
-                    tableBody += "</tr>";
-                }
-
-                $("#CastDetailsBody tbody").html(tableBody);
-            },
-            error: function () {
-                alert("Failed to load data.");
-            }
-        });
-    });
-
-
-    </script>
