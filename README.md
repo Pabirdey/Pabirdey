@@ -1,12 +1,49 @@
-public JsonResult Get_TAP_Hole_Metal_Details()
-        {
-            string sql = string.Empty;
-            DataTable dt = new DataTable();
-            sql ="SELECT CAST_NO,TROUGH_NO,CAST_ST_TIME,CAST_END_TIME,GUTKO,CAST_DURATION,SPEED,NO_TLC,NO_OT,";
-            sql+="CH_READY_TIME,SPLACING_WETNESS_TIME,CAST_TYPE,CAST_CLAY_COND,TAPHOLE_BEHAVIOUR,HM_BEFORE_SLAG,";
-            sql+="HM_AFTER_SLAG,HM_TEMP,HM_WEIGHT From Demo.T_CAST_DETAILS WHERE DATE_TIME='"+ +"' AND FUR_NAME='"+ +"';            
-            dt = DAL.GetRecords(sql);
-            sql = string.Empty;
-            string result = JsonConvert.SerializeObject(dt, Formatting.None);
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("Get_CastDetails", "CastHouse")',
+            type: 'GET',
+            success: function (result) {
+                var tableBody = "";
+                for (var i = 0; i < result.length; i++) {
+                    tableBody += "<tr>";
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CAST_NO}' readonly/></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TroughNo}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].CastStart}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Duration}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Rate}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].TLC}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].OT}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Ready}' /></td>`;
+                    tableBody += `<td><input class='form-control form-control-sm' value='${data[i].Wetness}' /></td>`;
+                    tableBody += `<td><select class='form-select form-select-sm'>
+                        <option ${data[i].CastType === 'Normal' ? 'selected' : ''}>Normal</option>
+                        <option ${data[i].CastType === 'Emergency' ? 'selected' : ''}>Emergency</option>
+                        <option ${data[i].CastType === 'Test' ? 'selected' : ''}>Test</option>
+                        </select></td>`;
+
+                    tableBody += `<td><select class='form-select form-select-sm'>
+                                    <option ${data[i].Clay === 'Good' ? 'selected' : ''}>Good</option>
+                                    <option ${data[i].Clay === 'Soft' ? 'selected' : ''}>Soft</option>
+                                    <option ${data[i].Clay === 'Cracked' ? 'selected' : ''}>Cracked</option>
+                                  </select></td>`;
+
+                    tableBody += `<td><select class='form-select form-select-sm'>
+                                    <option ${data[i].Taphole === 'Normal' ? 'selected' : ''}>Normal</option>
+                                    <option ${data[i].Taphole === 'Blocked' ? 'selected' : ''}>Blocked</option>
+                                    <option ${data[i].Taphole === 'Leakage' ? 'selected' : ''}>Leakage</option>
+                                  </select></td>`;
+
+                    tableBody += "</tr>";
+                }
+
+                $("#CastDetailsBody tbody").html(tableBody);
+            },
+            error: function () {
+                alert("Failed to load data.");
+            }
+        });
+    });
+
+
+    </script>
