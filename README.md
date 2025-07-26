@@ -1,10 +1,13 @@
-$(document).ready(function () {
+<script>
+    $(document).ready(function () {
         $('#date-daily1').datepicker({
             format: 'yyyy-mm-dd',
             autoclose: true,
             todayHighlight: true
         }).datepicker('update', new Date());
     });
+</script>
+
 
     <div class="mb-2">
     <label for="date-daily1">Date:</label>
