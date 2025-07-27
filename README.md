@@ -1,75 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Beautiful Table</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: linear-gradient(to right, #dbeafe, #f0f9ff);
-      font-family: 'Segoe UI', sans-serif;
-      padding: 30px;
-    }
+<style>
+  .pretty-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
 
-    .beautiful-table th {
-      background: linear-gradient(to right, #6366f1, #60a5fa);
-      color: white;
-      text-align: center;
-    }
+  .pretty-table th, .pretty-table td {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
 
-    .beautiful-table td {
-      background-color: #ffffff;
-      text-align: center;
-    }
+  .pretty-table thead {
+    background-color: #4CAF50;
+    color: white;
+  }
 
-    .beautiful-table tr:hover {
-      background-color: #e0f2fe;
-      transition: 0.3s;
-    }
+  .pretty-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
 
-    .card {
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
-<body>
+  .pretty-table tbody tr:hover {
+    background-color: #e6f7ff;
+  }
+</style>
 
-  <div class="card p-4">
-    <h4 class="mb-4 text-primary text-center">Employee Data</h4>
-    <div class="table-responsive">
-      <table class="table beautiful-table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Department</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>Ravi Kumar</td>
-            <td>IT</td>
-            <td><span class="badge bg-success">Active</span></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Priya Singh</td>
-            <td>HR</td>
-            <td><span class="badge bg-warning text-dark">Pending</span></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Amit Verma</td>
-            <td>Finance</td>
-            <td><span class="badge bg-danger">Blocked</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</body>
-</html>
+<table class="pretty-table">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Price</th>
+      <th>Available</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pen</td>
+      <td>$1.00</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Notebook</td>
+      <td>$3.50</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
