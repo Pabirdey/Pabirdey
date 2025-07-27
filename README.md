@@ -1,49 +1,19 @@
-.section-title {
-      font-weight: bold;
-      font-size: 18px;
-      padding: 10px;
-      background-color: #003366;
-      color: white;
-      border-radius: 5px 5px 0 0;
-      margin-bottom: 0;
-    }
-
-    .custom-table th,
-    .custom-table td {
-      vertical-align: middle;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .custom-table th {
-      background-color: #f8f9fa;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .custom-table td input,
-    .custom-table td select {
-      width: 100%;
-      text-align: center;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 4px;
-      font-size: 13px;
-    }
-
-    .custom-table {
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .scrollable-table {
-      max-height: 350px;
-      overflow-x: auto;
-    }
-
-    body {
-      padding: 20px;
-      background-color: #f0f2f5;
-      font-family: 'Segoe UI', sans-serif;
-    }
+ sql = "SELECT Decode(CAST_NO,NULL,' ',CAST_NO)CAST_NO,Decode(TROUGH_NO,NULL,' ',TROUGH_NO)TROUGH_NO,";
+            sql += "DECODE(TO_CHAR(CAST_ST_TIME,'HH24:MI'),NULL,' ',TO_CHAR(CAST_ST_TIME,'HH24:MI'))CAST_ST_TIME,DECODE(TO_CHAR(CAST_END_TIME,'HH24:MI'),NULL,' ',TO_CHAR(CAST_END_TIME,'HH24:MI'))CAST_END_TIME,";
+            sql += "Decode(GUTKO,NULL,' ',GUTKO)GUTKO,Decode(CAST_DURATION,NULL,' ',CAST_DURATION)CAST_DURATION,";
+            sql += "Decode(SPEED,NULL,' ',SPEED)SPEED,Decode(NO_TLC,NULL,' ',NO_TLC)NO_TLC,Decode(NO_OT,NULL,' ',NO_OT)NO_OT,";
+            sql += "Decode(CH_READY_TIME,NULL,' ',CH_READY_TIME)CH_READY_TIME,Decode(SPLACING_WETNESS_TIME,NULL,' ',SPLACING_WETNESS_TIME)SPLACING_WETNESS_TIME,";
+            sql += "Decode(CAST_TYPE,NULL,' ',CAST_TYPE)CAST_TYPE,Decode(CAST_CLAY_COND,NULL,' ',CAST_CLAY_COND)CAST_CLAY_COND,";
+            sql += "Decode(TAPHOLE_BEHAVIOUR,NULL,' ',TAPHOLE_BEHAVIOUR)TAPHOLE_BEHAVIOUR,Decode(HM_BEFORE_SLAG,NULL,' ',HM_BEFORE_SLAG)HM_BEFORE_SLAG,";
+            sql += "Decode(HM_AFTER_SLAG,NULL,' ',HM_AFTER_SLAG)HM_AFTER_SLAG,Decode(HM_TEMP,NULL,' ',HM_TEMP)HM_TEMP,Decode(HM_WEIGHT,NULL,' ',HM_WEIGHT)HM_WEIGHT FROM ";
+            sql += "Demo.T_CAST_DETAILS WHERE DATE_TIME=TO_DATE('" + Fdate + "', 'DD-MM-YYYY')-1 AND FUR_NAME='" + Fur_Name + "'";
+            sql += "UNION";
+            sql = "SELECT Decode(CAST_NO,NULL,' ',CAST_NO)CAST_NO,Decode(TROUGH_NO,NULL,' ',TROUGH_NO)TROUGH_NO,";
+            sql += "DECODE(TO_CHAR(CAST_ST_TIME,'HH24:MI'),NULL,' ',TO_CHAR(CAST_ST_TIME,'HH24:MI'))CAST_ST_TIME,DECODE(TO_CHAR(CAST_END_TIME,'HH24:MI'),NULL,' ',TO_CHAR(CAST_END_TIME,'HH24:MI'))CAST_END_TIME,";
+            sql += "Decode(GUTKO,NULL,' ',GUTKO)GUTKO,Decode(CAST_DURATION,NULL,' ',CAST_DURATION)CAST_DURATION,";
+            sql += "Decode(SPEED,NULL,' ',SPEED)SPEED,Decode(NO_TLC,NULL,' ',NO_TLC)NO_TLC,Decode(NO_OT,NULL,' ',NO_OT)NO_OT,";
+            sql += "Decode(CH_READY_TIME,NULL,' ',CH_READY_TIME)CH_READY_TIME,Decode(SPLACING_WETNESS_TIME,NULL,' ',SPLACING_WETNESS_TIME)SPLACING_WETNESS_TIME,";
+            sql += "Decode(CAST_TYPE,NULL,' ',CAST_TYPE)CAST_TYPE,Decode(CAST_CLAY_COND,NULL,' ',CAST_CLAY_COND)CAST_CLAY_COND,";
+            sql += "Decode(TAPHOLE_BEHAVIOUR,NULL,' ',TAPHOLE_BEHAVIOUR)TAPHOLE_BEHAVIOUR,Decode(HM_BEFORE_SLAG,NULL,' ',HM_BEFORE_SLAG)HM_BEFORE_SLAG,";
+            sql += "Decode(HM_AFTER_SLAG,NULL,' ',HM_AFTER_SLAG)HM_AFTER_SLAG,Decode(HM_TEMP,NULL,' ',HM_TEMP)HM_TEMP,Decode(HM_WEIGHT,NULL,' ',HM_WEIGHT)HM_WEIGHT FROM ";
+            sql += "Demo.T_CAST_DETAILS WHERE DATE_TIME=TO_DATE('" + Fdate + "', 'DD-MM-YYYY')  AND FUR_NAME='" + Fur_Name + "'";
