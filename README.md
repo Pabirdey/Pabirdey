@@ -1,45 +1,75 @@
-function Display_Tap_Hole_Details() {
-    debugger;
-    let date = "26-JUL-2025";
-    let Fur_name = "C";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Beautiful Table</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #dbeafe, #f0f9ff);
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+    }
 
-    $.ajax({
-        url: '@Url.Action("Get_TAP_Hole_Metal_Details", "CastHouse")',
-        type: 'GET',
-        data: { date: date, Fur_Name: Fur_name },
-        success: function (result_Tap_Hole_Metal) {
-            debugger;
-            var parsedData = JSON.parse(result_Tap_Hole_Metal);
-            var tableBody = "";
+    .beautiful-table th {
+      background: linear-gradient(to right, #6366f1, #60a5fa);
+      color: white;
+      text-align: center;
+    }
 
-            for (var i = 0; i < parsedData.length; i++) {
-                tableBody += "<tr>";
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CAST_NO}' readonly/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].TROUGH_NO}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CAST_ST_TIME}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CAST_END_TIME}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].GUTKO}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CAST_DURATION}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].SPEED}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].NO_TLC}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].NO_OT}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CH_READY_TIME}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].SPLACING_WETNESS_TIME}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CAST_TYPE}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].CAST_CLAY_COND}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].TAPHOLE_BEHAVIOUR}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].HM_BEFORE_SLAG}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].HM_AFTER_SLAG}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].HM_TEMP}'/></td>`;
-                tableBody += `<td><input class='form-control form-control-sm' value='${parsedData[i].HM_WEIGHT}'/></td>`;
-                tableBody += "</tr>";
-            }
+    .beautiful-table td {
+      background-color: #ffffff;
+      text-align: center;
+    }
 
-            // FIXED: Don't use `tbody` again in selector
-            $("#TAP_Hot_Metal_Details").html(tableBody);
-        },
-        error: function () {
-            alert("Failed to load data.");
-        }
-    });
-}
+    .beautiful-table tr:hover {
+      background-color: #e0f2fe;
+      transition: 0.3s;
+    }
+
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card p-4">
+    <h4 class="mb-4 text-primary text-center">Employee Data</h4>
+    <div class="table-responsive">
+      <table class="table beautiful-table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Ravi Kumar</td>
+            <td>IT</td>
+            <td><span class="badge bg-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Priya Singh</td>
+            <td>HR</td>
+            <td><span class="badge bg-warning text-dark">Pending</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Amit Verma</td>
+            <td>Finance</td>
+            <td><span class="badge bg-danger">Blocked</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>
