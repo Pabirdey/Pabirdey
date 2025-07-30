@@ -1,7 +1,5 @@
- $('#lstFur').change(function () {
-                IsSelectedFur = $('#lstFur option:selected').val();
-                Display_Tap_Hole_Details(lsSelectedFDate, IsSelectedFur);
-                Display_Driling_Details(lsSelectedFDate, IsSelectedFur);
-                Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur);
-                Display_Other_Details(lsSelectedFDate, IsSelectedFur);
-            });
+sql = "SELECT DECODE(CAST_NO,NULL,' ',CAST_NO)CAST_NO,DECODE(MAIN_RUNNER_HM_AMOUNT,NULL,' ',MAIN_RUNNER_HM_AMOUNT)MAIN_RUNNER_HM_AMOUNT,DECODE(TILT_RUNNER_HM_AMOUNT,NULL,' ',TILT_RUNNER_HM_AMOUNT)TILT_RUNNER_HM_AMOUNT,DECODE(DELAY_REASON,NULL,' ',DELAY_REASON)DELAY_REASON FROM ";
+            sql += "Demo.T_CAST_DETAILS WHERE DATE_TIME=TO_DATE('" + Fdate + "', 'DD-MM-YYYY')-1  AND FUR_NAME='" + Fur + "'";
+            sql += "UNION";
+            sql = "SELECT DECODE(CAST_NO,NULL,' ',CAST_NO)CAST_NO,DECODE(MAIN_RUNNER_HM_AMOUNT,NULL,' ',MAIN_RUNNER_HM_AMOUNT)MAIN_RUNNER_HM_AMOUNT,DECODE(TILT_RUNNER_HM_AMOUNT,NULL,' ',TILT_RUNNER_HM_AMOUNT)TILT_RUNNER_HM_AMOUNT,DECODE(DELAY_REASON,NULL,' ',DELAY_REASON)DELAY_REASON FROM ";
+            sql += "Demo.T_CAST_DETAILS WHERE DATE_TIME=TO_DATE('" + Fdate + "', 'DD-MM-YYYY')  AND FUR_NAME='" + Fur + "'";
