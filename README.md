@@ -1,58 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Save Message Popup</title>
+    <meta charset="UTF-8">
+    <title>Save Data Popup</title>
     <style>
-        /* Basic Page Styling */
         body {
             font-family: Arial, sans-serif;
-            padding: 50px;
+            padding: 40px;
         }
 
-        /* Popup Message Style */
-        #popupMessage {
-            position: fixed;
-            top: -100px; /* Start above the screen */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #28a745;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: top 0.5s ease-in-out;
-            z-index: 1000;
-        }
-
-        /* Show class moves it down */
-        #popupMessage.show {
-            top: 30px;
-        }
-
-        button {
+        .save-button {
             padding: 10px 20px;
-            font-size: 16px;
+            border: 1px solid #999;
+            background-color: #f0f0f0;
             cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 20px;
+            background-color: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+            transition: width 0.1s linear;
+        }
+
+        .popup {
+            position: relative;
+            display: inline-block;
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            animation: slideDown 0.5s ease;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .popup .close-btn {
+            position: absolute;
+            top: 4px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
 
-    <button onclick="saveData()">Save Data</button>
+    <button class="save-button" onclick="saveData()">💾 Save Data</button>
 
-    <div id="popupMessage">Data saved successfully!</div>
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="popup" id="popup">
+        <span class="close-btn" onclick="closePopup()">❌</span>
+        Data saved successfully!
+    </div>
 
     <script>
         function saveData() {
-            // Simulate data saving logic here if needed
+            document.getElementById('progressBar').style.display = 'block';
+            let progressFill = document.getElementById('progressFill');
+            let popup = document.getElementById('popup');
+            let width = 0;
+            progressFill.style.width = '0%';
+            popup.style.display = 'none';
 
-            var popup = document.getElementById("popupMessage");
-            popup.classList.add("show");
+            let interval = setInterval(function () {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('popup').style.display = 'inline-block';
+                    document.getElementById('progressBar').style.display = 'none';
+                } else {
+                    width++;
+                    progressFill.style.width = width + '%';
+                }
+            }, 30); // Adjust speed here
+        }
 
-            // Hide the popup after 3 seconds
-            setTimeout(function () {
-                popup.classList.remove("show");
-            }, 3000);
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
         }
     </script>
 
