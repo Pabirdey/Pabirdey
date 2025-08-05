@@ -1,33 +1,15 @@
-<button type="button" class="btn btn-warning w-100" onclick="saveTapHoleData()">Save</button>
-    function saveTapHoleData() {
-                var allData = [];
-
-                // Loop through each row
-                var rows = document.querySelectorAll("#TAP_Hot_Metal_Details tbody tr");
-                rows.forEach(function (row) {
-                    var inputs = row.querySelectorAll("input");
-                    var rowData = {};
-
-                    inputs.forEach(function (input) {
-                        var name = input.name;
-                        var value = input.value.trim();
-                        rowData[name] = value;
-                    });
-
-                    allData.push(rowData);
-                });
-
-                // Send to Controller
-                $.ajax({
-                    url: '/CastHouse/SaveTapHoleBulk',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(allData),
-                    success: function () {
-                        alert("✅ Data saved successfully!");
-                    },
-                    error: function () {
-                        alert("❌ Save failed!");
-                    }
-                });
-            }
+<div class="section_Exception-title">Carbon Paste Inj</div>
+                                        <div class="table-responsive scrollable-table" style="max-height:255px;">
+                                            <table class="table table-bordered table-sm text-center align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="Heading_Small">Date Time</th>
+                                                        <th class="Heading_Small">Shift</th>
+                                                        <th class="Heading_Small">Below Tuyere</th>
+                                                        <th class="Heading_Small">No of Drum</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="carbon_paste_inj"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
