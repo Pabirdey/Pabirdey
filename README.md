@@ -1,13 +1,15 @@
 <div class="col-md-5">
-    <div class="border rounded p-3 shadow-sm">
-        <!-- Exception Cast Heading + Save Button -->
+
+    <!-- ⬛ Exception Cast Box -->
+    <div class="border rounded p-3 shadow-sm mb-4">
+        <!-- Heading + Save Button -->
         <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="section_Exception-title">Exception Cast</div>
             <button type="button" class="btn btn-success btn-sm" onclick="saveExceptionCast()">Save</button>
         </div>
 
-        <!-- Exception Cast Table -->
-        <div class="table-responsive scrollable-table mb-4" style="max-height:255px;">
+        <!-- Table -->
+        <div class="table-responsive scrollable-table" style="max-height:255px;">
             <table class="table table-bordered table-sm text-center align-middle">
                 <thead>
                     <tr>
@@ -24,14 +26,17 @@
                 <tbody id="exception_cast"></tbody>
             </table>
         </div>
+    </div>
 
-        <!-- Carbon Paste Inj Heading + Save Button -->
+    <!-- ⬛ Carbon Paste Inj Box -->
+    <div class="border rounded p-3 shadow-sm">
+        <!-- Heading + Save Button -->
         <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="section_Exception-title">Carbon Paste Inj</div>
             <button type="button" class="btn btn-success btn-sm" onclick="saveCarbonPaste()">Save</button>
         </div>
 
-        <!-- Carbon Paste Inj Table -->
+        <!-- Table -->
         <div class="table-responsive scrollable-table" style="max-height:255px;">
             <table class="table table-bordered table-sm text-center align-middle">
                 <thead>
@@ -46,4 +51,5 @@
             </table>
         </div>
     </div>
+
 </div>
