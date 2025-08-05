@@ -1,16 +1,17 @@
-<div class="col-md-2">
-    <!-- 🔲 Outer Border -->
-    <div class="border rounded p-2 shadow-sm">
-        
-        <!-- 🟦 Inner Box -->
-        <div class="border p-2 rounded shadow-lg">
-            <div class="mb-2">
-                <button type="button" class="btn btn-warning w-50" onclick="saveTapHoleData()">Save</button>
-            </div>
-            <div>
-                <button type="button" class="btn btn-primary w-50">HM Logistics</button>
-            </div>
-        </div>
-
-    </div>
-</div>
+  <div class="table-responsive scrollable-table" style="max-height:255px;">
+                                <table class="table table-bordered table-sm text-center align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th class="Heading_Tiny">ID No</th>
+                                            <th class="Heading_Tiny">Taphole No</th>
+                                            <th>Date Time</th>
+                                            <th>HH24</th>
+                                            <th>MM</th>
+                                            <th>Taphole Length</th>
+                                            <th>Clay Paused</th>
+                                            <th>Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exception_cast"></tbody>
+                                </table>
+                            </div>
