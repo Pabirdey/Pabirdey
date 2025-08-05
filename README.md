@@ -1,41 +1,31 @@
-<script>
-function saveTapHoleData() {
-    var rows = document.querySelectorAll("#tap_hole_table tbody tr");
-    var data = [];
+[HttpPost]
+public JsonResult SaveData(List<Dictionary<string, string>> data)
+{
+    string connectionString = "your_connection_string";
 
-    rows.forEach(function(row) {
-        var rowData = {};
-        var inputs = row.querySelectorAll("input, select");
+    using (OracleConnection con = new OracleConnection(connectionString))
+    {
+        con.Open();
 
-        inputs.forEach(function(input) {
-            rowData[input.name] = input.value;
-        });
+        foreach (var row in data)
+        {
+            using (OracleCommand cmd = new OracleCommand())
+            {
+                cmd.Connection = con;
+                cmd.CommandText = @"INSERT INTO TAP_HOLE_TABLE
+                (CAST_NO, TROUGH_NO, CAST_ST_TIME, CAST_END_TIME, CAST_CLAY_COND)
+                VALUES (:CAST_NO, :TROUGH_NO, :CAST_ST_TIME, :CAST_END_TIME, :CAST_CLAY_COND)";
 
-        data.push(rowData);
-    });
+                cmd.Parameters.Add(":CAST_NO", row["CAST_NO"]);
+                cmd.Parameters.Add(":TROUGH_NO", row["TROUGH_NO"]);
+                cmd.Parameters.Add(":CAST_ST_TIME", row["CAST_ST_TIME"]);
+                cmd.Parameters.Add(":CAST_END_TIME", row["CAST_END_TIME"]);
+                cmd.Parameters.Add(":CAST_CLAY_COND", row["CAST_CLAY_COND"]);
 
-    // Get date and furnace values
-    var selectedDate = document.getElementById("selectedDate").value;
-    var selectedFurnace = document.getElementById("selectedFurnace").value;
-
-    // Create one object to send
-    var postData = {
-        date: selectedDate,
-        furnace: selectedFurnace,
-        rows: data
-    };
-
-    $.ajax({
-        url: '/CastHouse/SaveData', // Your controller
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(postData),
-        success: function (res) {
-            alert("Saved successfully!");
-        },
-        error: function () {
-            alert("Save failed.");
+                cmd.ExecuteNonQuery();
+            }
         }
-    });
+    }
+
+    return Json("OK");
 }
-</script>
