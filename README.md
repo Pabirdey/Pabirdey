@@ -1,93 +1,72 @@
-[HttpPost]
-public JsonResult SaveCarbonPasteData(string jsonData, string date, string source)
-{
-    try
-    {
-        var dataList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<dynamic>>(jsonData);
+function SaveCastHouseData() {
+            debugger;
+            var rows = document.querySelectorAll("#TAP_Hot_Metal_Details tbody tr");
+            var CastHouseData = [];
+            rows.forEach(function(row) {
+                var rowData = {};
+                var inputs = row.querySelectorAll("input, select");
+                inputs.forEach(function(input) {
+                    rowData[input.name] = input.value;
+                });
 
-        string connectionString = "User Id=your_user;Password=your_password;Data Source=your_datasource";
-
-        using (OracleConnection conn = new OracleConnection(connectionString))
-        {
-            conn.Open();
-
-            foreach (var row in dataList)
-            {
-                string dateTime = row.DateTime.ToString();
-                string shift = row.Shift.ToString();
-                string belowTuyere = row.BelowTuyere.ToString();
-                string noOfDrum = row.NoOfDrum.ToString();
-
-                // Sample upsert logic, you can modify it to use 'date' and 'source' if required
-                string checkSql = @"SELECT COUNT(*) FROM CARBON_PASTE_INJ 
-                                    WHERE DATETIME = TO_DATE(:DateTime, 'YYYY-MM-DD HH24:MI:SS') 
-                                    AND SHIFT = :Shift
-                                    AND SOURCE = :Source
-                                    AND ENTRY_DATE = TO_DATE(:EntryDate, 'YYYY-MM-DD')";
-
-                using (OracleCommand checkCmd = new OracleCommand(checkSql, conn))
-                {
-                    checkCmd.Parameters.Add(":DateTime", dateTime);
-                    checkCmd.Parameters.Add(":Shift", shift);
-                    checkCmd.Parameters.Add(":Source", source);
-                    checkCmd.Parameters.Add(":EntryDate", date);
-
-                    int count = Convert.ToInt32(checkCmd.ExecuteScalar());
-
-                    if (count > 0)
-                    {
-                        string updateSql = @"UPDATE CARBON_PASTE_INJ SET 
-                                                BELOW_TUYERE = :BelowTuyere,
-                                                NO_OF_DRUM = :NoOfDrum
-                                             WHERE 
-                                                DATETIME = TO_DATE(:DateTime, 'YYYY-MM-DD HH24:MI:SS') 
-                                                AND SHIFT = :Shift
-                                                AND SOURCE = :Source
-                                                AND ENTRY_DATE = TO_DATE(:EntryDate, 'YYYY-MM-DD')";
-
-                        using (OracleCommand updateCmd = new OracleCommand(updateSql, conn))
-                        {
-                            updateCmd.Parameters.Add(":BelowTuyere", belowTuyere);
-                            updateCmd.Parameters.Add(":NoOfDrum", noOfDrum);
-                            updateCmd.Parameters.Add(":DateTime", dateTime);
-                            updateCmd.Parameters.Add(":Shift", shift);
-                            updateCmd.Parameters.Add(":Source", source);
-                            updateCmd.Parameters.Add(":EntryDate", date);
-
-                            updateCmd.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        string insertSql = @"INSERT INTO CARBON_PASTE_INJ (
-                                                DATETIME, SHIFT, BELOW_TUYERE, NO_OF_DRUM, SOURCE, ENTRY_DATE
-                                             ) VALUES (
-                                                TO_DATE(:DateTime, 'YYYY-MM-DD HH24:MI:SS'),
-                                                :Shift, :BelowTuyere, :NoOfDrum, :Source, TO_DATE(:EntryDate, 'YYYY-MM-DD')
-                                             )";
-
-                        using (OracleCommand insertCmd = new OracleCommand(insertSql, conn))
-                        {
-                            insertCmd.Parameters.Add(":DateTime", dateTime);
-                            insertCmd.Parameters.Add(":Shift", shift);
-                            insertCmd.Parameters.Add(":BelowTuyere", belowTuyere);
-                            insertCmd.Parameters.Add(":NoOfDrum", noOfDrum);
-                            insertCmd.Parameters.Add(":Source", source);
-                            insertCmd.Parameters.Add(":EntryDate", date);
-
-                            insertCmd.ExecuteNonQuery();
-                        }
-                    }
+                CastHouseData.push(rowData);
+                console.log(CastHouseData);
+            });            
+            //var selectedDate = document.getElementById("selectedDate").value;
+            //var selectedFurnace = document.getElementById("selectedFurnace").value;           
+            $.ajax({
+                url: '/CastHouse/SaveCastHouseData',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(CastHouseData),
+                success: function (res) {
+                    alert("Saved successfully!");
+                },
+                error: function () {
+                    alert("Save failed.");
                 }
-            }
-
-            conn.Close();
+            });
         }
 
-        return Json(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message });
-    }
-}
+        function Display_Tap_Hole_Details(lsSelectedFDate,IsSelectedFur) {                            
+                    $.ajax({
+                            url: '@Url.Action("Get_TAP_Hole_Metal_Details", "CastHouse")',
+                            type: 'GET',
+                            data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                            success: function (result_Tap_Hole_Metal) {
+                             var parsedData = JSON.parse(result_Tap_Hole_Metal);
+                            var tableBody = "";
+                            for (var i = 0; i < parsedData.length; i++) {                                
+                                tableBody += "<tr>";
+                                tableBody += `<td><input name="CAST_NO" class='form-control form-control-lg' value='${parsedData[i].CAST_NO}' readonly/></td>`;
+                                tableBody += `<td><input name="TROUGH_NO" class='form-control form-control-lg' value='${parsedData[i].TROUGH_NO}' readonly/></td>`;
+                                tableBody += `<td><input name="CAST_ST_TIME" class='form-control form-control-lg' value='${parsedData[i].CAST_ST_TIME}' readonly/></td>`;
+                                tableBody += `<td><input name="CAST_END_TIME" class='form-control form-control-lg' value='${parsedData[i].CAST_END_TIME}' readonly/></td>`;
+                                tableBody += `<td><input name="GUTKO" class='form-control form-control-lg' value='${parsedData[i].GUTKO}' readonly/></td>`;
+                                tableBody += `<td><input name="CAST_DURATION" class='form-control form-control-lg' value='${parsedData[i].CAST_DURATION}' readonly/></td>`;
+                                tableBody += `<td><input name="SPEED" class='form-control form-control-lg' value='${parsedData[i].SPEED}' readonly/></td>`;
+                                tableBody += `<td><input name="NO_TLC" class='form-control form-control-lg' value='${parsedData[i].NO_TLC}' readonly/></td>`;
+                                tableBody += `<td><input name="NO_OT" class='form-control form-control-lg' value='${parsedData[i].NO_OT}' readonly/></td>`;
+                                tableBody += `<td><input name="CH_READY_TIME" class='form-control form-control-lg' value='${parsedData[i].CH_READY_TIME}'/></td>`;
+                                tableBody += `<td><input name="SPLACING_WETNESS_TIME" class='form-control form-control-lg' value='${parsedData[i].SPLACING_WETNESS_TIME}'/></td>`;
+                                tableBody += `<td><select name="CAST_TYPE" class='form-select form-select-lg'><option ${parsedData[i].CAST_TYPE === 'DRY' ? 'selected' : ''}>DRY</option><option ${parsedData[i].CAST_TYPE === 'NOT DRY' ? 'selected' : ''}>NOT DRY</option></select></td>`;
+                                tableBody += `<td>
+                                                <select name="CAST_CLAY_COND" class ='form-select form-select-md'>
+                                                <option ${!parsedData[i].CAST_CLAY_COND ? 'selected' : ''} value=""></option>
+                                                <option ${parsedData[i].CAST_CLAY_COND === 'WET' ? 'selected' : ''}>WET</option>
+                                                <option ${parsedData[i].CAST_CLAY_COND === 'DRY' ? 'selected' : ''}>DRY</option>
+                                                <option ${parsedData[i].CAST_CLAY_COND === 'EXCESS WET' ? 'selected' : ''}>EXCESS WET</option>
+                                                <option ${parsedData[i].CAST_CLAY_COND === 'BLEEDING' ? 'selected' : ''}>BLEEDING</option>
+                                                </select>
+                                              </td>`;
+                                tableBody += `<td><select name="TAPHOLE_BEHAVIOUR" class='form-select form-select-lg'><option ${parsedData[i].TAPHOLE_BEHAVIOUR === 'WIDE' ? 'selected' : ''}>WIDE</option><option ${parsedData[i].TAPHOLE_BEHAVIOUR === 'NORMAL' ? 'selected' : ''}>NORMAL</option><option ${parsedData[i].TAPHOLE_BEHAVIOUR === 'WIDE+COKE TROUBLE' ? 'selected' : ''}>WIDE+COKE TROUBLE</option><option ${parsedData[i].TAPHOLE_BEHAVIOUR === 'NORMAL+COKE TROUBLE' ? 'selected' : 'NORMAL+COKE TROUBLE'}></option></select></td>`;
+                                tableBody += `<td><input name="HM_BEFORE_SLAG" class='form-control form-control-lg' value='${parsedData[i].HM_BEFORE_SLAG}'/></td>`;
+                                tableBody += `<td><input name="HM_AFTER_SLAG" class='form-control form-control-lg' value='${parsedData[i].HM_AFTER_SLAG}'/></td>`;
+                                tableBody += `<td><input name="HM_TEMP" class='form-control form-control-lg' value='${parsedData[i].HM_TEMP}'/></td>`;
+                                tableBody += `<td><input name="HM_WEIGHT" class='form-control form-control-lg' value='${parsedData[i].HM_WEIGHT}' readonly/></td>`;
+                                tableBody += "</tr>";
+                                }
+                            $("#TAP_Hot_Metal_Details").html(tableBody);
+                         },
+                     });
+            }
