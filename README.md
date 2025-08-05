@@ -1,55 +1,10 @@
-<div class="col-md-5">
-
-    <!-- ⬛ Exception Cast Box -->
-    <div class="border rounded p-3 shadow-sm mb-4">
-        <!-- Heading + Save Button -->
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="section_Exception-title">Exception Cast</div>
-            <button type="button" class="btn btn-success btn-sm" onclick="saveExceptionCast()">Save</button>
-        </div>
-
-        <!-- Table -->
-        <div class="table-responsive scrollable-table" style="max-height:255px;">
-            <table class="table table-bordered table-sm text-center align-middle">
-                <thead>
-                    <tr>
-                        <th class="Heading_Tiny">ID No</th>
-                        <th class="Heading_Tiny">Taphole No</th>
-                        <th>Date Time</th>
-                        <th>HH24</th>
-                        <th>MM</th>
-                        <th>Taphole Length</th>
-                        <th>Clay Paused</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody id="exception_cast"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ⬛ Carbon Paste Inj Box -->
-    <div class="border rounded p-3 shadow-sm">
-        <!-- Heading + Save Button -->
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="section_Exception-title">Carbon Paste Inj</div>
-            <button type="button" class="btn btn-success btn-sm" onclick="saveCarbonPaste()">Save</button>
-        </div>
-
-        <!-- Table -->
-        <div class="table-responsive scrollable-table" style="max-height:255px;">
-            <table class="table table-bordered table-sm text-center align-middle">
-                <thead>
-                    <tr>
-                        <th class="Heading_Small">Date Time</th>
-                        <th class="Heading_Small">Shift</th>
-                        <th class="Heading_Small">Below Tuyere</th>
-                        <th class="Heading_Small">No of Drum</th>
-                    </tr>
-                </thead>
-                <tbody id="carbon_paste_inj"></tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
+ <div class="col-md-2">
+                        <div class="border p-2 rounded shadow-lg">
+                            <div class="mb-2">                               
+                                <button type="button" class="btn btn-warning w-50" onclick="saveTapHoleData()">Save</button>
+                            </div>
+                            <div>
+                                 <button type="button" class="btn btn-primary w-50">HM Logistics</button>
+                            </div>
+                        </div>
+                    </div>
