@@ -1,51 +1,41 @@
-[HttpPost]
-public JsonResult SaveCastHouseData(List<Dictionary<string, string>> data, string Fdate, string Fur)
-{
-    try
-    {
-        using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            conn.Open();
+ function SaveCastHouseData() {
+            debugger;
 
-            string updateSql = @"
-                UPDATE TEST.T_CAST_DETAILS SET  
-                    CH_READY_TIME = :CH_READY_TIME,
-                    SPLICING_WETNESS_TIME = :SPLICING_WETNESS_TIME,
-                    CAST_TYPE = :CAST_TYPE,
-                    CAST_CLAY_COND = :CAST_CLAY_COND,
-                    TAPHOLE_BEHAVIOUR = :TAPHOLE_BEHAVIOUR,
-                    HM_BEFORE_SLAG = :HM_BEFORE_SLAG,
-                    HM_AFTER_SLAG = :HM_AFTER_SLAG,
-                    HM_TEMP = :HM_TEMP
-                WHERE CAST_NO = :CAST_NO 
-                  AND DATE_TIME = :DATE_TIME  
-                  AND FUR_NAME = :FUR_NAME";
+            // Collect table rows data
+            var rows = document.querySelectorAll("#TAP_Hot_Metal_Details tbody tr");
+            var CastHouse = [];
+            rows.forEach(function (row) {
+                var rowData = {};
+                var inputs = row.querySelectorAll("input, select");
+                inputs.forEach(function (input) {
+                    rowData[input.name] = input.value;
+                });
+                CastHouse.push(rowData);
+            });
 
-            foreach (var row in data)
-            {
-                using (OracleCommand updateCmd = new OracleCommand(updateSql, conn))
-                {
-                    updateCmd.Parameters.Add(":CH_READY_TIME", row["CH_READY_TIME"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":SPLICING_WETNESS_TIME", row["SPLICING_WETNESS_TIME"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":CAST_TYPE", row["CAST_TYPE"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":CAST_CLAY_COND", row["CAST_CLAY_COND"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":TAPHOLE_BEHAVIOUR", row["TAPHOLE_BEHAVIOUR"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":HM_BEFORE_SLAG", row["HM_BEFORE_SLAG"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":HM_AFTER_SLAG", row["HM_AFTER_SLAG"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":HM_TEMP", row["HM_TEMP"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":CAST_NO", row["CAST_NO"]?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":DATE_TIME", Fdate?.Trim() ?? "");
-                    updateCmd.Parameters.Add(":FUR_NAME", Fur?.Trim() ?? "");
+            var selectedDate = document.getElementById("tbFDatePick").value;
+            var selectedFurnace = document.getElementById("lstFur").value;
 
-                    updateCmd.ExecuteNonQuery();
+            // Debug check
+            console.log(CastHouse);
+            console.log(selectedDate);
+            console.log(selectedFurnace);
+
+            // Send AJAX request
+            $.ajax({
+                url: '/CastHouse/SaveCastHouseData',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    data: CastHouse,   // matches the C# parameter name
+                    Fdate: selectedDate,
+                    Fur: selectedFurnace
+                }),
+                success: function (res) {
+                    alert("Saved successfully!");
+                },
+                error: function () {
+                    alert("Save failed.");
                 }
-            }
+            });
         }
-
-        return Json(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message });
-    }
-}
