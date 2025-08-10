@@ -2,7 +2,8 @@
             debugger;
 
             // Collect table rows data
-            var rows = document.querySelectorAll("#TAP_Hot_Metal_Details tbody tr");
+             var rows = document.querySelectorAll("#TAP_Hot_Metal_Details tbody tr,#Driling_Slag_Details tbody tr");
+            //var rows = document.querySelectorAll("#Driling_Slag_Details tbody tr");
             var CastHouse = [];
             rows.forEach(function (row) {
                 var rowData = {};
