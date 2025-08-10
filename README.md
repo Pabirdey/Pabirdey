@@ -1,1 +1,1 @@
-background-image: linear-gradient(90deg, #FF512F, #F09819);
+background-image: linear-gradient(90deg, #FFE259, #FFA751);
