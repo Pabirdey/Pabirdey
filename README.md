@@ -1,6 +1,6 @@
-                                      <select name="DRILL_TYPE" class="form-select form-select-lg">
-                                      <option value="" ${!parsedData[i].DRILL_TYPE ? 'selected' : ''}>NULL</option>
-                                      <option value="LANCING" ${parsedData[i].DRILL_TYPE === 'LANCING' ? 'selected' : ''}>LANCING</option>
-                                      <option value="DANGO DRILL" ${parsedData[i].DRILL_TYPE === 'DANGO DRILL' ? 'selected' : ''}>DANGO DRILL</option>
-                                      <option value="SELF" ${parsedData[i].DRILL_TYPE === 'SELF' ? 'selected' : ''}>SELF</option>
-                                    </select>
+ <select name="COLOR_FUME_DRILLING" class ='form-select form-select-lg'>
+                                                <option ${!parsedData[i].COLOR_FUME_DRILLING ? 'selected': ''} value=""></option>
+                                                <option ${parsedData[i].COLOR_FUME_DRILLING === 'BROWN' ? 'selected': ''}>BROWN</option>
+                                                <option ${parsedData[i].COLOR_FUME_DRILLING === 'WHITE' ? 'selected': ''}>WHITE</option>
+                                                <option ${parsedData[i].COLOR_FUME_DRILLING === 'OTHERS' ? 'selected': ''}>OTHERS</option>
+                                                </select>
