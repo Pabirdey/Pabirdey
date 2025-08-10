@@ -1,5 +1,6 @@
-<select name="CAST_TYPE" class="form-select form-select-lg">
-    <option value="" ${!data.CAST_TYPE ? 'selected' : ''}>NULL</option>
-    <option value="DRY" ${data.CAST_TYPE === 'DRY' ? 'selected' : ''}>DRY</option>
-    <option value="NOT DRY" ${data.CAST_TYPE === 'NOT DRY' ? 'selected' : ''}>NOT DRY</option>
-</select>
+ <select name="TAPHOLE_BEHAVIOUR" class='form-select form-select-lg'>
+                                <option ${data.TAPHOLE_BEHAVIOUR === 'WIDE' ? 'selected' : ''}>WIDE</option>
+                                <option ${data.TAPHOLE_BEHAVIOUR === 'NORMAL' ? 'selected' : ''}>NORMAL</option>
+                                <option ${data.TAPHOLE_BEHAVIOUR === 'WIDE+COKE TROUBLE' ? 'selected' : ''}>WIDE+COKE TROUBLE</option>
+                                <option ${data.TAPHOLE_BEHAVIOUR === 'NORMAL+COKE TROUBLE' ? 'selected' : ''}>NORMAL+COKE TROUBLE</option>
+                              </select>
