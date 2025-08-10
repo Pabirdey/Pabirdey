@@ -1,1 +1,1 @@
-text-shadow: rgba(13, 0, 77, 0.08) 0px 2px 4px, rgba(13, 0, 77, 0.08) 0px 3px 6px, rgba(13, 0, 77, 0.08) 0px 8px 16px;
+background: linear-gradient(90deg, #a8e063, #56ab2f);
