@@ -7,8 +7,15 @@ public JsonResult SaveCastHouseData(List<Dictionary<string, string>> data, strin
                     conn.Open();
 
                     string updateSql = @"
-                UPDATE TEST.T_CAST_DETAILS SET                    
-                                     
+                UPDATE TEST.T_CAST_DETAILS SET 
+                    CH_READY_TIME = :CH_READY_TIME, 
+                    SPLACING_WETNESS_TIME = :SPLACING_WETNESS_TIME,
+                    CAST_TYPE = :CAST_TYPE,
+                    CAST_CLAY_COND = :CAST_CLAY_COND,
+                    TAPHOLE_BEHAVIOUR = :TAPHOLE_BEHAVIOUR,
+                    HM_BEFORE_SLAG = :HM_BEFORE_SLAG,
+                    HM_AFTER_SLAG = :HM_AFTER_SLAG,
+                    HM_TEMP = :HM_TEMP,                         
                     DRILL_DIA = :DRILL_DIA,
                     DRILL_TYPE = :DRILL_TYPE,
                     DRILL_TIME = :DRILL_TIME,
@@ -35,7 +42,14 @@ public JsonResult SaveCastHouseData(List<Dictionary<string, string>> data, strin
                     {
                         using (OracleCommand cmd = new OracleCommand(updateSql, conn))
                         {
-                            
+                            cmd.Parameters.Add(":CH_READY_TIME", row["CH_READY_TIME"]);
+                            cmd.Parameters.Add(":SPLACING_WETNESS_TIME", row["SPLACING_WETNESS_TIME"]);
+                            cmd.Parameters.Add(":CAST_TYPE", row["CAST_TYPE"]);
+                            cmd.Parameters.Add(":CAST_CLAY_COND", row["CAST_CLAY_COND"]);
+                            cmd.Parameters.Add(":TAPHOLE_BEHAVIOUR", row["TAPHOLE_BEHAVIOUR"]);
+                            cmd.Parameters.Add(":HM_BEFORE_SLAG", row["HM_BEFORE_SLAG"]);
+                            cmd.Parameters.Add(":HM_AFTER_SLAG", row["HM_AFTER_SLAG"]);
+                            cmd.Parameters.Add(":HM_TEMP", row["HM_TEMP"]);
                             cmd.Parameters.Add(":DRILL_DIA", StringOrDBNull(row,"DRILL_DIA"));
                             cmd.Parameters.Add(":DRILL_TYPE", StringOrDBNull(row,"DRILL_TYPE"));
                             cmd.Parameters.Add(":DRILL_TIME", StringOrDBNull(row,"DRILL_TIME"));
