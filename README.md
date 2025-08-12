@@ -1,93 +1,57 @@
-public JsonResult SaveCastHouseData(List<Dictionary<string, string>> data, string Fdate, string Fur)
-{
-    try
-    {
-        using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            conn.Open();
-
-            string updateSql = @"
-                UPDATE TEST.T_CAST_DETAILS SET 
-                    CH_READY_TIME = :CH_READY_TIME, 
-                    SPLACING_WETNESS_TIME = :SPLACING_WETNESS_TIME,
-                    CAST_TYPE = :CAST_TYPE,
-                    CAST_CLAY_COND = :CAST_CLAY_COND,
-                    TAPHOLE_BEHAVIOUR = :TAPHOLE_BEHAVIOUR,
-                    HM_BEFORE_SLAG = :HM_BEFORE_SLAG,
-                    HM_AFTER_SLAG = :HM_AFTER_SLAG,
-                    HM_TEMP = :HM_TEMP,                         
-                    DRILL_DIA = :DRILL_DIA,
-                    DRILL_TYPE = :DRILL_TYPE,
-                    DRILL_TIME = :DRILL_TIME,
-                    NO_DRILL_BAR = :NO_DRILL_BAR,
-                    NO_DRILL_BIT = :NO_DRILL_BIT,
-                    NO_LANCING_PIPE = :NO_LANCING_PIPE,
-                    NO_SHAFT_USED = :NO_SHAFT_USED,
-                    DRILL_MC_AIR_PRESSURE = :DRILL_MC_AIR_PRESSURE,
-                    TAPHOLE_LENGTH = :TAPHOLE_LENGTH,
-                    LEN_DRILL_HAMMER = :LEN_DRILL_HAMMER,
-                    COLOR_FUME_DRILLING = :COLOR_FUME_DRILLING,
-                    SLAG_RETENTION = :SLAG_RETENTION,
-                    SLAG_LADLE = :SLAG_LADLE,
-                    NO_CINDER_GRANULATION = :NO_CINDER_GRANULATION,
-                    GRANULATION_PERC = :GRANULATION_PERC,
-                    CINDER_THEORETICAL_WT = :CINDER_THEORETICAL_WT,
-                    SLAG_RATE = :SLAG_RATE,
-                    TOTAL_SLAG = :TOTAL_SLAG
-                WHERE CAST_NO = :CAST_NO 
-                  AND TRUNC(DATE_TIME) = TO_DATE(:Fdate, 'DD-MM-YYYY') 
-                  AND FUR_NAME = :Fur";
-
-            foreach (var row in data)
-            {
-                using (OracleCommand cmd = new OracleCommand(updateSql, conn))
-                {
-                    cmd.BindByName = true; // Important for Oracle
-
-                    cmd.Parameters.Add(":CH_READY_TIME", StringOrDBNull(row, "CH_READY_TIME"));
-                    cmd.Parameters.Add(":SPLACING_WETNESS_TIME", StringOrDBNull(row, "SPLACING_WETNESS_TIME"));
-                    cmd.Parameters.Add(":CAST_TYPE", StringOrDBNull(row, "CAST_TYPE"));
-                    cmd.Parameters.Add(":CAST_CLAY_COND", StringOrDBNull(row, "CAST_CLAY_COND"));
-                    cmd.Parameters.Add(":TAPHOLE_BEHAVIOUR", StringOrDBNull(row, "TAPHOLE_BEHAVIOUR"));
-                    cmd.Parameters.Add(":HM_BEFORE_SLAG", StringOrDBNull(row, "HM_BEFORE_SLAG"));
-                    cmd.Parameters.Add(":HM_AFTER_SLAG", StringOrDBNull(row, "HM_AFTER_SLAG"));
-                    cmd.Parameters.Add(":HM_TEMP", StringOrDBNull(row, "HM_TEMP"));
-                    cmd.Parameters.Add(":DRILL_DIA", StringOrDBNull(row, "DRILL_DIA"));
-                    cmd.Parameters.Add(":DRILL_TYPE", StringOrDBNull(row, "DRILL_TYPE"));
-                    cmd.Parameters.Add(":DRILL_TIME", StringOrDBNull(row, "DRILL_TIME"));
-                    cmd.Parameters.Add(":NO_DRILL_BAR", StringOrDBNull(row, "NO_DRILL_BAR"));
-                    cmd.Parameters.Add(":NO_DRILL_BIT", StringOrDBNull(row, "NO_DRILL_BIT"));
-                    cmd.Parameters.Add(":NO_LANCING_PIPE", StringOrDBNull(row, "NO_LANCING_PIPE"));
-                    cmd.Parameters.Add(":NO_SHAFT_USED", StringOrDBNull(row, "NO_SHAFT_USED"));
-                    cmd.Parameters.Add(":DRILL_MC_AIR_PRESSURE", StringOrDBNull(row, "DRILL_MC_AIR_PRESSURE"));
-                    cmd.Parameters.Add(":TAPHOLE_LENGTH", StringOrDBNull(row, "TAPHOLE_LENGTH"));
-                    cmd.Parameters.Add(":LEN_DRILL_HAMMER", StringOrDBNull(row, "LEN_DRILL_HAMMER"));
-                    cmd.Parameters.Add(":COLOR_FUME_DRILLING", StringOrDBNull(row, "COLOR_FUME_DRILLING"));
-                    cmd.Parameters.Add(":SLAG_RETENTION", StringOrDBNull(row, "SLAG_RETENTION"));
-                    cmd.Parameters.Add(":SLAG_LADLE", StringOrDBNull(row, "SLAG_LADLE"));
-                    cmd.Parameters.Add(":NO_CINDER_GRANULATION", StringOrDBNull(row, "NO_CINDER_GRANULATION"));
-                    cmd.Parameters.Add(":GRANULATION_PERC", StringOrDBNull(row, "GRANULATION_PERC"));
-                    cmd.Parameters.Add(":CINDER_THEORETICAL_WT", StringOrDBNull(row, "CINDER_THEORETICAL_WT"));
-                    cmd.Parameters.Add(":SLAG_RATE", StringOrDBNull(row, "SLAG_RATE"));
-                    cmd.Parameters.Add(":TOTAL_SLAG", StringOrDBNull(row, "TOTAL_SLAG"));
-                    cmd.Parameters.Add(":CAST_NO", StringOrDBNull(row, "CAST_NO"));
-                    cmd.Parameters.Add(":Fdate", Fdate);
-                    cmd.Parameters.Add(":Fur", Fur);
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    if (rowsAffected == 0)
-                    {
-                        // Optional: Log the unmatched row
-                        // System.Diagnostics.Debug.WriteLine("No row updated for CAST_NO=" + row["CAST_NO"]);
-                    }
-                }
+   function Display_Tap_Hole_Details(lsSelectedFDate, IsSelectedFur) {
+             $.ajax({
+                    url: '/CastHouse/Get_TAP_Hole_Metal_Details', 
+                    type: 'GET',
+                    data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                    success: function (result_Tap_Hole_Metal) {
+                        var parsedData = JSON.parse(result_Tap_Hole_Metal);
+                        var tableBody = "";
+                        for (var i = 0; i < parsedData.length; i++) {
+                            var data = parsedData[i];
+                            tableBody += "<tr>";
+                            tableBody += `<td><input name="CAST_NO" class='form-control form-control-lg' value='${data.CAST_NO || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="TROUGH_NO" class='form-control form-control-lg' value='${data.TROUGH_NO || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="CAST_ST_TIME" class='form-control form-control-lg' value='${data.CAST_ST_TIME || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="CAST_END_TIME" class='form-control form-control-lg' value='${data.CAST_END_TIME || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="GUTKO" class='form-control form-control-lg' value='${data.GUTKO || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="CAST_DURATION" class='form-control form-control-lg' value='${data.CAST_DURATION || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="SPEED" class='form-control form-control-lg' value='${data.SPEED || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="NO_TLC" class='form-control form-control-lg' value='${data.NO_TLC || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="NO_OT" class='form-control form-control-lg' value='${data.NO_OT || ''}' readonly/></td>`;
+                            tableBody += `<td><input name="CH_READY_TIME" class='form-control form-control-lg' value='${data.CH_READY_TIME || ''}' /></td>`;
+                            tableBody += `<td><input name="SPLACING_WETNESS_TIME" class='form-control form-control-lg' value='${data.SPLACING_WETNESS_TIME || ''}' /></td>`;
+                            tableBody += `<td>
+                                <select name="CAST_TYPE" class ="form-select form-select-lg">
+                                    <option value="" ${!data.CAST_TYPE ? 'selected': ''}></option>
+                                    <option value="DRY" ${data.CAST_TYPE === 'DRY' ? 'selected': ''}>DRY</option>
+                                    <option value="NOT DRY" ${data.CAST_TYPE === 'NOT DRY' ? 'selected': ''}>NOT DRY</option>
+                                </select>
+                                        </td>`;                          
+                            tableBody += `<td>
+                                <select name="CAST_CLAY_COND" class ="form-select form-select-lg">
+                                <option value="" ${!data.CAST_CLAY_COND ? 'selected': ''}></option>
+                                <option value="WET" ${data.CAST_CLAY_COND === 'WET' ? 'selected': ''}>WET</option>
+                                <option value="DRY" ${data.CAST_CLAY_COND === 'DRY' ? 'selected': ''}>DRY</option>
+                                <option value="EXCESS WET" ${data.CAST_CLAY_COND === 'EXCESS WET' ? 'selected': ''}>EXCESS WET</option>
+                                <option value="BLEEDING" ${data.CAST_CLAY_COND === 'BLEEDING' ? 'selected': ''}>BLEEDING</option>                                
+                              </select>
+                              </td>`;
+                            tableBody += `<td>
+                               <select name="TAPHOLE_BEHAVIOUR" class ="form-select form-select-lg">
+                                <option value="" ${!data.TAPHOLE_BEHAVIOUR ? 'selected': ''}></option>
+                                <option value="WIDE" ${data.TAPHOLE_BEHAVIOUR === 'WIDE' ? 'selected': ''}>WIDE</option>
+                                <option value="NORMAL" ${data.TAPHOLE_BEHAVIOUR === 'NORMAL' ? 'selected': ''}>NORMAL</option>
+                                <option value="WIDE+COKE TROUBLE" ${data.TAPHOLE_BEHAVIOUR === 'WIDE+COKE TROUBLE' ? 'selected': ''}>WIDE+COKE TROUBLE</option>
+                                <option value="NORMAL+COKE TROUBLE" ${data.TAPHOLE_BEHAVIOUR === 'NORMAL+COKE TROUBLE' ? 'selected': ''}>NORMAL+COKE TROUBLE</option>
+                               </select>
+                              </td>`;
+                              tableBody += `<td><input name="HM_BEFORE_SLAG" class='form-control form-control-lg' value='${data.HM_BEFORE_SLAG || ''}' /></td>`;
+                              tableBody += `<td><input name="HM_AFTER_SLAG" class='form-control form-control-lg' value='${data.HM_AFTER_SLAG || ''}' /></td>`;
+                              tableBody += `<td><input name="HM_TEMP" class='form-control form-control-lg' value='${data.HM_TEMP || ''}' /></td>`;
+                              tableBody += `<td><input name="HM_WEIGHT" class='form-control form-control-lg' value='${data.HM_WEIGHT || ''}' readonly/></td>`;
+                        tableBody += "</tr>";
             }
-        }
-
-        return Json(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message });
-    }
+            $("#TAP_Hot_Metal_Details tbody").html(tableBody);
+        }       
+    });
 }
