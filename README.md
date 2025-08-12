@@ -92,3 +92,21 @@ private object StringOrDBNull(Dictionary<string, string> row, string key)
         return DBNull.Value;
     return row[key];
 }
+private object StringOrDBNull(Dictionary<string, string> row, string key)
+{
+    try
+    {
+        if (!row.ContainsKey(key))
+            throw new ArgumentException($"Missing key: {key}");
+
+        if (string.IsNullOrWhiteSpace(row[key]))
+            return DBNull.Value;
+
+        return row[key];
+    }
+    catch (Exception ex)
+    {
+        // Here you can log or directly throw a clear exception
+        throw new Exception($"Error processing key '{key}': {ex.Message}");
+    }
+}
