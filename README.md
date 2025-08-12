@@ -110,3 +110,12 @@ private object StringOrDBNull(Dictionary<string, string> row, string key)
         throw new Exception($"Error processing key '{key}': {ex.Message}");
     }
 }
+
+catch (Exception ex)
+{
+    return Json(new
+    {
+        success = false,
+        message = ex.Message
+    });
+}
