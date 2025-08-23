@@ -1,7 +1,4 @@
-flatpickr("#StartDate", {
-        enableTime: true,
-        dateFormat: "d-M-Y H:i",
-        time_24hr: true,
-        defaultHour:00
-    });
-
+ @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info">@ViewBag.Message</div>
+        }
