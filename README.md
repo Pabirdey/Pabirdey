@@ -16,3 +16,4 @@
                             <option value="RMBB" @(Model != null && Model.Source == "RMBB" ? "selected" : "")>RMBB</option>
                             <option value="RMBBN" @(Model != null && Model.Source == "RMBBN" ? "selected" : "")>RMBBN</option>
                         </select>
+                         <input type="submit" value="Save" name="SaveRawMaterial" class="btn btn-primary" />
