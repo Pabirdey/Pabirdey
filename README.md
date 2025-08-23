@@ -1,91 +1,120 @@
- <h4 class="mb-4" id="Main_Heading">Raw Material Quantity</h4>
-        <hr class="section-divider">
-        <form method="post" action="/RmbbPile/RmbbPile" id="rawMaterialForm">
-            <div class="container-fluid" style="margin-left:280px;">
-                <div class="d-flex flex-nowrap gap-2 align-items-end">
-                    <div style="width:8%;">
-                        <label class="form-label" style="margin-left:40px;">Pile No</label>
-                        <input class="form-control" type="text" value="@Model.PileNo" name="PileNo" placeholder="Enter PileNo" autocomplete="off">
-                    </div>
-                    <div style="width:8%;">
-                        <label class="form-label" style="margin-left:40px;">Select Source</label>
-                        <select name="Source" id="SourceSelect" class="form-control" onchange="document.getElementById('rawMaterialForm').submit();">
-                            <option value="">Select Source</option>
-                            <option value="RMBB_KNR" @(Model != null && Model.Source == "RMBB_KNR" ? "selected" : "")>RMBB_KNR</option>
-                            <option value="RMBB" @(Model != null && Model.Source == "RMBB" ? "selected" : "")>RMBB</option>
-                            <option value="RMBBN" @(Model != null && Model.Source == "RMBBN" ? "selected" : "")>RMBBN</option>
-                        </select>
+[HttpPost]
+public ActionResult RmbbPile(RmbbPile input, string SaveRawMaterial)
+{
+    RmbbPile model = new RmbbPile();
+    string message = "";
 
+    // Validate required fields
+    if (!string.IsNullOrEmpty(SaveRawMaterial))
+    {
+        if (string.IsNullOrEmpty(input.PileNo) || string.IsNullOrEmpty(input.Source))
+        {
+            ViewBag.Message = "PileNo and Source are required to save.";
+            return View(input);
+        }
 
-                    </div>
-                    <div style="width:8%">
-                        <label class="form-label" style="margin-left:40px;">Shift</label>
-                        <select class="form-select">
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                        </select>
-                    </div>
-                    <div style="width:12%;">
-                        <label class="form-label fw-bold" style="mar
-    gin-left:40px;">Start Date</label>
-                        <input type="text" class="form-control" name="StartDate" id="StartDate" value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("dd-MMM-yyyy HH:mm") : "")" />
-                    </div>
+        using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            conn.Open();
 
+            // Check if record exists
+            string checkSql = "SELECT COUNT(*) FROM imtg.T_PILE_RAWMAT_QUANTITY_NEW_BK WHERE PILE_NO = :PILE_NO AND SOURCE = :SOURCE";
+            using (OracleCommand checkCmd = new OracleCommand(checkSql, conn))
+            {
+                checkCmd.Parameters.Add(":PILE_NO", OracleDbType.Varchar2).Value = input.PileNo;
+                checkCmd.Parameters.Add(":SOURCE", OracleDbType.Varchar2).Value = input.Source;
 
-                    <div style="width:12%;">
-                        <label class="form-label" style="margin-left:40px;">End Date</label>
-                        <input type="text" class="form-control" name="EndDate" id="EndDate" value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("dd-MMM-yyyy HH:mm") : "")" />
-                    </div>
-                    <div style="width:12%;">
-                        <label class="form-label" style="margin-left:40px;">Cons.St.Date</label>
-                        <input type="text" class="form-control" name="ConsStartDate" id="ConsStartDate" value="@(Model.ConsStartDate.HasValue ? Model.ConsStartDate.Value.ToString("dd-MMM-yyyy HH:mm") : "")" />
-                    </div>
-                </div>
-            </div>
-            <hr class="section-divider">
-            <!-- First row of materials -->
-            <div class="row material-row mb-2">
-                <div class="col-md-2">
-                    <label class="form-label">Noa Fines</label>
-                    <input class="form-control" type="text" value="@Model.NOA_FINES" name="NOA_FINES" id="NOA_FINES" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Joda Fines</label>
-                    <input class="form-control" type="text" value="@Model.JODA_FINES" name="JODA_FINES" id="JODA_FINES" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">KB Fines</label>
-                    <input class="form-control" type="text" value="@Model.KB_FINES" name="KB_FINES" id="KB_FINES" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Yard Fines</label>
-                    <input class="form-control" type="text" value="@Model.YARD_FINES" name="YARD_FINES" id="YARD_FINES" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">BHJ</label>
-                    <input class="form-control" type="text" value="@Model.TXT_BHJ" name="TXT_BHJ" id="TXT_BHJ" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Namisa</label>
-                    <input class="form-control" type="text" value="@Model.IO_NAMISA" name="IO_NAMISA" id="IO_NAMISA" onblur="IMPOreFinesSum()" autocomplete="off">
-                </div>
-            </div>
-            <!-- Second row of materials -->
-            <div class="row material-row mb-2">
-                <div class="col-md-2">
-                    <label class="form-label">Fortescue BF</label>
-                    <input class="form-control" type="text" value="@Model.IO_FORTESCUE_BF" name="IO_FORTESCUE_BF" id="IO_FORTESCUE_BF" onblur="IMPOreFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Noa Crushed</label>
-                    <input class="form-control" type="text" value="@Model.IRON_ORE_NOA_CRUSHED" name="IRON_ORE_NOA_CRUSHED" id="IRON_ORE_NOA_CRUSHED" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Joda Crushed</label>
-                    <input class="form-control" type="text" value="@Model.IRON_ORE_JODA_CRUSHED" name="IRON_ORE_JODA_CRUSHED" id="IRON_ORE_JODA_CRUSHED" onblur="IOFinesSum()" autocomplete="off">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">KB Crushed</label>
-                    <input class="form-control" type="text" value="@Model.IRON_ORE_KB_CRUSHED" name="IRON_ORE_KB_CRUSHED" id="IRON_ORE_KB_CRUSHED" onblur="IOFinesSum()" autocomplete="off">
-                </div>
+                int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                if (count > 0)
+                {
+                    // Perform UPDATE
+                    string updateSql = @"UPDATE imtg.T_PILE_RAWMAT_QUANTITY_NEW_BK SET
+                                            PREP_START_DATE = :PREP_START_DATE,
+                                            PREP_END_DATE = :PREP_END_DATE,
+                                            CONS_ST_DATE = :CONS_ST_DATE,
+                                            NOA_FINES = :NOA_FINES,
+                                            JODA_FINES = :JODA_FINES,
+                                            KB_FINES = :KB_FINES,
+                                            YARD_FINES = :YARD_FINES
+                                         WHERE PILE_NO = :PILE_NO AND SOURCE = :SOURCE";
+
+                    using (OracleCommand updateCmd = new OracleCommand(updateSql, conn))
+                    {
+                        updateCmd.Parameters.Add(":PREP_START_DATE", OracleDbType.Date).Value = input.StartDate ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":PREP_END_DATE", OracleDbType.Date).Value = input.EndDate ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":CONS_ST_DATE", OracleDbType.Date).Value = input.ConsStartDate ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":NOA_FINES", OracleDbType.Decimal).Value = input.NOA_FINES ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":JODA_FINES", OracleDbType.Decimal).Value = input.JODA_FINES ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":KB_FINES", OracleDbType.Decimal).Value = input.KB_FINES ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":YARD_FINES", OracleDbType.Decimal).Value = input.YARD_FINES ?? (object)DBNull.Value;
+                        updateCmd.Parameters.Add(":PILE_NO", OracleDbType.Varchar2).Value = input.PileNo;
+                        updateCmd.Parameters.Add(":SOURCE", OracleDbType.Varchar2).Value = input.Source;
+
+                        updateCmd.ExecuteNonQuery();
+                        message = "Record updated successfully.";
+                    }
+                }
+                else
+                {
+                    // Perform INSERT
+                    string insertSql = @"INSERT INTO imtg.T_PILE_RAWMAT_QUANTITY_NEW_BK
+                        (PILE_NO, SOURCE, PREP_START_DATE, PREP_END_DATE, CONS_ST_DATE, NOA_FINES, JODA_FINES, KB_FINES, YARD_FINES)
+                        VALUES (:PILE_NO, :SOURCE, :PREP_START_DATE, :PREP_END_DATE, :CONS_ST_DATE, :NOA_FINES, :JODA_FINES, :KB_FINES, :YARD_FINES)";
+
+                    using (OracleCommand insertCmd = new OracleCommand(insertSql, conn))
+                    {
+                        insertCmd.Parameters.Add(":PILE_NO", OracleDbType.Varchar2).Value = input.PileNo;
+                        insertCmd.Parameters.Add(":SOURCE", OracleDbType.Varchar2).Value = input.Source;
+                        insertCmd.Parameters.Add(":PREP_START_DATE", OracleDbType.Date).Value = input.StartDate ?? (object)DBNull.Value;
+                        insertCmd.Parameters.Add(":PREP_END_DATE", OracleDbType.Date).Value = input.EndDate ?? (object)DBNull.Value;
+                        insertCmd.Parameters.Add(":CONS_ST_DATE", OracleDbType.Date).Value = input.ConsStartDate ?? (object)DBNull.Value;
+                        insertCmd.Parameters.Add(":NOA_FINES", OracleDbType.Decimal).Value = input.NOA_FINES ?? (object)DBNull.Value;
+                        insertCmd.Parameters.Add(":JODA_FINES", OracleDbType.Decimal).Value = input.JODA_FINES ?? (object)DBNull.Value;
+                        insertCmd.Parameters.Add(":KB_FINES", OracleDbType.Decimal).Value = input.KB_FINES ?? (object)DBNull.Value;
+                        insertCmd.Parameters.Add(":YARD_FINES", OracleDbType.Decimal).Value = input.YARD_FINES ?? (object)DBNull.Value;
+
+                        insertCmd.ExecuteNonQuery();
+                        message = "Record inserted successfully.";
+                    }
+                }
+            }
+        }
+
+        ViewBag.Message = message;
+        model = input; // retain entered values
+    }
+    else if (!string.IsNullOrEmpty(input.PileNo) && !string.IsNullOrEmpty(input.Source))
+    {
+        // Load existing data
+        using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            conn.Open();
+
+            string query = "SELECT * FROM imtg.T_PILE_RAWMAT_QUANTITY_NEW_BK WHERE PILE_NO = :PILE_NO AND SOURCE = :SOURCE";
+            using (OracleCommand cmd = new OracleCommand(query, conn))
+            {
+                cmd.Parameters.Add(":PILE_NO", OracleDbType.Varchar2).Value = input.PileNo;
+                cmd.Parameters.Add(":SOURCE", OracleDbType.Varchar2).Value = input.Source;
+
+                using (OracleDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        model.PileNo = input.PileNo;
+                        model.Source = input.Source;
+                        model.StartDate = reader["PREP_START_DATE"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["PREP_START_DATE"]);
+                        model.EndDate = reader["PREP_END_DATE"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["PREP_END_DATE"]);
+                        model.ConsStartDate = reader["CONS_ST_DATE"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["CONS_ST_DATE"]);
+                        model.NOA_FINES = reader["NOA_FINES"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["NOA_FINES"]);
+                        model.JODA_FINES = reader["JODA_FINES"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["JODA_FINES"]);
+                        model.KB_FINES = reader["KB_FINES"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["KB_FINES"]);
+                        model.YARD_FINES = reader["YARD_FINES"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["YARD_FINES"]);
+                    }
+                }
+            }
+        }
+    }
+
+    return View(model);
+}
