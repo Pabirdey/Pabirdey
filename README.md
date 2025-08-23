@@ -1,4 +1,6 @@
- @if (!string.IsNullOrEmpty(ViewBag.Message))
-        {
-            <div class="alert alert-info">@ViewBag.Message</div>
-        }
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <script type="text/javascript">
+        alert('@ViewBag.Message');
+    </script>
+}
