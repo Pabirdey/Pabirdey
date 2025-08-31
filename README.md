@@ -172,3 +172,13 @@ public ActionResult RmbbPile(RmbbPile input, string SaveRawMaterial)
 
     return View(model);
 }
+   LD_Sludge_Cons = reader.IsDBNull(0) ? null : reader.GetDecimal(0);
+                                Mill_Scale_Cons = reader.IsDBNull(1) ? null : reader.GetDecimal(1);
+                                Flue_Dust_Cons = reader.IsDBNull(2) ? null : reader.GetDecimal(2);
+                                Esp_Dust_Cons = reader.IsDBNull(3) ? null : reader.GetDecimal(3);
+                                Kiln_Dust_Cons = reader.IsDBNull(4) ? null : reader.GetDecimal(4);
+                                Gcp_Sludge_Cons = reader.IsDBNull(5) ? null : reader.GetDecimal(5);
+                                Lime_Fines_Cons = reader.IsDBNull(6) ? null : reader.GetDecimal(6);
+                                Wrp_MET_Cons = reader.IsDBNull(7) ? null : reader.GetDecimal(7);
+                                LD_Slag_Fines_Cons = reader.IsDBNull(8) ? null : reader.GetDecimal(8);
+                                Mill_Sludge_Cons = reader.IsDBNull(9) ? null : reader.GetDecimal(9);
