@@ -1,65 +1,19 @@
-ajaya.nath@tatasteel.com
-akhilesh.sahu1@tatasteel.com
-amit.sahoo50@tatasteel.com
-ashish.dixit@tatasteel.com
-baikuntha.sahoo@tatasteel.com
-barun.sethi@tatasteel.com
-bharat.mallick@tatasteel.com
-biswajit.nayak@tatasteel.com
-buddhray.mandi@tatasteel.com
-chandrakant@tatasteel.com
-chittaranjan.mishra@tatasteel.com
-deba.tripathy@tatasteel.com
-debendra.sahoo1@tatasteel.com
-hari.patel@tatasteel.com
-hitesh.tiwari@tatasteel.com
-ilesh.sahu@tatasteel.com
-ishwar.das@tatasteel.com
-jaykrushna.barik@tatasteel.com
-jyoti.biswal@tatasteel.com
-kalucharan.patra@tatasteel.com
-kamleshwar.patel@tatasteel.com
-laxmikanta.mohapatra@tatasteel.com
-malaya.manik@tatasteel.com
-maneet.gupta@tatasteel.com
-mirza.baig50@tatasteel.com
-mithlesh.mishra@tatasteel.com
-muktiswarup.raul@tatasteel.com
-narendra.nayak@tatasteel.com
-nihar.mohapatra@tatasteel.com
-pankaj.biswal@tatasteel.com
-pathani.chakra@tatasteel.com
-prakashranjan.sahu@tatasteel.com
-pramit.mohanta@tatasteel.com
-premananda.swain@tatasteel.com
-priyanshu.samal@tatasteel.com
-radhakanta.sahu@tatasteel.com
-rajesh.jena@tatasteel.com
-rajesh229.sharma@tatasteel.com
-ramesh.roul@tatasteel.com
-mr.kannan@tatasteel.com
-ramnihor.tripathi@tatasteel.com
-ratikanta.das50@tatasteel.com
-ravi.singh4@tatasteel.com
-sanjay.keshri@tatasteel.com
-sanjit.sahoo1@tatasteel.com
-santanu.mishra50@tatasteel.com
-santosh.pradhan50@tatasteel.com
-sasanka.pothal@tatasteel.com
-satyabrata.panda@tatasteel.com
-shyamkishor.singh@tatasteel.com
-sruti.mishra@tstsl.tatasteel.com
-subhakanta.puhan@tatasteel.com
-subham.panigrahi1@tstsl.tatasteel.com
-subhransu.sahoo@tatasteel.com
-sujit.nag@tatasteel.com
-sujit.sendha@tatasteel.com
-sukhendra.singh@tatasteel.com
-surendra.sidar@tatasteel.com
-susanta.nayak50@tatasteel.com
-sushanta.mallick@tatasteel.com
-tejeshwar.verma@tatasteel.com
-tilak.soni@tatasteel.com
-varun.mishra@tatasteel.com
-yogesh.pandey1@tstsl.tatasteel.com
-yugal.patel@tatasteel.com
+Begin
+  For k in (Select DATE_TIME,BM_CONS,FLUX_TRIM,Lime_Trim,Coke_Trim,SINTER_RET_FINES_ATOF,SINTER_RET_FINES_G,SINTER_RET_FINES_H,SINTER_RET_FINES_I From imtg.T_SP1_PRODUCTION Where Date_Time>=sysdate-500 Order by Date_Time)
+  Loop
+    Begin
+        Update imtg.T_SINTER_MIS_DAILY SET
+       BASE_MIX=k.BM_CONS/Decode((nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0)),0,null,(nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0))*100,        
+        LIME_STONE=k.FLUX_TRIM/Decode((nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0)),0,null,(nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0))*100,        
+        LIME=k.Lime_Trim/Decode((nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0)),0,null,nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0))*100,        
+        COKE_BREEZE=k.Coke_Trim/Decode((nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0)),0,null,(nvl(k.FLUX_TRIM,0)+nvl(k.Lime_Trim,0)+nvl(k.Coke_Trim,0)+nvl(k.SINTER_RET_FINES_ATOF,0)+nvl(k.SINTER_RET_FINES_H,0)+nvl(k.SINTER_RET_FINES_G,0)+nvl(k.SINTER_RET_FINES_I,0))*100
+        Where DATE_TIME=Timestamp AND PLANT='SP1';   
+    Exception
+    When Others Then  
+    DBMS_OUTPUT.PUT_LINE(SQLERRM);
+    End;
+  End Loop;
+  Exception
+  When Others Then 
+  DBMS_OUTPUT.PUT_LINE(SQLERRM);
+  END;
