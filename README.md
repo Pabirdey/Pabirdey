@@ -1,12 +1,99 @@
-<select id="PSW_BL1" name="PSW_BL1" onchange="CheckPSW_CONS1()" class="form-control">
-    <option value="">Select</option>
-    @if (ViewBag.PSW_BL1LIST != null)
-    {
-        foreach (var item in (List<SelectListItem>)ViewBag.PSW_BL1LIST)
-        {
-            <option value="@item.Value" @(item.Value == Convert.ToString(Model.PSW_BL1) ? "selected" : "")>
-                @item.Text
-            </option>
-        }
-    }
-</select>
+  Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (DRI_LUMPS,DRI_FINES,DRI_PRODUCTION,CHAR_GENERATION,STEAM_GENERATION_DRI,ORE_CONSUMPTION,TOTAL_COAL,DOLOMITE,SP_IRON_ORE,SP_COAL,SP_DOLOMITE,CAPACITY,DRI_LUMPS_OS)=
+        (Select Nvl(DRI_LUMPS,0),nvl(DRI_FINES,0),nvl(DRI_PRODUCTION,0),nvl(CHAR_GENERATION,0),nvl(STEAM_GENERATION_DRI/24,0),nvl(ORE_CONSUMPTION,0),nvl(TOTAL_COAL,0),ROUND(nvl(DOLOMITE,0),1),nvl(SP_IRON_ORE,0),ROUND(nvl(SP_COAL,0),3),nvl(SP_DOLOMITE,0),500,nvl(DRI_LUMPS_OS,0)
+        From TSBSL.T_TSBSL_DRI_PROD_DAILY b Where a.TIMESTAMP=trunc(b.TIMESTAMP) AND b.SOURCE='KILN1')
+        Where a.TIMESTAMP>=vTimestamp-10 AND a.PLANT='TSM_KILN1';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--sysdate-10--');
+     End;
+     
+      Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (ZONE9_TEMP,ZONE10_TEMP,REDUCTION_ZONE_TEMP)=
+        (Select K1_ZONE9_TEMPERATURE,K1_ZONE10_TEMPERATURE,
+        (Case When (nvl(K1_ZONE9_TEMPERATURE,0)+nvl(K1_ZONE10_TEMPERATURE,0))/Decode(((Case When K1_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K1_ZONE10_TEMPERATURE>0 Then 1 Else 0 END)),0,null,((Case When K1_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K1_ZONE10_TEMPERATURE>0 Then 1 Else 0 END)))>500 Then (nvl(K1_ZONE9_TEMPERATURE,0)+nvl(K1_ZONE10_TEMPERATURE,0))/Decode(((Case When K1_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K1_ZONE10_TEMPERATURE>0 Then 1 Else 0 END)),0,null,((Case When K1_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K1_ZONE10_TEMPERATURE>0 Then 1 Else 0 END))) Else null END)
+        From TSBSL.T_TSM_DRI_PROCESS_DAILY b where a.Timestamp=trunc(b.Timestamp))
+        where a.Timestamp>=vTimestamp-10 AND a.PLANT='TSM_KILN1';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN1_TEMP--');
+     End;
+
+    Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (DRI_LUMPS,DRI_FINES,DRI_PRODUCTION,CHAR_GENERATION,STEAM_GENERATION_DRI,ORE_CONSUMPTION,TOTAL_COAL,DOLOMITE,SP_IRON_ORE,SP_COAL,SP_DOLOMITE,CAPACITY,DRI_LUMPS_OS)=
+        (Select nvl(DRI_LUMPS,0),nvl(DRI_FINES,0),nvl(DRI_PRODUCTION,0),nvl(CHAR_GENERATION,0),nvl(STEAM_GENERATION_DRI/24,0),nvl(ORE_CONSUMPTION,0),nvl(TOTAL_COAL,0),ROUND(nvl(DOLOMITE,0),1),nvl(SP_IRON_ORE,0),nvl(SP_COAL,0),nvl(SP_DOLOMITE,0),500,nvl(DRI_LUMPS_OS,0)
+        From TSBSL.T_TSBSL_DRI_PROD_DAILY b Where a.TIMESTAMP=trunc(b.TIMESTAMP) AND b.SOURCE='KILN2')
+        Where a.TIMESTAMP>=vTimestamp-10 AND a.PLANT='TSM_KILN2';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN2--');
+     End;
+
+    Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (ZONE9_TEMP,ZONE10_TEMP,REDUCTION_ZONE_TEMP)=
+        (Select K2_ZONE9_TEMP,K2_ZONE10_TEMP,
+        (Case When (nvl(K2_ZONE9_TEMP,0)+nvl(K2_ZONE10_TEMP,0))/Decode(((Case When K2_ZONE9_TEMP>0 Then 1 Else 0 END)+(Case When K2_ZONE10_TEMP>0 Then 1 Else 0 END)),0,null,((Case When K2_ZONE9_TEMP>0 Then 1 Else 0 END)+(Case When K2_ZONE10_TEMP>0 Then 1 Else 0 END)))>500 Then (nvl(K2_ZONE9_TEMP,0)+nvl(K2_ZONE10_TEMP,0))/Decode(((Case When K2_ZONE9_TEMP>0 Then 1 Else 0 END)+(Case When K2_ZONE10_TEMP>0 Then 1 Else 0 END)),0,null,((Case When K2_ZONE9_TEMP>0 Then 1 Else 0 END)+(Case When K2_ZONE10_TEMP>0 Then 1 Else 0 END))) Else NULL END)
+        From TSBSL.T_TSM_DRI_PROCESS_DAILY b where a.Timestamp=trunc(b.Timestamp))
+        where a.Timestamp>=vTimestamp-10 AND a.PLANT='TSM_KILN2';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN2-_TEMP-');
+     End;
+     
+      Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (DRI_LUMPS,DRI_FINES,DRI_PRODUCTION,CHAR_GENERATION,STEAM_GENERATION_DRI,ORE_CONSUMPTION,TOTAL_COAL,DOLOMITE,SP_IRON_ORE,SP_COAL,SP_DOLOMITE,CAPACITY,DRI_LUMPS_OS)=
+        (Select nvl(DRI_LUMPS,0),nvl(DRI_FINES,0),nvl(DRI_PRODUCTION,0),nvl(CHAR_GENERATION,0),nvl(STEAM_GENERATION_DRI/24,0),nvl(ORE_CONSUMPTION,0),nvl(TOTAL_COAL,0),ROUND(nvl(DOLOMITE,0),1),nvl(SP_IRON_ORE,0),nvl(SP_COAL,0),nvl(SP_DOLOMITE,0),500,nvl(DRI_LUMPS_OS,0)
+        From TSBSL.T_TSBSL_DRI_PROD_DAILY b Where a.TIMESTAMP=trunc(b.TIMESTAMP) AND b.SOURCE='KILN3')
+        Where a.TIMESTAMP>=vTimestamp-10 AND a.PLANT='TSM_KILN3';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN3--');
+     End;
+     
+     Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (ZONE9_TEMP,ZONE10_TEMP,REDUCTION_ZONE_TEMP)=
+        (Select K3_ZONE9_TEMPERATURE,K3_ZONE10_TEMPERATURE,
+        (Case When (nvl(K3_ZONE9_TEMPERATURE,0)+nvl(K3_ZONE10_TEMPERATURE,0))/Decode(((Case When K3_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K3_ZONE10_TEMPERATURE>0 Then 1 Else 0 END)),0,null,((Case When K3_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K3_ZONE10_TEMPERATURE>0 Then 1 Else 0 END)))>500 Then (nvl(K3_ZONE9_TEMPERATURE,0)+nvl(K3_ZONE10_TEMPERATURE,0))/Decode(((Case When K3_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K3_ZONE10_TEMPERATURE>0 Then 1 Else 0 END)),0,null,((Case When K3_ZONE9_TEMPERATURE>0 Then 1 Else 0 END)+(Case When K3_ZONE10_TEMPERATURE>0 Then 1 Else 0 END))) Else NULL END)
+        From TSBSL.T_TSM_DRI_PROCESS_DAILY b where a.Timestamp=trunc(b.Timestamp))
+        where a.Timestamp>=vTimestamp-10 AND a.PLANT='TSM_KILN3';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN3-_TEMP-');
+     End;
+
+    Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (DRI_LUMPS,DRI_FINES,DRI_PRODUCTION,CHAR_GENERATION,STEAM_GENERATION_DRI,ORE_CONSUMPTION,TOTAL_COAL,DOLOMITE,SP_IRON_ORE,SP_COAL,SP_DOLOMITE,CAPACITY,DRI_LUMPS_OS)=
+        (Select nvl(DRI_LUMPS,0),nvl(DRI_FINES,0),nvl(DRI_PRODUCTION,0),nvl(CHAR_GENERATION,0),nvl(STEAM_GENERATION_DRI/24,0),nvl(ORE_CONSUMPTION,0),nvl(TOTAL_COAL,0),ROUND(nvl(DOLOMITE,0),1),nvl(SP_IRON_ORE,0),nvl(SP_COAL,0),nvl(SP_DOLOMITE,0),500,nvl(DRI_LUMPS_OS,0)
+        From TSBSL.T_TSBSL_DRI_PROD_DAILY b Where a.TIMESTAMP=trunc(b.TIMESTAMP) AND b.SOURCE='KILN4')
+        Where a.TIMESTAMP>=vTimestamp-10 AND a.PLANT='TSM_KILN4';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN4--');
+     End;
+
+     Begin
+        Update TSBSL.T_TSM_DRI_MIS_DAILY a SET
+        (DRI_LUMPS,DRI_FINES,DRI_PRODUCTION,CHAR_GENERATION,STEAM_GENERATION_DRI,ORE_CONSUMPTION,TOTAL_COAL,DOLOMITE,SP_IRON_ORE,SP_COAL,SP_DOLOMITE,CAPACITY,DRI_LUMPS_OS)=
+        (Select nvl(DRI_LUMPS,0),nvl(DRI_FINES,0),nvl(DRI_PRODUCTION,0),nvl(CHAR_GENERATION,0),nvl(STEAM_GENERATION_DRI/24,0),nvl(ORE_CONSUMPTION,0),nvl(TOTAL_COAL,0),ROUND(nvl(DOLOMITE,0),1),nvl(SP_IRON_ORE,0),nvl(SP_COAL,0),nvl(SP_DOLOMITE,0),500,nvl(DRI_LUMPS_OS,0)
+        From TSBSL.T_TSBSL_DRI_PROD_DAILY b Where a.TIMESTAMP=trunc(b.TIMESTAMP) AND b.SOURCE='KILN5')
+        Where a.TIMESTAMP>=vTimestamp-10 AND a.PLANT='TSM_KILN5';
+        Commit;         
+     Exception
+     When Others Then
+     DBMS_OUTPUT.PUT_LINE(SQLERRM ||'--DRI_KILN5--');
+     End;
+     
