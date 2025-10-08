@@ -14,22 +14,97 @@ SELECT
     ROUND(b.SWELLING_INDEX_CRMT, 2) AS SWELLING_INDEX_CRMT,
     ROUND(b.RDI, 2) AS RDI,
     ROUND(b.RI, 1) AS RI,
-   nvl(Avg(case when COST_ELEMENT like '%120000056%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0)+
-   nvl(((nvl(Avg(case when COST_ELEMENT like '%120000055%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0)+nvl(avg(case when COST_ELEMENT like '%120000057%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0))/avg(case when COST_ELEMENT like '%100021211%' and area like '%100021211%' then ACTUAL_QUANTITY else NULL end))*1000,0)+
-   nvl(((nvl(avg(case when COST_ELEMENT like '%120005660%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0))/avg(case when COST_ELEMENT like '%100021211%' and area like '%100021211%' then ACTUAL_QUANTITY else NULL end))*1000,0)+
-   nvl(((nvl(avg(case when COST_ELEMENT like '%120005731%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0)+
-nvl(avg(case when COST_ELEMENT like '%120006250%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0)+
-nvl(avg(case when COST_ELEMENT like '%120006280%' and area like '%100021212%' then ACTUAL_QUANTITY else NULL end),0))/avg(case when COST_ELEMENT like '%100021211%' and area like '%100021211%' then ACTUAL_QUANTITY else NULL end))*1000,0)
+
+    -- ✅ Corrected IRON_ORE_FINES Calculation
+    NVL(AVG(CASE 
+             WHEN COST_ELEMENT LIKE '%120000056%' 
+              AND AREA LIKE '%100021212%' 
+              AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+             THEN ACTUAL_QUANTITY 
+         END), 0)
+    +
+    NVL((
+        NVL(AVG(CASE 
+                 WHEN COST_ELEMENT LIKE '%120000055%' 
+                  AND AREA LIKE '%100021212%' 
+                  AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+                 THEN ACTUAL_QUANTITY 
+             END), 0)
+        +
+        NVL(AVG(CASE 
+                 WHEN COST_ELEMENT LIKE '%120000057%' 
+                  AND AREA LIKE '%100021212%' 
+                  AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+                 THEN ACTUAL_QUANTITY 
+             END), 0)
+    )
+    /
+    AVG(CASE 
+          WHEN COST_ELEMENT LIKE '%100021211%' 
+           AND AREA LIKE '%100021211%' 
+           AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+          THEN ACTUAL_QUANTITY 
+        END) * 1000, 0)
+    +
+    NVL((
+        NVL(AVG(CASE 
+                 WHEN COST_ELEMENT LIKE '%120005660%' 
+                  AND AREA LIKE '%100021212%' 
+                  AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+                 THEN ACTUAL_QUANTITY 
+             END), 0)
+    )
+    /
+    AVG(CASE 
+          WHEN COST_ELEMENT LIKE '%100021211%' 
+           AND AREA LIKE '%100021211%' 
+           AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+          THEN ACTUAL_QUANTITY 
+        END) * 1000, 0)
+    +
+    NVL((
+        NVL(AVG(CASE 
+                 WHEN COST_ELEMENT LIKE '%120005731%' 
+                  AND AREA LIKE '%100021212%' 
+                  AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+                 THEN ACTUAL_QUANTITY 
+             END), 0)
+        +
+        NVL(AVG(CASE 
+                 WHEN COST_ELEMENT LIKE '%120006250%' 
+                  AND AREA LIKE '%100021212%' 
+                  AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+                 THEN ACTUAL_QUANTITY 
+             END), 0)
+        +
+        NVL(AVG(CASE 
+                 WHEN COST_ELEMENT LIKE '%120006280%' 
+                  AND AREA LIKE '%100021212%' 
+                  AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+                 THEN ACTUAL_QUANTITY 
+             END), 0)
+    )
+    /
+    AVG(CASE 
+          WHEN COST_ELEMENT LIKE '%100021211%' 
+           AND AREA LIKE '%100021211%' 
+           AND TRUNC(c.Date_Time, 'MON') = a.Timestamp 
+          THEN ACTUAL_QUANTITY 
+        END) * 1000, 0) 
     AS IRON_ORE_FINES
+
 FROM 
     (imtg.t_Pellet_production_monthly a
-     FULL OUTER JOIN imtg.t_Pellet_quality_monthly b ON a.Timestamp = b.Date_Time)
+     FULL OUTER JOIN imtg.t_Pellet_quality_monthly b 
+        ON a.Timestamp = b.Date_Time)
 FULL OUTER JOIN 
-    imtg.T_COST_DATA c ON (a.Timestamp = b.Date_Time OR a.Timestamp = TRUNC(c.Date_Time, 'MON'))
+    imtg.T_COST_DATA c 
+        ON (TRUNC(c.Date_Time, 'MON') = a.Timestamp)
 
 WHERE 
     b.SOURCE = 'PRODUCT'
-    AND a.Timestamp IS NOT NULL AND a.Timestamp>='01-APR-2025'
+    AND a.Timestamp IS NOT NULL
+    AND a.Timestamp >= TO_DATE('01-APR-2025', 'DD-MON-YYYY')
 
 GROUP BY 
     a.Timestamp,
