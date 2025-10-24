@@ -1,81 +1,30 @@
-DECLARE
-    vDate DATE;
-BEGIN
-    -- Get the latest date from target table
-    SELECT MAX(DATE_TIME)
-    INTO vDate
-    FROM KPO.T_KPO_SINTER_CHEMICAL
-    WHERE SOURCE = 'SP1';
-
-    IF vDate IS NULL THEN
-        vDate := TO_DATE('20-DEC-2015', 'DD-MON-YYYY');
-    END IF;
-
-    MERGE INTO KPO.T_KPO_SINTER_CHEMICAL t
-    USING (
-        SELECT 
-            STR_TEST_DATE,
-            NVL(STR_TEST_SHIFT, 'E') AS STR_TEST_SHIFT,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E011', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS CAO,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E012', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS SIO2,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E026', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS P,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E015', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS MGO,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E016', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS MNO,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E017', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS AL2O3,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E018', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS TIO2,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E020', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS K2O,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E042', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS FE,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E009', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS FEO,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E023', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS NA2O,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E116', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS CL,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E014', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS S,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'E019', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS CR2O3,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'D101', NULLIF(STR_ANALYSIS_VALUE, 0)))) AS ZNO,
-            ROUND(AVG(DECODE(STR_ELEMENT_CODE, 'D101', NULLIF(STR_ANALYSIS_VALUE, 0))) * 0.8) AS ZN
-        FROM CRMTXRF.SAMPLE_TEST_REPORT@MISPROD
-        WHERE STR_ANALYSIS_VALUE <= 100
-          AND STR_DEPT_CODE = 'L204'
-          AND STR_TEST_GROUP_CODE = 'T342'
-          AND STR_TEST_DATE > vDate
-        GROUP BY STR_TEST_DATE, NVL(STR_TEST_SHIFT, 'E')
-    ) s
-    ON (
-        t.DATE_TIME = s.STR_TEST_DATE
-        AND t.SHIFT = s.STR_TEST_SHIFT
-        AND t.SOURCE = 'SP1'
-    )
-
-    WHEN MATCHED THEN
-        UPDATE SET
-            t.CAO   = s.CAO,
-            t.SIO2  = s.SIO2,
-            t.P     = s.P,
-            t.MGO   = s.MGO,
-            t.MNO   = s.MNO,
-            t.AL2O3 = s.AL2O3,
-            t.TIO2  = s.TIO2,
-            t.K2O   = s.K2O,
-            t.FE    = s.FE,
-            t.FEO   = s.FEO,
-            t.NA2O  = s.NA2O,
-            t.CL    = s.CL,
-            t.S     = s.S,
-            t.CR2O3 = s.CR2O3,
-            t.ZNO   = s.ZNO,
-            t.ZN    = s.ZN
-
-    WHEN NOT MATCHED THEN
-        INSERT (
-            DATE_TIME, SHIFT, SOURCE, CAO, SIO2, P, MGO, MNO,
-            AL2O3, TIO2, K2O, FE, FEO, NA2O, CL, S, CR2O3, ZNO, ZN
-        )
-        VALUES (
-            s.STR_TEST_DATE, s.STR_TEST_SHIFT, 'SP1', 
-            s.CAO, s.SIO2, s.P, s.MGO, s.MNO,
-            s.AL2O3, s.TIO2, s.K2O, s.FE, s.FEO, 
-            s.NA2O, s.CL, s.S, s.CR2O3, s.ZNO, s.ZN
-        );
-
-    COMMIT;
-END;
-/
+Select b.Timestamp Date_Month,'TSK_PELLET' AS PLANT,ROUND((a.ACTUAL_QUANTITY))NET_PROD,
+ROUND(b.NET_PRODUCTIVITY,2)NET_PRODUCTIVITY,NULL,
+Round(c.FE,2)FE,Round(c.CAO/Nullif(c.SIO2,0),2)B2,
+Round(c.AL2O3,3)AL2O3,Round(c.P,3)Phos,
+Round(c.K2O,3)K2O,ROUND(d.AVG_CCS)CCS_CRMT,Round(c.PCT_TUM_6P3MM,1)TUMBLER_PLS_6P3_MM,
+Round(c.PLS_TUM_MIN_0P5MM,3)TUMBLER_MIN_0P5_MM,ROUND(AVG(e.RDI),2)RDI,ROUND(AVG(f.RI),2)RI,
+Round(AVG(g.SWELLING_INDEX),2)SWELLING_INDEX_CRMT,
+AVG((nvl(h.ENG_CONS_DRYER_1,0)+nvl(i.ENG_CONS_DRYER_2,0))/
+Decode(((Case When h.ENG_CONS_DRYER_1>0 Then 1 Else 0 END)+
+(Case When i.ENG_CONS_DRYER_2>0 Then 1 Else 0 END)),0,null,
+((Case When h.ENG_CONS_DRYER_1>0 Then 1 Else 0 END)+(Case When i.ENG_CONS_DRYER_2>0 Then 1 Else 0 END))))ENG_CONS,NULL,NULL,NULL
+FROM KPO.T_KPO_COST_DATA a,KPO.T_KPO_PELLET_PROD_MONTHLY b,KPO.t_kpo_Pellet_quality_monthly c ,
+KPO.T_KPO_PELLET_CCS_MONTHLY d,KPO.T_KPO_PELLET_RDI_DAILY e, KPO.T_KPO_PELLET_RI_DAILY f,
+KPO.T_KPO_PELLET_SWELLING_INDEX_DAILY g,KPO.T_KPO_PELLET_DRYING_GRIND_PROCESS_DAILY h,
+kpo.T_KPO_PELLET_DRYGRIND_STREAM2_DAILY i
+Where c.SOURCE(+)='PRODUCT' AND c.PLANT(+)='KPO-Pellet Plant'
+AND a.AREA(+)='100028600' AND a.COST_TYPE(+)='MC' AND a.COST_ELEMENT(+)='111105481'
+AND  b.Timestamp=c.DATE_MONTH(+) AND b.Timestamp=d.DATE_MONTH(+)
+AND b.Timestamp=Trunc(e.DATE_Time(+),'MON') AND b.Timestamp=Trunc(f.DATE_Time(+),'MON')AND 
+b.Timestamp=Trunc(g.DATE_Time(+),'MON')AND b.Timestamp=Trunc(a.DATE_Time(+),'MON') AND 
+trunc(b.Timestamp)=Trunc(h.Timestamp(+),'MON')AND trunc(b.Timestamp)=Trunc(i.Timestamp(+),'MON') AND 
+Trunc(g.Date_Time,'MON')<Trunc(SYSDATE,'MOn')  AND 
+Trunc(f.Date_Time,'MON')<Trunc(SYSDATE,'MOn')  AND
+Trunc(e.Date_Time,'MON')<Trunc(SYSDATE,'MOn')  AND
+Trunc(h.Timestamp,'MON')<Trunc(SYSDATE,'MOn')  AND
+Trunc(i.Timestamp,'MON')<Trunc(SYSDATE,'MOn')  AND
+b.Timestamp>=sysdate-200
+Group by b.Timestamp,b.NET_PRODUCTIVITY,c.FE,c.CAO,c.SIO2,c.AL2O3,c.P,
+c.K2O,d.AVG_CCS,c.PCT_TUM_6P3MM,c.PLS_TUM_MIN_0P5MM,a.ACTUAL_QUANTITY
+Order by b.Timestamp
