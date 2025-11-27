@@ -1,56 +1,113 @@
-Select a.Timestamp Date_Month,'TSJ_PELLET' AS PLANT,ROUND(a.NET_PROD)NET_PROD,ROUND(a.NET_PRODUCTIVITY,2)NET_PRODUCTIVITY,
-Round(a.ACTUAL_AVAILABILITY,2) AS Availability,Round(b.FE,2)FE,Round(b.CAO/Nullif(b.SIO2,0),3)B2,
-Round(b.AL2O3,2)AL2O3,Round(b.P,3)Phos,
-Round(b.K2O,3)K2O,Round(b.CCS_CRMT)CCS_CRMT,Round(b.TUMBLER_PLS_6P3_MM,1)TUMBLER_PLS_6P3_MM,
-Round(b.TUMBLER_MIN_0P5_MM,2)TUMBLER_MIN_0P5_MM,Round(b.SWELLING_INDEX_CRMT,1)SWELLING_INDEX_CRMT,
-ROUND(b.RDI,2)RDI,ROUND(b.RI,2)RI,
-(nvl(NOA_IRON_ORE_FINES,0)+nvl(JODA_IRON_ORE_FINES,0)+Nvl(IMPORTED_ORE_FINES,0)+nvl(DOMESTIC_PURCHASE,0))TOT_IRON_ORE_FINES,
-Round((nvl(ENG_CONS_DRYER_1,0)+nvl(ENG_CONS_DRYER_2,0))/Decode((NVl2(ENG_CONS_DRYER_1,1,0)+nvl2(ENG_CONS_DRYER_2,1,0)),0,NULL,
-(NVl2(ENG_CONS_DRYER_1,1,0)+nvl2(ENG_CONS_DRYER_2,1,0)))) AVG_ENG_CONS_DRYER,
-ROUND(BENTONITE_COST_CONS,2)BENTONITE_COST_CONS,
-ROUND((nvl(ANTH_KGPTNP,0)+nvl(NUT_COKE_KGPTNP,0)+nvl(CB_KGPTNP,0)),1)SOILD_FUEL,
-ROUND((nvl(GCP_SLUDGE_KGPTNP,0)+nvl(FLUE_DUST_KGPTNP,0)),1)SOILD_WASTE,
-Round(d.SPM_HOOD_EXHUST_STACK_PD_ID577,1)Hood_exhaust_SPM,Round(d.SPM_WB_HOOD_EXS_STACK_PD_ID579,1)WB_HOOD_EXHAUST_SPM,
-Round(c.DEDUSTING_SPM_ID1105,2)De_Dusting_SPM
-From imtg.T_PELLET_PRODUCTION_MONTHLY a,imtg.T_PELLET_QUALITY_MONTHLY b,T_PELLET_INDUR_Monthly03 c,T_PELLET_INDUR_Monthly02 d
-Where a.Timestamp=b.DATE_TIME(+) AND a.Timestamp=c.Timestamp(+) AND a.Timestamp=d.Timestamp(+) AND b.SOURCE(+)='PRODUCT'
-AND a.Timestamp>=sysdate-365
-Union
-Select b.Timestamp Date_Month,'TSK_PELLET' AS PLANT,ROUND(sum(a.ACTUAL_QUANTITY))NET_PROD,
-ROUND(b.NET_PRODUCTIVITY,1)NET_PRODUCTIVITY,NULL,
-Round(c.FE,1)FE,Round(c.CAO/Nullif(c.SIO2,0),2)B2,
-Round(c.AL2O3,2)AL2O3,Round(c.P,3)Phos,
-Round(c.K2O,3)K2O,ROUND(d.AVG_CCS)CCS_CRMT,Round(c.PCT_TUM_6P3MM,1)TUMBLER_PLS_6P3_MM,
-Round(c.PLS_TUM_MIN_0P5MM,2)TUMBLER_MIN_0P5_MM,ROUND(AVG(e.RDI),2)RDI,ROUND(AVG(f.RI),1)RI,
-Round(AVG(g.SWELLING_INDEX),1)SWELLING_INDEX_CRMT,
-ROUND((nvl(b.NOA_ORE,0)+nvl(b.JODA_ORE,0)+nvl(b.CRUSHED_FINES,0)+nvl(b.NINL_ORE,0)+nvl(b.KHONDBOND_ORE,0)))TOT_IRON_ORE,
-ROUND((nvl(b.ANTHRACITE_FUEL,0)+nvl(b.NUT_COKE_FUEL,0)+nvl(b.COKE_BREEZE_FUEL,0)),1)Solid_Fuel,
-ROUND(b.BENTONITE,2)BENTONITE,
-ROUND(b.NOA_ORE/Decode((nvl(b.NOA_ORE,0)+nvl(b.JODA_ORE,0)+nvl(b.CRUSHED_FINES,0)+nvl(b.NINL_ORE,0)+nvl(b.KHONDBOND_ORE,0)),0,
-NULL,(nvl(b.NOA_ORE,0)+nvl(b.JODA_ORE,0)+nvl(b.CRUSHED_FINES,0)+nvl(b.NINL_ORE,0)+nvl(b.KHONDBOND_ORE,0)))*100,1) NOA_PERC,
-ROUND(b.JODA_ORE/Decode((nvl(b.NOA_ORE,0)+nvl(b.JODA_ORE,0)+nvl(b.CRUSHED_FINES,0)+nvl(b.NINL_ORE,0)+nvl(b.KHONDBOND_ORE,0)),0,
-NULL,(nvl(b.NOA_ORE,0)+nvl(b.JODA_ORE,0)+nvl(b.CRUSHED_FINES,0)+nvl(b.NINL_ORE,0)+nvl(b.KHONDBOND_ORE,0)))*100,1) JODA_PERC
-FROM KPO.T_KPO_COST_DATA a,KPO.T_KPO_PELLET_PROD_MONTHLY b,KPO.t_kpo_Pellet_quality_monthly c ,
-KPO.T_KPO_PELLET_CCS_MONTHLY d,KPO.T_KPO_PELLET_RDI_DAILY e, KPO.T_KPO_PELLET_RI_DAILY f,
-KPO.T_KPO_PELLET_SWELLING_INDEX_DAILY g
-Where c.SOURCE(+)='PRODUCT' AND c.PLANT(+)='KPO-Pellet Plant'
-AND a.AREA(+)='100028600' AND a.COST_TYPE(+)='MC' AND a.COST_ELEMENT(+)='111105481'
-AND  Trunc(b.Timestamp)=Trunc(c.DATE_MONTH(+)) AND Trunc(b.Timestamp)=Trunc(d.DATE_MONTH(+))
-AND Trunc(b.Timestamp)=Trunc(e.DATE_Time(+),'MON') AND Trunc(b.Timestamp)=Trunc(f.DATE_Time(+),'MON')AND 
-Trunc(b.Timestamp)=Trunc(g.DATE_Time(+),'MON')AND Trunc(b.Timestamp)=Trunc(a.DATE_Time(+),'MON') AND 
-Trunc(g.Date_Time,'MON')<Trunc(SYSDATE,'MOn')  AND 
-Trunc(f.Date_Time,'MON')<Trunc(SYSDATE,'MOn')  AND
-Trunc(e.Date_Time,'MON')<Trunc(SYSDATE,'MOn')  AND
-b.Timestamp>=sysdate-365
-Group by b.Timestamp,b.NET_PRODUCTIVITY,c.FE,c.CAO,c.SIO2,c.AL2O3,c.P,
-c.K2O,d.AVG_CCS,c.PCT_TUM_6P3MM,c.PLS_TUM_MIN_0P5MM,a.ACTUAL_QUANTITY,b.NOA_ORE,b.JODA_ORE,b.CRUSHED_FINES,b.NINL_ORE,b.KHONDBOND_ORE,b.BENTONITE,
-b.ANTHRACITE_FUEL,b.NUT_COKE_FUEL,b.COKE_BREEZE_FUEL
-Union
-Select a.Timestamp Date_Month,'TSG_PELLET' AS PLANT,ROUND(a.NET_PROD)NET_PROD,Round(a.NETPRODUCTIVITY,1)NET_PRODUCTIVITY,
-Round(a.AVAILABILITY_PERC,1) AS Availability,Round(b.FE_T,1) ,ROUND(b.CAO/Decode(b.SIO2,0,NULL,b.SIO2),1)B2,ROUND(b.AL2O3,2)AL2O3,
-ROUND(b.CCS)CCS,ROUND(b.TI,1)TI,ROUND(b.AI,2)AI,ROUND(b.SWELLING,2)SWELLING,ROUND(b.RDI_MINUS_3P15,2)RDI,ROUND(b.RI,1)RI,
-ROUND(a.NOA_ORE)TOT_IRON_ORE,ROUND((BENTONITE*1000)/Decode(PRIME_PELLET,0,Null,PRODUCTION),2)Bentonite,
-ROUND(a.AVG_SPEC_ENG_CONS_MJTGP)ENG_CONS
-From TSLPL.T_TSG_PELLET_PROD_MONTHLY a,TSLPL.T_TSG_PELLET_QUALITY_MONTHLY b
-Where a.Timestamp>=sysdate-365 AND b.SOURCE='PELLET'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raw Material Entry</title>
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Raw Material Consumption</h3>
+
+    <!-- Date & Furnace Row -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Furnace</label>
+            <select class="form-select">
+                <option>C</option>
+                <option>A</option>
+                <option>B</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-success">
+            <tr>
+                <th>Material</th>
+                <th>Value in Tons</th>
+                <th>Value in Kgs</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <!-- Example Row 1 -->
+            <tr>
+                <td>COAL</td>
+                <td><input type="text" class="form-control" value="161.460906"></td>
+                <td><input type="text" class="form-control" value="161460.906"></td>
+                <td>
+                    <select class="form-select">
+                        <option>IPC</option>
+                        <option>Imported</option>
+                        <option>Local</option>
+                    </select>
+                </td>
+            </tr>
+
+            <!-- Example Row 2 -->
+            <tr>
+                <td>NUT COKE</td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td>
+                    <select class="form-select">
+                        <option>BF Sized Joda</option>
+                        <option>Local</option>
+                        <option>Other</option>
+                    </select>
+                </td>
+            </tr>
+
+            <!-- Add all other materials same way -->
+            <tr>
+                <td>PYROXINITE</td>
+                <td><input type="text" class="form-control" value="1403.78925"></td>
+                <td><input type="text" class="form-control" value="1403789.25"></td>
+                <td>
+                    <select class="form-select">
+                        <option>Local</option>
+                        <option>Imported</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>LIME STONE</td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td>
+                    <select class="form-select">
+                        <option>Gotan</option>
+                        <option>Local</option>
+                    </select>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <!-- Buttons -->
+    <div class="text-center mt-3">
+        <button class="btn btn-primary px-4">Save</button>
+        <button class="btn btn-secondary px-4">Back</button>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
