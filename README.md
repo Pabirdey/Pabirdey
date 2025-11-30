@@ -1,42 +1,29 @@
-<script>
-$(document).ready(function () {
+public ActionResult GetMaterials(string furnace)
+{
+    List<string> list = new List<string>();
 
-    // When furnace dropdown changes
-    $("select").change(function () {
+    using (OracleConnection con = new OracleConnection("YOUR_CONN"))
+    {
+        con.Open();
 
-        var furnace = $(this).val();
-        loadMaterials(furnace);
+        string q = @"SELECT MATERIAL_NAME 
+                     FROM T_MATERIAL_MASTER 
+                     WHERE FURNACE = :FURNACE 
+                     ORDER BY MATERIAL_NAME";
 
-    });
+        using (OracleCommand cmd = new OracleCommand(q, con))
+        {
+            cmd.Parameters.Add(":FURNACE", furnace);
 
-    // Load default furnace (first dropdown value)
-    loadMaterials($("select").val());
-});
-
-
-// Function to load materials based on furnace
-function loadMaterials(furnaceName) {
-
-    $.ajax({
-        url: '/Home/GetMaterialsByFurnace',
-        type: 'GET',
-        data: { furnace: furnaceName },
-        success: function (data) {
-
-            var tbody = $("#materialTable tbody");
-            tbody.empty(); // Clear previous rows
-
-            for (var i = 0; i < data.length; i++) {
-
-                var row = "<tr>" +
-                    "<td>" + data[i] + "</td>" +
-                    "<td><input type='text' class='form-control medium-textbox' id='ton_" + i + "'></td>" +
-                    "<td><input type='text' class='form-control medium-textbox' id='kg_" + i + "'></td>" +
-                    "</tr>";
-
-                tbody.append(row);
+            using (OracleDataReader dr = cmd.ExecuteReader())
+            {
+                while (dr.Read())
+                {
+                    list.Add(dr["MATERIAL_NAME"].ToString());
+                }
             }
         }
-    });
+    }
+
+    return Json(list, JsonRequestBehavior.AllowGet);
 }
-</script>
