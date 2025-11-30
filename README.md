@@ -1,39 +1,60 @@
-public ActionResult GetMaterials()
-{
-    List<string> materials = new List<string>();
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raw Material Entry</title>
 
-    using (OracleConnection con = new OracleConnection("YOUR_CONN"))
-    {
-        con.Open();
-        string query = "SELECT MATERIAL_NAME FROM T_MATERIAL_MASTER ORDER BY MATERIAL_NAME";
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .medium-textbox {
+            width: 120px;
+            max-width: 120px;            
+        }        
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h3 class="text-center mb-4">Raw Material Consumption</h3>
+        <!-- Date & Furnace Row -->
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Furnace</label>
+                <select class="form-select">
+                    <option>C</option>
+                    <option>E</option>
+                    <option>F</option>
+                </select>
+            </div>
+        </div>
+        <table id="materialTable" class="table table-bordered" style="width:60%;">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Value (Tons)</th>
+                    <th>Value (Kgs)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        using (OracleDataReader dr = cmd.ExecuteReader())
-        {
-            while (dr.Read())
-            {
-                materials.Add(dr["MATERIAL_NAME"].ToString());
-            }
-        }
-    }
-    return Json(materials, JsonRequestBehavior.AllowGet);
-}
-<table id="materialTable" class="table table-bordered" style="width:60%;">
-    <thead>
-        <tr>
-            <th>Material</th>
-            <th>Value (Tons)</th>
-            <th>Value (Kgs)</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+        <!-- Buttons -->
+        <div>
+            <button class="btn btn-primary px-4">Save</button>
+            <button class="btn btn-secondary px-4">Back</button>
+        </div>
+    </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
 $(document).ready(function () {
-
     $.ajax({
         url: '/Home/GetMaterials',
         type: 'GET',
@@ -52,6 +73,4 @@ $(document).ready(function () {
             }
         }
     });
-
-});
 </script>
