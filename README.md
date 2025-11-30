@@ -1,20 +1,42 @@
-public ActionResult GetMaterials()
-{
-    List<string> list = new List<string>();
+<script>
+$(document).ready(function () {
 
-    using (OracleConnection con = new OracleConnection("YOUR_CONN"))
-    {
-        con.Open();
-        string q = "SELECT MATERIAL_NAME FROM T_MATERIAL_MASTER ORDER BY MATERIAL_NAME";
+    // When furnace dropdown changes
+    $("select").change(function () {
 
-        using (OracleCommand cmd = new OracleCommand(q, con))
-        using (OracleDataReader dr = cmd.ExecuteReader())
-        {
-            while (dr.Read())
-            {
-                list.Add(dr["MATERIAL_NAME"].ToString());
+        var furnace = $(this).val();
+        loadMaterials(furnace);
+
+    });
+
+    // Load default furnace (first dropdown value)
+    loadMaterials($("select").val());
+});
+
+
+// Function to load materials based on furnace
+function loadMaterials(furnaceName) {
+
+    $.ajax({
+        url: '/Home/GetMaterialsByFurnace',
+        type: 'GET',
+        data: { furnace: furnaceName },
+        success: function (data) {
+
+            var tbody = $("#materialTable tbody");
+            tbody.empty(); // Clear previous rows
+
+            for (var i = 0; i < data.length; i++) {
+
+                var row = "<tr>" +
+                    "<td>" + data[i] + "</td>" +
+                    "<td><input type='text' class='form-control medium-textbox' id='ton_" + i + "'></td>" +
+                    "<td><input type='text' class='form-control medium-textbox' id='kg_" + i + "'></td>" +
+                    "</tr>";
+
+                tbody.append(row);
             }
         }
-    }
-    return Json(list, JsonRequestBehavior.AllowGet);
+    });
 }
+</script>
