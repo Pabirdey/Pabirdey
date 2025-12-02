@@ -1,7 +1,7 @@
 SELECT 
     a.Timestamp,
     b.FUR_NAME,
-    a.TAG_ID,
+    b.TAG_ID,
     b.WEB_SL_NO,
     b.WEB_COLUMN,
 
@@ -25,9 +25,10 @@ SELECT
 
 FROM T_ATOF_BIN_DETAILS b
 LEFT JOIN t_furnaces_proc_hm_prod a
-    ON b.TAG_ID = a.TAG_ID
-    AND a.Timestamp = TO_DATE('30-NOV-2025','DD-MON-YYYY')
+      ON b.TAG_ID = a.TAG_ID
+     AND a.Timestamp = TO_DATE('30-NOV-2025','DD-MON-YYYY')
 
 WHERE b.REQUIRED = 'Y'
   AND b.WEB_COLUMN IS NOT NULL
-ORDER BY a.TAG_ID, b.WEB_SL_NO;
+
+ORDER BY b.TAG_ID, b.WEB_SL_NO;
