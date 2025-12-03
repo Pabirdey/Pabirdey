@@ -1,32 +1,73 @@
-CREATE OR REPLACE VIEW VW_FURNACE_MATERIAL AS
-SELECT 
-    b.TAG_ID,
-    b.FUR_NAME,
-    b.WEB_SL_NO,
-    b.WEB_COLUMN,
-    a.Timestamp,
-    NVL(a.VALUE,0) AS VALUE,
-    
-    /* Value Kgs */
-    CASE 
-        WHEN b.FUR_NAME = 'F' AND b.WEB_COLUMN = 'Pellet' 
-            THEN NVL(a.VALUE,0) * 1000
-        WHEN b.FUR_NAME = 'F'
-            THEN NVL(a.VALUE,0)
-        ELSE NVL(a.VALUE,0)
-    END AS VAL_KGS,
+function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+                $.ajax({
+                        url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
+                        type: 'GET',
+                        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                        success: function (result_Mudgun_Details) {
+                        var parsedData = JSON.parse(result_Mudgun_Details);
+                        var tableBody = "";
+                        for (var i = 0; i < parsedData.length; i++) {
+                        tableBody += "<tr>";
+                        tableBody += `<td><input name="CAST_NO" class='form-control form-control-lg' value='${parsedData[i].CAST_NO}' readonly/></td>`;
+                        tableBody += `<td>
+                        <select name="CLOSURE_MODE" class='form-select form-select-lg'>
+                            <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
+                            <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
+                            <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
+                        </select>
+                        </td>`;
+                tableBody += `<td><input name="CLAY_QUANTITY" class='form-control form-control-lg' value='${parsedData[i].CLAY_QUANTITY}'/></td>`;
+                tableBody += `<td>
+                    <select name="MG_CLAY_USED" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].MG_CLAY_USED ? 'selected' : ''} value=""></option>
+                        ${[
+                            'LRH', 'UBQ', 'SARVESH', 'CALDYRS', 'HARIMA(S)', 'HARIMA(D)', 'CORUS', 'TRB', 'VISUVIUS',
+                            'HARIMA-TWH4', 'HARIMA-CPH4', 'HARIMA(D)-TWH5', 'HARIMA(D)-TWH5K', 'HARIMA(D)-TWH5-T'
+                        ].map(option => `<option ${parsedData[i].MG_CLAY_USED === option ? 'selected' : ''}>${option}</option>`).join("")}
+                    </select>
+                </td>`;
+                tableBody += `<td><input name="LOT_NO" class='form-control form-control-lg' value='${parsedData[i].LOT_NO}'/></td>`;
+                //tableBody += `<td><input name="LOT_NO" class='form-control form-control-lg' value='${parsedData[i].LOT_NO}'/>
+                //<button type="button" class="btn btn-outline-primary openLotModal" data-index="${i}" data-bs-toggle="modal" data-bs-target="#lotModal">                        
+                //   </button>
+                //   </td>`;
+                
+                tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
+                tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
+                tableBody += `<td>
+                    <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>REPLACEMENT</option>
+                        <option ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>WEILD</option>
+                    </select>
+                </td>`;
 
-    /* Value Tons */
-    CASE 
-        WHEN b.FUR_NAME = 'F' AND b.WEB_COLUMN = 'Pellet'
-            THEN NVL(a.VALUE,0)
-        WHEN b.FUR_NAME = 'F'
-            THEN NVL(a.VALUE,0) / 1000
-        ELSE NVL(a.VALUE,0) / 1000
-    END AS VAL_TONS
+                tableBody += `<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
+                tableBody += `<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
+                tableBody += `<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
+                tableBody += `<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
+                tableBody += `<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
+                tableBody += `<td><input name="PRESS_ON_FORCE" class='form-control form-control-lg' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
 
-FROM T_ATOF_BIN_DETAILS b
-LEFT JOIN t_furnaces_proc_hm_prod a
-       ON b.TAG_ID = a.TAG_ID
-WHERE b.REQUIRED = 'Y'
-  AND b.WEB_COLUMN IS NOT NULL;
+                tableBody += `<td>
+                    <select name="CLAY_LEAKAGE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLAY_LEAKAGE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
+
+                tableBody += `<td>
+                    <select name="BACK_FIRE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].BACK_FIRE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].BACK_FIRE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].BACK_FIRE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
+
+                tableBody += "</tr>";
+            }
+
+            $("#Mudgun_Details tbody").html(tableBody);
+        }
+    });
