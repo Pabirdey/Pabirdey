@@ -1,18 +1,13 @@
-<div class="modal fade" id="othersModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Enter Other Clay Name</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+// Event delegation for dynamically created rows
+$(document).on("change", "select[name='MG_CLAY_USED']", function () {
 
-      <div class="modal-body">
-        <input type="text" id="otherClayName" class="form-control" placeholder="Enter Clay Name">
-      </div>
+    if ($(this).val() === "OTHERS") {
 
-      <div class="modal-footer">
-        <button type="button" id="saveOtherClay" class="btn btn-primary">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
+        // save reference of current dropdown
+        window.currentClayDropdown = this;
+
+        // open modal
+        var modal = new bootstrap.Modal(document.getElementById("othersModal"));
+        modal.show();
+    }
+});
