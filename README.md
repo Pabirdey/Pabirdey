@@ -10,7 +10,12 @@
         <input type="text" id="otherClayName" class="form-control" placeholder="Enter Clay Name">
       </div>
 
-      <div class="modal-footer">
+   document.getElementById("MG_CLAY_USED").addEventListener("change", function () {
+    if (this.value === "OTHERS") {
+        var modal = new bootstrap.Modal(document.getElementById("othersModal"));
+        modal.show();
+    }
+});   <div class="modal-footer">
         <button type="button" id="saveOtherClay" class="btn btn-primary">Save</button>
       </div>
     </div>
