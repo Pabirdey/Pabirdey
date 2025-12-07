@@ -1,15 +1,27 @@
-$(document).on("click", "#TAP_Hot_Metal_Details tr, #Driling_Slag_Details tr", function () {
+function Display_Drilling_Details(lsSelectedFDate, IsSelectedFur) {
+    $.ajax({
+        url: '/CastHouse/Get_Drilling_Slag_Details',
+        type: 'GET',
+        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+        success: function (resultData) {
 
-    // Always read data attribute as string
-    let castNo = $(this).attr("data-castno");
+            var parsedData = JSON.parse(resultData);
+            var tableBody = "";
 
-    if (!castNo) return;
-    castNo = castNo.trim();
+            for (var i = 0; i < parsedData.length; i++) {
 
-    // Remove old highlights
-    $("#TAP_Hot_Metal_Details tr, #Driling_Slag_Details tr").removeClass("highlight");
+                tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
 
-    // Highlight both tables where CAST NO matches
-    $('#TAP_Hot_Metal_Details tr[data-castno="' + castNo + '"]').addClass("highlight");
-    $('#Driling_Slag_Details tr[data-castno="' + castNo + '"]').addClass("highlight");
-});
+                tableBody += `<td><input class="form-control form-control-lg" name="CAST_NO" value="${parsedData[i].CAST_NO}" readonly/></td>`;
+                tableBody += `<td><input class="form-control form-control-lg" name="DRILL_DIA" value="${parsedData[i].DRILL_DIA}"/></td>`;
+                tableBody += `<td><input class="form-control form-control-lg" name="DRILL_TYPE" value="${parsedData[i].DRILL_TYPE}"/></td>`;
+                tableBody += `<td><input class="form-control form-control-lg" name="TOTAL_DRILLING_TIME" value="${parsedData[i].TOTAL_DRILLING_TIME}"/></td>`;
+                // Add remaining fields...
+
+                tableBody += "</tr>";
+            }
+
+            $("#Driling_Slag_Details tbody").html(tableBody);
+        }
+    });
+}
