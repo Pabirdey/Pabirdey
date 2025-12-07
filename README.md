@@ -1,2 +1,8 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
+
+tableBody += `<td>
+                <input name="CAST_NO" 
+                       class="form-control form-control-lg"
+                       value="${parsedData[i].CAST_NO}" 
+                       readonly />
+              </td>`;
