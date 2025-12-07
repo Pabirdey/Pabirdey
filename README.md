@@ -1,15 +1,20 @@
-// Highlight row when clicking anywhere inside the row
-$(document).on("click", "#TAP_Hot_Metal_Details tr, #TAP_Hot_Metal_Details tr *", function () {
+#TAP_Hot_Metal_Details tr.highlight td {
+    background-color: yellow !important;
+}
+$(document).on("click", "#TAP_Hot_Metal_Details *", function () {
 
-    let row = $(this).closest("tr");     // always get parent TR
+    let row = $(this).closest("tr"); // Get the parent row
+
+    if (!row.length) return;
+
     let castNo = row.attr("data-castno");
-
     if (!castNo) return;
+
     castNo = castNo.trim();
 
-    // Remove previous highlights
+    // Remove previous highlight
     $("#TAP_Hot_Metal_Details tr").removeClass("highlight");
 
-    // Highlight row with same CAST_NO
-    $('#TAP_Hot_Metal_Details tr[data-castno="' + castNo + '"]').addClass("highlight");
+    // Highlight the row
+    row.addClass("highlight");
 });
