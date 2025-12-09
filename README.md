@@ -1,20 +1,6 @@
-#TAP_Hot_Metal_Details tr.highlight td {
-    background-color: yellow !important;
-}
-$(document).on("click", "#TAP_Hot_Metal_Details *", function () {
-
-    let row = $(this).closest("tr"); // Get the parent row
-
-    if (!row.length) return;
-
-    let castNo = row.attr("data-castno");
-    if (!castNo) return;
-
-    castNo = castNo.trim();
-
-    // Remove previous highlight
-    $("#TAP_Hot_Metal_Details tr").removeClass("highlight");
-
-    // Highlight the row
-    row.addClass("highlight");
-});
+INSERT INTO T_IOPP_PROC_RAW (DATE_TIME, TAG_NAME, TAG_VALUE)
+SELECT DATE_TIME,
+       CAST(TAG_NAME AS VARCHAR2(32767)) AS TAG_NAME,
+       TAG_VALUE
+FROM dbo.VW_TAG_LOGS@IOPP
+WHERE DATE_TIME >= TO_DATE('09-DEC-2025','DD-MON-YYYY');
