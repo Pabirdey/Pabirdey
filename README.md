@@ -1,6 +1,6 @@
 public ActionResult GetRawMaterialByFurnace(string furnace, string fdate)
 {
-    var list = new List<RawMaterialModel>();
+    var list = new List<Dictionary<string, object>>();
 
     using (OracleConnection conn = new OracleConnection("Your Connection"))
     {
@@ -10,21 +10,23 @@ public ActionResult GetRawMaterialByFurnace(string furnace, string fdate)
         {
             cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.Add("p_furnace", furnace);
-            cmd.Parameters.Add("p_date", fdate);
-            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+            cmd.Parameters.Add("p_furnace", OracleDbType.Varchar2).Value = furnace;
+            cmd.Parameters.Add("p_date", OracleDbType.Varchar2).Value = fdate;
+            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor)
+                           .Direction = ParameterDirection.Output;
 
             using (OracleDataReader dr = cmd.ExecuteReader())
             {
                 while (dr.Read())
                 {
-                    list.Add(new RawMaterialModel
-                    {
-                        Material = dr["MATERIAL_NAME"].ToString(),
-                        ValueTon = dr["VALUE_TON"].ToString(),
-                        ValueKg = dr["VALUE_KG"].ToString(),
-                        TypeName = dr["TYPE_NAME"].ToString()
-                    });
+                    var row = new Dictionary<string, object>();
+
+                    row["MATERIAL"]  = dr["MATERIAL_NAME"].ToString();
+                    row["VALUE_TON"] = dr["VALUE_TON"].ToString();
+                    row["VALUE_KG"]  = dr["VALUE_KG"].ToString();
+                    row["TYPE_NAME"] = dr["TYPE_NAME"].ToString();
+
+                    list.Add(row);
                 }
             }
         }
