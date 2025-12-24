@@ -1,33 +1,48 @@
- [HttpGet]
-        public ActionResult GetRawMaterialByFurnace(string furnace, string fdate)
+[HttpGet]
+public ActionResult GetRawMaterialByFurnace(string furnace, string fdate)
+{
+    var list = new List<Dictionary<string, object>>();
+
+    using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
+    {
+        conn.Open();
+
+        using (OracleCommand cmd = new OracleCommand("PROC_GET_RAW_MATERIAL", conn))
         {
-            var list = new List<Dictionary<string, object>>();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.BindByName = true;
 
-            using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
+            // 🔹 Param 1 - Furnace
+            cmd.Parameters.Add("p_furnace", OracleDbType.Varchar2).Value = furnace;
+
+            // 🔹 Param 2 - Date (Convert to Oracle DATE)
+            DateTime dt = DateTime.ParseExact(fdate, "dd/MM/yyyy",
+                                  System.Globalization.CultureInfo.InvariantCulture);
+            cmd.Parameters.Add("p_date", OracleDbType.Date).Value = dt;
+
+            // 🔹 Param 3 - Ref Cursor OUT
+            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
+
+            // 🔹 Execute
+            cmd.ExecuteNonQuery();
+
+            // 🔹 Read Cursor Data
+            OracleDataReader dr = ((OracleRefCursor)cmd.Parameters["p_cursor"].Value).GetDataReader();
+
+            while (dr.Read())
             {
-                conn.Open();
+                var row = new Dictionary<string, object>();
 
-                using (OracleCommand cmd = new OracleCommand("PROC_GET_RAW_MATERIAL", conn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                row["MATERIAL"] = dr["MATERIAL_NAME"].ToString();
+                row["VALUE_TON"] = dr["VALUE_TON"].ToString();
+                row["VALUE_KG"] = dr["VALUE_KG"].ToString();
 
-                    cmd.Parameters.Add("p_furnace", OracleDbType.Varchar2).Value = furnace;
-                    cmd.Parameters.Add("p_date", OracleDbType.Varchar2).Value = fdate;
-                    cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
-
-                    using (OracleDataReader dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            var row = new Dictionary<string, object>();
-                            row["MATERIAL"] = dr["MATERIAL_NAME"].ToString();
-                            row["VALUE_TON"] = dr["VALUE_TON"].ToString();
-                            row["VALUE_KG"] = dr["VALUE_KG"].ToString();
-                            list.Add(row);
-                        }
-                    }
-                }
+                list.Add(row);
             }
 
-            return Json(list, JsonRequestBehavior.AllowGet);
+            dr.Close();
         }
+    }
+
+    return Json(list, JsonRequestBehavior.AllowGet);
+}
