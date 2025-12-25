@@ -1,48 +1,35 @@
 <script type="text/javascript">
-    $(document).ready(function () {
-
-        // ----------- SET DEFAULT DATE (Yesterday) ----------
+    $(document).ready(function () {        
         var caldate1 = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy",new System.Globalization.CultureInfo("en-GB"))';
-
         $('#currDate-value').html(caldate1);
-
         $('#date-daily1').datepicker({
             format: "dd/mm/yyyy",
             autoclose: true,
             todayHighlight: true
         }).datepicker("setDate", caldate1);
 
-        // ----------- DATE CHANGE -----------
         $('#date-daily1').on('changeDate', function () {
             caldate1 = $('#date-daily1').datepicker('getFormattedDate');
             $('#currDate-value').html(caldate1);
-
             var furnace = $("#ddlFurnace").val();
             Display_Material(furnace, caldate1);
         });
 
-        // ----------- FURNACE CHANGE --------
+        
         $("#ddlFurnace").change(function () {
-            var furnace = $("#ddlFurnace").val();
-
-            // ✔ BEST WAY: always take date from datepicker
+            var furnace = $("#ddlFurnace").val();            
             var fDate = $('#date-daily1').datepicker('getFormattedDate');
-
             Display_Material(furnace, fDate);
         });
-
-        // ----------- AJAX FUNCTION ----------
+        
         function Display_Material(furnace, fDate) {
-
             $.ajax({
                 url: '@Url.Action("GetRawMaterialByFurnace","HML")',
                 type: 'GET',
                 data: { furnace: furnace, fdate: fDate },
-
                 success: function (data) {
                     var tbody = $("#materialTable tbody");
                     tbody.empty();
-
                     for (var i = 0; i < data.length; i++) {
                         var row = "<tr>" +
                             "<td class='fw-bold'>" + data[i].MATERIAL + "</td>" +
@@ -56,9 +43,7 @@
                     alert("Error Occurred: " + xhr.responseText);
                 }
             });
-        }
-
-        // ----------- LOAD FIRST TIME ----------
+        }        
         Display_Material($("#ddlFurnace").val(), caldate1);
     });
 </script>
