@@ -1,4 +1,4 @@
-<script type="text/javascript">
+ <script type="text/javascript">
     $(document).ready(function () {        
         var caldate1 = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy",new System.Globalization.CultureInfo("en-GB"))';
         $('#currDate-value').html(caldate1);
@@ -33,8 +33,8 @@
                     for (var i = 0; i < data.length; i++) {
                         var row = "<tr>" +
                             "<td class='fw-bold'>" + data[i].MATERIAL + "</td>" +
-                            "<td><input type='text' class='form-control medium-textbox' value='" + data[i].VALUE_TON + "'></td>" +
-                            "<td><input type='text' class='form-control medium-textbox' value='" + data[i].VALUE_KG + "'></td>" +
+                            "<td><input type='text' class='form-control large-textbox' value='" + data[i].VALUE_TON + "'></td>" +
+                            "<td><input type='text' class='form-control large-textbox' value='" + data[i].VALUE_KG + "'></td>" +
                             "</tr>";
                         tbody.append(row);
                     }
