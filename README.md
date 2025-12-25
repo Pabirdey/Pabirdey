@@ -2,145 +2,109 @@
 <html>
 <head>
     <title>Raw Material Entry</title>
-
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body{
-            background:#d1ffb0;
+            background:#d6ffd6;
         }
-
-        .form-panel{
-            background:#2f8a2f;
+        .panel-box{
+            background:#2e8b57;
             color:white;
-            padding:20px;
+            padding:15px;
             border-radius:8px;
-            width:85%;
-            margin:auto;
+            margin-bottom:20px;
         }
-
-        .heading-box{
-            background:#1b4d1b;
-            padding:10px;
+        .inner-panel{
+            background:#3fa35c;
+            padding:15px;
             border-radius:8px;
-            margin-bottom:15px;
         }
-
-        .table-header{
-            color:yellow;
-            font-weight:bold;
-            text-align:center;
-        }
-
-        .material-name{
-            font-weight:bold;
-            color:#ffe9e9;
-        }
-
-        input{
-            text-align:right;
-            font-weight:bold;
+        .label-col{
+            color:#fff;
+            font-weight:600;
         }
     </style>
 </head>
+
 <body>
 
-<div class="form-panel">
+<div class="container-fluid mt-4">
 
-    <!-- Top Section -->
-    <div class="heading-box d-flex justify-content-between align-items-center">
-        <div>
-            <label class="fw-bold">Date:</label>
-            <input type="date" class="form-control d-inline-block" style="width:210px;">
-        </div>
-
-        <div>
-            <label class="fw-bold">Furnace:</label>
-            <select class="form-select d-inline-block" style="width:140px;">
-                <option>A</option>
-                <option>B</option>
-                <option selected>C</option>
-                <option>D</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Table -->
-    <div class="row fw-bold table-header">
-        <div class="col-4">RAW MATERIAL</div>
-        <div class="col-3">Value in Tons</div>
-        <div class="col-3">Value in Kgs</div>
-        <div class="col-2">Types</div>
-    </div>
-
-    <hr>
-
-    <!-- DATA ROWS -->
-    <div id="rowsContainer">
-
-        <!-- Example Row (Repeat for all items) -->
-        <div class="row mb-2 align-items-center">
-            <div class="col-4 material-name">COAL</div>
-
-            <div class="col-3">
-                <input class="form-control" value="0">
+    <!-- Top Filter -->
+    <div class="panel-box">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <label class="form-label">Date:</label>
+                <input type="date" class="form-control">
             </div>
 
-            <div class="col-3">
-                <input class="form-control" value="0">
-            </div>
-
-            <div class="col-2">
+            <div class="col-md-4">
+                <label class="form-label">Furnace:</label>
                 <select class="form-select">
-                    <option>IPC</option>
-                    <option>Imported</option>
-                    <option>Local</option>
+                    <option>F</option>
+                    <option>E</option>
                 </select>
             </div>
         </div>
-
-        <!-- Copy this row for EVERY ITEM in your list -->
-        <div class="row mb-2 align-items-center">
-            <div class="col-4 material-name">NUT COKE</div>
-            <div class="col-3"><input class="form-control" value="161.460906"></div>
-            <div class="col-3"><input class="form-control" value="161460.906"></div>
-            <div class="col-2">
-                <select class="form-select">
-                    <option>BF Sized</option>
-                    <option>Joda</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="row mb-2 align-items-center">
-            <div class="col-4 material-name">SINTER</div>
-            <div class="col-3"><input class="form-control" value="1403.78925"></div>
-            <div class="col-3"><input class="form-control" value="1403789.25"></div>
-            <div class="col-2">
-                <select class="form-select">
-                    <option>Local</option>
-                    <option>Imported</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Add all remaining items same way -->
-
     </div>
 
-    <hr>
+    <!-- Main Panel -->
+    <div class="panel-box">
+        <div class="inner-panel">
 
-    <!-- Buttons -->
-    <div class="text-center">
-        <button class="btn btn-primary px-4">Save</button>
-        <button class="btn btn-secondary px-4">Back</button>
+            <div class="row fw-bold text-warning mb-2">
+                <div class="col-md-3">Material</div>
+                <div class="col-md-3">Value in Tons</div>
+                <div class="col-md-3">Value in Kgs</div>
+                <div class="col-md-3">Types</div>
+            </div>
+
+            <!-- === ROW 1 === -->
+            <div class="row mb-2">
+                <div class="col-md-3 label-col">COAL</div>
+                <div class="col-md-3"><input class="form-control" /></div>
+                <div class="col-md-3"><input class="form-control" /></div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option>IPC</option>
+                        <option>ABC</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- === ROW 2 === -->
+            <div class="row mb-2">
+                <div class="col-md-3 label-col">NUT COKE</div>
+                <div class="col-md-3"><input class="form-control" /></div>
+                <div class="col-md-3"><input class="form-control" /></div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option>BF SIZED JODA</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Repeat same structure for all other materials -->
+
+            <!-- Theoretical Production -->
+            <div class="row mt-4">
+                <div class="col-md-4 label-col">Theoretical Production</div>
+                <div class="col-md-4">
+                    <input class="form-control" readonly value="4307.16">
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="mt-4">
+                <button class="btn btn-primary">Save</button>
+                <button class="btn btn-secondary ms-2">Back</button>
+            </div>
+
+        </div>
     </div>
 
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
