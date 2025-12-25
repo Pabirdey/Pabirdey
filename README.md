@@ -12,7 +12,6 @@ body{
 .page-title{
     font-weight:700;
     color:#2c3e50;
-    letter-spacing:.5px;
 }
 
 /* Card look */
@@ -40,30 +39,39 @@ body{
     padding:12px;
 }
 
-/* Rows */
 #materialTable td{
     font-size:20px;
     font-family: Courier New;
     vertical-align:middle;
 }
 
+/* Row Hover */
 #materialTable tbody tr:hover{
     background:#f5f7fa;
 }
 
-/* INPUT BOX */
+/* -------- COLUMN WIDTH FIX HERE -------- */
+
+/* Value Tons Column */
+#materialTable td:nth-child(2),
+#materialTable th:nth-child(2){
+    width:200px;   /* Increase if you want */
+}
+
+/* Value Kgs Column */
+#materialTable td:nth-child(3),
+#materialTable th:nth-child(3){
+    width:230px;
+    padding-left:45px;   /* Keeps gap between columns */
+}
+
+/* -------- INPUT SIZE -------- */
 .medium-textbox{
-    width:140px;
-    height:48px;
+    width:180px;
+    height:50px;
     text-align:right;
     font-size:20px;
     font-weight:bold;
-}
-
-/* GAP BETWEEN TONS & KGS COLUMN */
-#materialTable td:nth-child(3),
-#materialTable th:nth-child(3){
-    padding-left:45px;
 }
 
 /* Buttons */
@@ -73,6 +81,7 @@ body{
     font-size:18px;
     border-radius:8px;
 }
+
 </style>
 }
 
@@ -89,7 +98,7 @@ body{
             <div class="col-md-4">
                 <label class="form-label fw-bold">Date</label><br>
                 <a id="date-daily1" class="drpickr btn btn-primary">
-                    <i class="fa fa-calendar"></i> 
+                    <i class="fa fa-calendar"></i>
                     <label id="currDate-value" style="font-size:20px;color:white"></label>
                 </a>
             </div>
@@ -135,6 +144,7 @@ body{
 <script src="@Url.Content("~/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")"></script>
 
 <script>
+
 $(document).ready(function () {
 
     var caldate1 = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy",new System.Globalization.CultureInfo("en-GB"))';
@@ -181,6 +191,8 @@ $(document).ready(function () {
             }
         });
     }
+
 });
+
 </script>
 }
