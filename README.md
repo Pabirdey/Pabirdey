@@ -1,6 +1,7 @@
 @section css {
     <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap/dist/css/bootstrap.min.css")">
     <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")">
+
     <style>
         body {
             background: #eef2f7;
@@ -22,59 +23,67 @@
 
         /* TABLE */
         #materialTable {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
         }
 
-            #materialTable thead {
-                background: #1f4e79;
-                color: white;
-            }
+        #materialTable thead {
+            background: #1f4e79;
+            color: white;
+        }
 
-            #materialTable th {
-                font-size: 20px;
-                padding: 12px;
-            }
+        #materialTable th {
+            font-size: 22px;
+            padding: 14px;
+            text-align: center;
+        }
 
-            #materialTable td {
-                font-size: 12px;
-                font-family: Courier New;
-                vertical-align: middle;
-            }
+        #materialTable td {
+            font-size: 18px;
+            font-family: Calibri;
+            padding: 10px;
+            vertical-align: middle;
+            border: 2px solid #000;
+        }
 
-            /* Row Hover */
-            #materialTable tbody tr:hover {
-                background: #f5f7fa;
-            }
+        #materialTable th,
+        #materialTable td {
+            border: 2px solid black;
+        }
 
-            /* -------- COLUMN WIDTH FIX HERE -------- */
-             
-            /* Material Column */
-            #materialTable td:nth-child(1),
-            #materialTable th:nth-child(1) {
-                width: 50px; /* Increase if you want */
-            }
+        #materialTable tbody tr:hover {
+            background: #f5f7fa;
+        }
 
-            /* Value Tons Column */
-            #materialTable td:nth-child(2),
-            #materialTable th:nth-child(2) {
-                width: 100px; /* Increase if you want */
-            }
+        /* -------- COLUMN WIDTH BIG -------- */
 
-            /* Value Kgs Column */
-            #materialTable td:nth-child(3),
-            #materialTable th:nth-child(3) {
-                width: 130px;
-                padding-left: 45px; /* Keeps gap between columns */
-            }
+        /* MATERIAL COLUMN BIG */
+        #materialTable th:nth-child(1),
+        #materialTable td:nth-child(1) {
+            width: 430px;
+        }
+
+        /* VALUE (TONS) COLUMN BIG */
+        #materialTable th:nth-child(2),
+        #materialTable td:nth-child(2) {
+            width: 250px;
+            text-align: center;
+        }
+
+        /* VALUE (KGS) COLUMN BIG */
+        #materialTable th:nth-child(3),
+        #materialTable td:nth-child(3) {
+            width: 270px;
+            text-align: center;
+        }
 
         /* -------- INPUT SIZE -------- */
         .medium-textbox {
-            width: 180px;
+            width: 220px;
             height: 50px;
             text-align: right;
-            font-size: 12px;
+            font-size: 18px;
             font-weight: bold;
         }
 
@@ -87,11 +96,14 @@
         }
     </style>
 }
+
 <div class="app-content">
     <div class="main-content">
         <div class="container mt-5">
             <div class="card-box">
+
                 <h3 class="text-center page-title mb-4">Raw Material Consumption</h3>
+
                 <!-- Date + Furnace -->
                 <div class="row mb-4">
                     <div class="col-md-4">
@@ -101,6 +113,7 @@
                             <label id="currDate-value" style="font-size:20px;color:white"></label>
                         </a>
                     </div>
+
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Furnace</label>
                         <select class="form-select shadow-sm" id="ddlFurnace">
@@ -110,6 +123,7 @@
                         </select>
                     </div>
                 </div>
+
                 <!-- TABLE -->
                 <table id="materialTable" class="table table-bordered shadow-sm">
                     <thead>
@@ -121,23 +135,26 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+
                 <!-- BUTTONS -->
                 <div class="mt-4">
                     <button class="btn btn-primary btn-custom me-2">Save</button>
                     <button class="btn btn-secondary btn-custom">Back</button>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
-@section scripts {
-    <script src="@Url.Content("~/bower_components/jquery/dist/jquery.min.js")"></script>
-    <script src="@Url.Content("~/bower_components/bootstrap/dist/js/bootstrap.min.js")"></script>
-    <script src="@Url.Content("~/bower_components/moment/moment.min.js")"></script>
-    <script src="@Url.Content("~/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")"></script>
-    <script>
 
+@section scripts {
+<script src="@Url.Content("~/bower_components/jquery/dist/jquery.min.js")"></script>
+<script src="@Url.Content("~/bower_components/bootstrap/dist/js/bootstrap.min.js")"></script>
+<script src="@Url.Content("~/bower_components/moment/moment.min.js")"></script>
+<script src="@Url.Content("~/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")"></script>
+
+<script>
 $(document).ready(function () {
 
     var caldate1 = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy",new System.Globalization.CultureInfo("en-GB"))';
@@ -186,6 +203,5 @@ $(document).ready(function () {
     }
 
 });
-
-    </script>
+</script>
 }
