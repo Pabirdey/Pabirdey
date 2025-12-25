@@ -1,39 +1,47 @@
-[HttpGet]
-public ActionResult GetRawMaterialByFurnace(string furnace, string fdate)
-{
-    var list = new List<object>();
+ <script type="text/javascript">
+    $(document).ready(function () {
+        var caldate1 = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy",new System.Globalization.CultureInfo("en-GB"))';
+        $('#currDate-value').html(caldate1);
+        $('#date-daily1').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        }).datepicker("setDate", caldate1);
+        $('#date-daily1').on('changeDate', function () {
+            caldate1 = $('#date-daily1').datepicker('getFormattedDate');
+            $('#currDate-value').html(caldate1);          
+            var furnace = $("#ddlFurnace").val();
+            Display_Material(furnace, caldate1);
+        });       
+        $("#ddlFurnace").change(function () {
+            debugger;
+            var furnace = $("#ddlFurnace").val();
+            var fDate = $("#currDate-value").val();
+            Display_Material(furnace, fDate);
+        });
+        function Display_Material(furnace, fDate) {
+            $.ajax({
+                url: '@Url.Action("GetRawMaterialByFurnace","HML")',
+                type: 'GET',
+                data: { furnace: furnace, fdate: fDate },
 
-    using (var conn = new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        conn.Open();
-
-        using (var cmd = new OracleCommand("PROC_GET_RAW_MATERIAL", conn))
-        {
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("p_furnace", OracleDbType.Varchar2).Value = furnace;
-
-            // Convert string date to Date
-            cmd.Parameters.Add("p_date", OracleDbType.Date)
-                          .Value = Convert.ToDateTime(fdate);
-
-            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor)
-                          .Direction = ParameterDirection.Output;
-
-            using (var dr = cmd.ExecuteReader())
-            {
-                while (dr.Read())
-                {
-                    list.Add(new
-                    {
-                        MATERIAL = dr["MATERIAL_NAME"],
-                        VALUE_TON = dr["VALUE_TON"],
-                        VALUE_KG = dr["VALUE_KG"]
-                    });
+                success: function (data) {
+                    var tbody = $("#materialTable tbody");
+                    tbody.empty();
+                    for (var i = 0; i < data.length; i++) {
+                        var row = "<tr>" +
+                            "<td class='fw-bold'>" + data[i].MATERIAL + "</td>" +
+                            "<td><input type='text' class='form-control medium-textbox' value='" + data[i].VALUE_TON + "'></td>" +
+                            "<td><input type='text' class='form-control medium-textbox' value='" + data[i].VALUE_KG + "'></td>" +
+                            "</tr>";
+                        tbody.append(row);
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseText);
                 }
-            }
+            });
         }
-    }
-
-    return Json(list, JsonRequestBehavior.AllowGet);
-}
+        Display_Material($("#ddlFurnace").val(), caldate1);
+    });
+</script>
