@@ -23,3 +23,9 @@ $(document).on("click", "#Driling_Slag_Details *, #TAP_Hot_Metal_Details *", fun
         matchRows[0].scrollIntoView({ behavior: "smooth", block: "center" });
     }
 });
+.highlight{
+    background: yellow;
+}
+.active{
+    outline: 2px solid red;
+}
