@@ -8,11 +8,18 @@ $(document).on("click", "#Driling_Slag_Details *, #TAP_Hot_Metal_Details *", fun
 
     castNo = castNo.trim();
 
-    // Remove previous highlight
-    $("#Driling_Slag_Details tr").removeClass("highlight");
-    $("#TAP_Hot_Metal_Details tr").removeClass("highlight");
+    // Remove previous highlight / active
+    $("#Driling_Slag_Details tr, #TAP_Hot_Metal_Details tr")
+        .removeClass("highlight active");
 
-    // Highlight all matching rows in BOTH tables
-    $('#Driling_Slag_Details tr[data-castno="' + castNo + '"]').addClass("highlight");
-    $('#TAP_Hot_Metal_Details tr[data-castno="' + castNo + '"]').addClass("highlight");
+    // Highlight + Activate matching rows
+    let matchRows = $('#Driling_Slag_Details tr[data-castno="' + castNo + '"], ' +
+                     '#TAP_Hot_Metal_Details tr[data-castno="' + castNo + '"]');
+
+    matchRows.addClass("highlight active");
+
+    // Auto scroll to first matching row
+    if (matchRows.length > 0) {
+        matchRows[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    }
 });
