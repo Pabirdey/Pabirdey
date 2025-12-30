@@ -1,103 +1,42 @@
-function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+function saveData() {
+    let furnace = document.getElementById("txtFurnace").value;
+    let selectedDate = document.getElementById("txtDate").value;
 
-    $.ajax({
-        url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
-        type: 'GET',
-        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
-        success: function (result_Mudgun_Details) {
+    if (!furnace || !selectedDate) {
+        alert("Please enter Furnace and Date");
+        return;
+    }
 
-            var parsedData = JSON.parse(result_Mudgun_Details);
-            var tableBody = "";
+    let rows = [];
+    let tableRows = document.querySelectorAll("#tblData tbody tr");
 
-            for (var i = 0; i < parsedData.length; i++) {
+    tableRows.forEach(function(row) {
+        rows.push({
+            furnace: furnace,
+            tagid: row.querySelector(".tagid").textContent.trim(),
+            material: row.querySelector(".material").textContent.trim(),
+            date: selectedDate,
+            valueTon: row.querySelector(".ton").value,
+            valueKg: row.querySelector(".kg").value
+        });
+    });
 
-                tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
-
-                tableBody += `<td>
-                                <input name="CAST_NO" 
-                                       class='form-control form-control-lg' 
-                                       value='${parsedData[i].CAST_NO}' readonly/>
-                              </td>`;
-
-                tableBody += `<td>
-                    <select name="CLOSURE_MODE" class='form-select form-select-lg'>
-                        <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
-                        <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
-                        <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
-                    </select>
-                </td>`;
-
-                tableBody += `<td>
-                    <input name="CLAY_QUANTITY" 
-                           class='form-control form-control-lg' 
-                           value='${parsedData[i].CLAY_QUANTITY}'/>
-                </td>`;
-
-                tableBody += `<td>
-                    <select name="MG_CLAY_USED" class='form-select form-select-lg'>
-                        <option ${!parsedData[i].MG_CLAY_USED ? 'selected' : ''} value=""></option>
-                        ${[
-                            'LRH','UBQ','SARVESH','CALDYRS','HARIMA(S)','HARIMA(D)','CORUS','TRB','VISUVIUS',
-                            'HARIMA-TWH4','HARIMA-CPH4','HARIMA(D)-TWH5',
-                            'HARIMA(D)-TWH5K','HARIMA(D)-TWH5-T'
-                        ].map(option => 
-                            `<option ${parsedData[i].MG_CLAY_USED === option ? 'selected' : ''}>${option}</option>`
-                        ).join("")}
-                    </select>
-                </td>`;
-
-                /* ******** LOT NO TEXTBOX + BUTTON HERE ******** */
-                tableBody += `
-                <td class="d-flex gap-2">
-                    <input name="LOT_NO" 
-                           class='form-control form-control-lg lotno'
-                           value='${parsedData[i].LOT_NO}' />
-
-                    <button type="button" 
-                            class="btn btn-primary btn-sm getLot"
-                            data-castno="${parsedData[i].CAST_NO}">
-                        Get
-                    </button>
-                </td>`;
-
-                tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
-                tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
-
-                tableBody += `<td>
-                    <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
-                        <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
-                        <option ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>REPLACEMENT</option>
-                        <option ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>WEILD</option>
-                    </select>
-                </td>`;
-
-                tableBody += `<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
-                tableBody += `<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
-                tableBody += `<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
-                tableBody += `<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
-                tableBody += `<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
-                tableBody += `<td><input name="PRESS_ON_FORCE" class='form-control form-control-lg' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
-
-                tableBody += `<td>
-                    <select name="CLAY_LEAKAGE" class='form-select form-select-lg'>
-                        <option ${!parsedData[i].CLAY_LEAKAGE ? 'selected' : ''} value=""></option>
-                        <option ${parsedData[i].CLAY_LEAKAGE === 'YES' ? 'selected' : ''}>YES</option>
-                        <option ${parsedData[i].CLAY_LEAKAGE === 'NO' ? 'selected' : ''}>NO</option>
-                    </select>
-                </td>`;
-
-                tableBody += `<td>
-                    <select name="BACK_FIRE" class='form-select form-select-lg'>
-                        <option ${!parsedData[i].BACK_FIRE ? 'selected' : ''} value=""></option>
-                        <option ${parsedData[i].BACK_FIRE === 'YES' ? 'selected' : ''}>YES</option>
-                        <option ${parsedData[i].BACK_FIRE === 'NO' ? 'selected' : ''}>NO</option>
-                    </select>
-                </td>`;
-
-                tableBody += `</tr>`;
-            }
-
-            $("#Mudgun_Details tbody").html(tableBody);
+    // सभी पंक्तियों को एक साथ भेजना
+    fetch("/Home/SaveRawMaterialBatch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rows)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Data saved successfully!");
+        } else {
+            alert("Error: " + data.message);
         }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error sending data");
     });
 }
