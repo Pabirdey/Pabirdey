@@ -1,68 +1,34 @@
 function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
-
-    $.ajax({
-        url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
-        type: 'GET',
-        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
-        success: function (result_Mudgun_Details) {
-
-            var parsedData = JSON.parse(result_Mudgun_Details);
-            var tableBody = "";
-
-            for (var i = 0; i < parsedData.length; i++) {
-
-                tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
-
-                tableBody += `<td>
-                                <input name="CAST_NO" 
-                                       class='form-control form-control-lg' 
-                                       value='${parsedData[i].CAST_NO}' readonly/>
-                              </td>`;
-
-                tableBody += `<td>
-                    <select name="CLOSURE_MODE" class='form-select form-select-lg'>
-                        <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
-                        <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
-                        <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
-                    </select>
-                </td>`;
-
-                tableBody += `<td>
-                    <input name="CLAY_QUANTITY" 
-                           class='form-control form-control-lg' 
-                           value='${parsedData[i].CLAY_QUANTITY}'/>
-                </td>`;
-
+                 $.ajax({
+                        url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
+                        type: 'GET',
+                        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                        success: function (result_Mudgun_Details) {
+                            var parsedData = JSON.parse(result_Mudgun_Details);
+                            var tableBody = "";
+                                for (var i = 0; i < parsedData.length; i++) {
+                                    tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
+                                    tableBody += `<td><input name="CAST_NO" class='form-control form-control-lg' value='${parsedData[i].CAST_NO}' readonly/></td>`;
+                                    tableBody += `<td>
+                                     <select name="CLOSURE_MODE" class='form-select form-select-lg'>
+                                        <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
+                                        <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
+                                        <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
+                                     </select>
+                                   </td>`;
+                tableBody += `<td><input name="CLAY_QUANTITY" class='form-control form-control-lg' value='${parsedData[i].CLAY_QUANTITY}'/></td>`;
                 tableBody += `<td>
                     <select name="MG_CLAY_USED" class='form-select form-select-lg'>
                         <option ${!parsedData[i].MG_CLAY_USED ? 'selected' : ''} value=""></option>
                         ${[
-                            'LRH','UBQ','SARVESH','CALDYRS','HARIMA(S)','HARIMA(D)','CORUS','TRB','VISUVIUS',
-                            'HARIMA-TWH4','HARIMA-CPH4','HARIMA(D)-TWH5',
-                            'HARIMA(D)-TWH5K','HARIMA(D)-TWH5-T'
-                        ].map(option => 
-                            `<option ${parsedData[i].MG_CLAY_USED === option ? 'selected' : ''}>${option}</option>`
-                        ).join("")}
+                            'LRH', 'UBQ', 'SARVESH', 'CALDYRS', 'HARIMA(S)', 'HARIMA(D)', 'CORUS', 'TRB', 'VISUVIUS',
+                            'HARIMA-TWH4', 'HARIMA-CPH4', 'HARIMA(D)-TWH5', 'HARIMA(D)-TWH5K', 'HARIMA(D)-TWH5-T'
+                        ].map(option => `<option ${parsedData[i].MG_CLAY_USED === option ? 'selected' : ''}>${option}</option>`).join("")}
                     </select>
                 </td>`;
-
-                /* ******** LOT NO TEXTBOX + BUTTON HERE ******** */
-                tableBody += `
-                <td class="d-flex gap-2">
-                    <input name="LOT_NO" 
-                           class='form-control form-control-lg lotno'
-                           value='${parsedData[i].LOT_NO}' />
-
-                    <button type="button" 
-                            class="btn btn-primary btn-sm getLot"
-                            data-castno="${parsedData[i].CAST_NO}">
-                        Get
-                    </button>
-                </td>`;
-
+                tableBody += `<td><input name="LOT_NO" class='form-control form-control-lg' value='${parsedData[i].LOT_NO}'/></td>`;    
                 tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
                 tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
-
                 tableBody += `<td>
                     <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
                         <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
@@ -94,10 +60,10 @@ function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
                     </select>
                 </td>`;
 
-                tableBody += `</tr>`;
+                tableBody += "</tr>";
             }
 
             $("#Mudgun_Details tbody").html(tableBody);
         }
-    });
-}
+                         });
+            }   
