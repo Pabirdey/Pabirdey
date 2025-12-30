@@ -1,21 +1,13 @@
-<script>
-document.addEventListener("click", function(e){
+$(document).on("click", ".castTable tr", function () {
 
-    let row = e.target.closest("tr");
-    if(!row) return;
+    let castNo = $(this).attr("data-castno");
+    if (!castNo) return;
 
-    let castCell = row.querySelector(".cast");
-    if(!castCell) return;
+    castNo = castNo.trim();
 
-    let castNo = castCell.innerText.trim();
+    // Remove previous highlight from all tables
+    $(".castTable tr").removeClass("highlight");
 
-    document.querySelectorAll("tr").forEach(r => r.classList.remove("highlight"));
-
-    document.querySelectorAll(".cast").forEach(td => {
-        if (td.innerText.trim() === castNo) {
-            td.parentElement.classList.add("highlight");
-        }
-    });
-
+    // Highlight all rows having same cast no
+    $('.castTable tr[data-castno="' + castNo + '"]').addClass("highlight");
 });
-</script>
