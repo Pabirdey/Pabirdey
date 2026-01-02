@@ -1,42 +1,11 @@
-function saveData() {
-    let furnace = document.getElementById("txtFurnace").value;
-    let selectedDate = document.getElementById("txtDate").value;
-
-    if (!furnace || !selectedDate) {
-        alert("Please enter Furnace and Date");
-        return;
-    }
-
-    let rows = [];
-    let tableRows = document.querySelectorAll("#tblData tbody tr");
-
-    tableRows.forEach(function(row) {
-        rows.push({
-            furnace: furnace,
-            tagid: row.querySelector(".tagid").textContent.trim(),
-            material: row.querySelector(".material").textContent.trim(),
-            date: selectedDate,
-            valueTon: row.querySelector(".ton").value,
-            valueKg: row.querySelector(".kg").value
-        });
-    });
-
-    // सभी पंक्तियों को एक साथ भेजना
-    fetch("/Home/SaveRawMaterialBatch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(rows)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Data saved successfully!");
-        } else {
-            alert("Error: " + data.message);
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Error sending data");
-    });
-}
+ tableBody += `<td>
+                                <input list="MG_CLAY_USED" class ="form-control" placeholder="Select or Type">
+                                <datalist id="MG_CLAY_USED">
+                                 <option ${!parsedData[i].MG_CLAY_USED ? 'selected': ''} value=""></option>
+                                         ${[
+                                        'LRH', 'UBQ', 'SARVESH', 'CALDYRS', 'HARIMA(S)', 'HARIMA(D)', 'CORUS', 'TRB', 'VISUVIUS',
+                                        'HARIMA-TWH4', 'HARIMA-CPH4', 'HARIMA(D)-TWH5',
+                                        'HARIMA(D)-TWH5K', 'HARIMA(D)-TWH5-T'
+                                 ].map(option =>
+                                `<option ${parsedData[i].MG_CLAY_USED === option ? 'selected': ''}>${option}</option>`).join("")}
+                                </datalist>       
