@@ -1,24 +1,19 @@
-tableBody += `
-<td>
-  <input list="MG_CLAY_USED_${i}" 
-         class="form-control"
-         placeholder="Select or Type"
-         value="${parsedData[i].MG_CLAY_USED || ''}">
-
-  <datalist id="MG_CLAY_USED_${i}">
-    <option value="LRH">
-    <option value="UBQ">
-    <option value="SARVESH">
-    <option value="CALDYRS">
-    <option value="HARIMA(S)">
-    <option value="HARIMA(D)">
-    <option value="CORUS">
-    <option value="TRB">
-    <option value="VISUVIUS">
-    <option value="HARIMA-TWH4">
-    <option value="HARIMA-CPH4">
-    <option value="HARIMA(D)-TWH5">
-    <option value="HARIMA(D)-TWH5K">
-    <option value="HARIMA(D)-TWH5-T">
-  </datalist>
-</td>`;
+<div class="border rounded p-3 shadow-sm">                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="section_Exception-title">Carbon Paste Inj</div>
+                                <button type="button" class="btn btn-success btn-sm" onclick="saveCarbonPaste()">Save</button>
+                            </div>                            
+                            <div class="table-responsive scrollable-table" style="max-height:255px;">
+                                <table class="table table-bordered table-sm text-center align-middle" id="carbon_paste_inj">
+                                    <thead>
+                                        <tr>
+                                            <th class="Heading_Small">Date Time</th>
+                                            <th class="Heading_Small">Shift</th>
+                                            <th class="Heading_Small">Below Tuyere</th>
+                                            <th class="Heading_Small">No of Drum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
