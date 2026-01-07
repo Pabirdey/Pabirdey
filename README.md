@@ -1,54 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Clay Validation</title>
-</head>
-
-<body>
-
-Clay 1 :
-<select id="MG_CLAY1">
-<option value=""></option>
-<option>ACE</option>
-<option>BRL</option>
-<option>HARIMA</option>
-</select>
-<input id="P1" placeholder="%">
-
-<br><br>
-
-Clay 2 :
-<select id="MG_CLAY2">
-<option value=""></option>
-<option>ACE</option>
-<option>BRL</option>
-<option>HARIMA</option>
-</select>
-<input id="P2" placeholder="%">
-
-<br><br>
-
-Clay 3 :
-<select id="MG_CLAY3">
-<option value=""></option>
-<option>ACE</option>
-<option>BRL</option>
-<option>HARIMA</option>
-</select>
-<input id="P3" placeholder="%">
-
-<br><br>
-
-Result :
-<input id="MG_CLAY_USED" readonly style="width:300px">
-
-<br><br>
-
-<button onclick="checkClay()">Save</button>
-
-
-<script>
-
 function checkClay() {
 
     var P1 = Number(P1.value) || 0;
@@ -59,29 +8,42 @@ function checkClay() {
     var MG2 = MG_CLAY2.value;
     var MG3 = MG_CLAY3.value;
 
-    var sum = P1 + P2 + P3;
+    var P_Sum = P1 + P2 + P3;
 
-    if (sum !== 100) {
-        alert("Sum is " + sum + "%. It must be 100%");
-        return;
+    if (P_Sum === 100) {
+
+        var result = "";
+
+        if (MG1 && !MG2 && !MG3)
+            result = MG1 + "(" + P1 + "%)";
+
+        if (MG1 && MG2 && !MG3)
+            result = MG1 + "(" + P1 + "%)+" + MG2 + "(" + P2 + "%)";
+
+        if (MG1 && MG2 && MG3)
+            result = MG1 + "(" + P1 + "%)+" + MG2 + "(" + P2 + "%)+" + MG3 + "(" + P3 + "%)";
+
+        if (!MG1 && MG2 && !MG3)
+            result = MG2 + "(" + P2 + "%)";
+
+        if (!MG1 && MG2 && MG3)
+            result = MG2 + "(" + P2 + "%)+" + MG3 + "(" + P3 + "%)";
+
+        if (!MG1 && !MG2 && MG3)
+            result = MG3 + "(" + P3 + "%)";
+
+        if (MG1 && !MG2 && MG3)
+            result = MG1 + "(" + P1 + "%)+" + MG3 + "(" + P3 + "%)";
+
+        if (!MG1 && !MG2 && !MG3)
+            result = "";
+
+        MG_CLAY_USED.value = result;     // textbox result
     }
+    else {
+        alert("Sum of Percentage is " + P_Sum + ". It should be 100.");
+        alert("Sum of Percentage is " + P_Sum + ". It should be 100.");
 
-    var result = "";
-
-    if (MG1) result = MG1 + "(" + P1 + "%)";
-    if (MG2) {
-        if (result !== "") result += "+";
-        result += MG2 + "(" + P2 + "%)";
+        MG_CLAY_USED.value = "Sum is " + P_Sum + "%. Must be 100%";   // show in textbox also
     }
-    if (MG3) {
-        if (result !== "") result += "+";
-        result += MG3 + "(" + P3 + "%)";
-    }
-
-    MG_CLAY_USED.value = result;
 }
-
-</script>
-
-</body>
-</html>
