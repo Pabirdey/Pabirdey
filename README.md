@@ -1,47 +1,87 @@
-Declare
-	P_Sum Number;
-Begin
+<!DOCTYPE html>
+<html>
+<head>
+<title>Clay Validation</title>
+</head>
 
-		P_Sum:=nvl(:BLK_CLAY.P1,0)+nvl(:BLK_CLAY.P2,0)+nvl(:BLK_CLAY.P3,0);		
-   	--Message('P_Sum: '||P_Sum);	
-		If P_Sum=100 Then			
-				If :BLK_CLAY.MG_CLAY1 is Not Null and :BLK_CLAY.MG_CLAY2 is Null and :BLK_CLAY.MG_CLAY3 is Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY1||'('||:BLK_CLAY.P1||'%)';
-				End If;
-				If :BLK_CLAY.MG_CLAY1 is Not Null and :BLK_CLAY.MG_CLAY2 is Not Null and :BLK_CLAY.MG_CLAY3 is Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY1||'('||:BLK_CLAY.P1||'%)+'||:BLK_CLAY.MG_CLAY2||'('||:BLK_CLAY.P2||'%)';
-				End If;
-				If :BLK_CLAY.MG_CLAY1 is Not Null and :BLK_CLAY.MG_CLAY2 is Not Null and :BLK_CLAY.MG_CLAY3 is Not Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY1||'('||:BLK_CLAY.P1||'%)+'||:BLK_CLAY.MG_CLAY2||'('||:BLK_CLAY.P2||'%)+'||:BLK_CLAY.MG_CLAY3||'('||:BLK_CLAY.P3||'%)';
-				End If;
-				
-				If :BLK_CLAY.MG_CLAY1 is Null and :BLK_CLAY.MG_CLAY2 is Not Null and :BLK_CLAY.MG_CLAY3 is Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY2||'('||:BLK_CLAY.P2||'%)';
-				End If;
-				If :BLK_CLAY.MG_CLAY1 is Null and :BLK_CLAY.MG_CLAY2 is Not Null and :BLK_CLAY.MG_CLAY3 is Not Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY2||'('||:BLK_CLAY.P2||'%)+'||:BLK_CLAY.MG_CLAY3||'('||:BLK_CLAY.P3||'%)';
-				End If;
-				
-				If :BLK_CLAY.MG_CLAY1 is Null and :BLK_CLAY.MG_CLAY2 is Null and :BLK_CLAY.MG_CLAY3 is Not Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY3||'('||:BLK_CLAY.P3||'%)';
-				End If;
-				If :BLK_CLAY.MG_CLAY1 is Not Null and :BLK_CLAY.MG_CLAY2 is Null and :BLK_CLAY.MG_CLAY3 is Not Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=:BLK_CLAY.MG_CLAY1||'('||:BLK_CLAY.P1||'%)+'||:BLK_CLAY.MG_CLAY3||'('||:BLK_CLAY.P3||'%)';
-				End If;
-				
-				If :BLK_CLAY.MG_CLAY1 is Null and :BLK_CLAY.MG_CLAY2 is Null and :BLK_CLAY.MG_CLAY3 is Null Then
-						:T_CAST_DETAILS.MG_CLAY_USED:=Null;
-				End If;
-				
-				Go_Item('T_CAST_DETAILS.MG_CLAY_USED');
-				Go_Item('T_FUR_MSTR.PC_SAVE');
-				Execute_Trigger('WHEN-BUTTON-PRESSED');
-				Hide_Window('MG_CLAY');
-		Else
-				Message('Sum of Percentage is '||P_Sum||'. It should be 100.');
-				Message('Sum of Percentage is '||P_Sum||'. It should be 100.');
-		End If;	
+<body>
 
-Exception
-	When Others Then Null;
-End;
+Clay 1 :
+<select id="MG_CLAY1">
+<option value=""></option>
+<option>ACE</option>
+<option>BRL</option>
+<option>HARIMA</option>
+</select>
+<input id="P1" placeholder="%">
+
+<br><br>
+
+Clay 2 :
+<select id="MG_CLAY2">
+<option value=""></option>
+<option>ACE</option>
+<option>BRL</option>
+<option>HARIMA</option>
+</select>
+<input id="P2" placeholder="%">
+
+<br><br>
+
+Clay 3 :
+<select id="MG_CLAY3">
+<option value=""></option>
+<option>ACE</option>
+<option>BRL</option>
+<option>HARIMA</option>
+</select>
+<input id="P3" placeholder="%">
+
+<br><br>
+
+Result :
+<input id="MG_CLAY_USED" readonly style="width:300px">
+
+<br><br>
+
+<button onclick="checkClay()">Save</button>
+
+
+<script>
+
+function checkClay() {
+
+    var P1 = Number(P1.value) || 0;
+    var P2 = Number(P2.value) || 0;
+    var P3 = Number(P3.value) || 0;
+
+    var MG1 = MG_CLAY1.value;
+    var MG2 = MG_CLAY2.value;
+    var MG3 = MG_CLAY3.value;
+
+    var sum = P1 + P2 + P3;
+
+    if (sum !== 100) {
+        alert("Sum is " + sum + "%. It must be 100%");
+        return;
+    }
+
+    var result = "";
+
+    if (MG1) result = MG1 + "(" + P1 + "%)";
+    if (MG2) {
+        if (result !== "") result += "+";
+        result += MG2 + "(" + P2 + "%)";
+    }
+    if (MG3) {
+        if (result !== "") result += "+";
+        result += MG3 + "(" + P3 + "%)";
+    }
+
+    MG_CLAY_USED.value = result;
+}
+
+</script>
+
+</body>
+</html>
