@@ -1,60 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Datalist Open on Click</title>
-    <style>
-        body{
-            font-family: Arial;
-            padding: 40px;
-        }
+<title>Datalist Change Item Anytime</title>
 
-        input{
-            width:250px;
-            padding:8px;
-            font-size:16px;
-        }
-    </style>
+<style>
+input{
+    width:250px;
+    padding:6px;
+    font-size:16px;
+}
+</style>
+
 </head>
-
 <body>
 
-<h2>Datalist Open On Click Example</h2>
+<h3>Click input anytime to open list & change value</h3>
 
 <input list="MG_CLAY_USED" id="clayInput" placeholder="Select or Type">
 
 <datalist id="MG_CLAY_USED">
-    <option value="LRH">
-    <option value="UBQ">
-    <option value="SARVESH">
-    <option value="HARIMA(S)">
-    <option value="HARIMA(D)">
-    <option value="CORUS">
+  <option value="LRH">
+  <option value="UBQ">
+  <option value="SARVESH">
+  <option value="HARIMA(S)">
+  <option value="HARIMA(D)">
+  <option value="CORUS">
 </datalist>
 
-
 <script>
-
-// When user clicks input → dropdown opens
 const input = document.getElementById("clayInput");
 
 input.addEventListener("click", function () {
 
-    // Chrome / Edge / New browsers
+    // Save current value
+    const currentValue = this.value;
+
+    // Chrome / Edge support
     if (this.showPicker) {
         this.showPicker();
-        return;
+    }
+    else {
+        // Old browser trick
+        this.blur();
+        this.focus();
     }
 
-    // Fallback for old browsers
-    this.blur();      // remove focus
-    this.focus();     // re-focus to trigger list
+    // Restore value (so it does not clear)
+    this.value = currentValue;
 });
 
-// Also open when user focuses with TAB key
+// Also open when focus by TAB
 input.addEventListener("focus", function () {
     if (this.showPicker) this.showPicker();
 });
-
 </script>
 
 </body>
