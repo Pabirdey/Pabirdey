@@ -1,33 +1,28 @@
-.input-wrapper {
-    display: flex;
-    border: 1px solid #999;
+<script>
+function toggleList(index) {
+    var list = document.getElementById("list_" + index);
+    list.style.display = (list.style.display === "block") ? "none" : "block";
 }
 
-.input-wrapper input {
-    border: none;
-    outline: none;
+function selectItem(el, index) {
+    document.getElementById("clayInput_" + index).value = el.innerText;
+    document.getElementById("list_" + index).style.display = "none";
+
+    // OPTIONAL: if OTHERS clicked
+    if (el.innerText === "OTHERS") {
+        // open modal / show textbox / anything
+        console.log("OTHERS selected at row:", index);
+    }
 }
 
-.arrow-btn {
-    width: 30px;
-    text-align: center;
-    cursor: pointer;
-    background: #f0f0f0;
-}
+// Close all lists when clicking outside
+document.addEventListener("click", function (e) {
+    if (!e.target.closest(".input-wrapper") &&
+        !e.target.closest(".list-box")) {
 
-.list-box {
-    border: 1px solid #999;
-    display: none;
-    background: #fff;
-    position: absolute;
-    z-index: 999;
-}
-
-.list-box div {
-    padding: 5px;
-    cursor: pointer;
-}
-
-.list-box div:hover {
-    background: #e6e6e6;
-}
+        document.querySelectorAll(".list-box").forEach(function (l) {
+            l.style.display = "none";
+        });
+    }
+});
+</script>
