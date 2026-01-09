@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Custom Input List Without Datalist</title>
+    <title>Input with Separate Arrow List</title>
 
     <style>
         body {
@@ -9,28 +9,38 @@
             padding: 40px;
         }
 
-        .container {
-            position: relative;
-            width: 250px;
+        .input-wrapper {
+            display: flex;
+            width: 300px;
+            border: 1px solid #999;
         }
 
-        .form-control {
-            width: 100%;
+        .input-wrapper input {
+            flex: 1;
+            border: none;
             padding: 6px;
-            font-size: 14px;
+            outline: none;
+        }
+
+        .arrow-btn {
+            width: 30px;
+            border-left: 1px solid #999;
+            cursor: pointer;
+            text-align: center;
+            background: #f0f0f0;
+            user-select: none;
+        }
+
+        .arrow-btn:hover {
+            background: #ddd;
         }
 
         .list-box {
-            position: absolute;
-            top: 34px;
-            left: 0;
-            width: 100%;
+            width: 300px;
             border: 1px solid #999;
-            background: #fff;
-            max-height: 150px;
-            overflow-y: auto;
+            border-top: none;
             display: none;
-            z-index: 999;
+            background: #fff;
         }
 
         .list-box div {
@@ -41,77 +51,44 @@
         .list-box div:hover {
             background: #e6e6e6;
         }
-
-        .mt-10 {
-            margin-top: 10px;
-        }
     </style>
 </head>
 
 <body>
 
-    <h3>Input with List (Without Datalist)</h3>
+<h3>Textbox with Arrow Dropdown</h3>
 
-    <div class="container">
-        <input type="text" id="clayInput"
-               class="form-control"
-               placeholder="Select or type"
-               autocomplete="off"
-               onclick="showList()"
-               onkeyup="filterList()" />
+<div class="input-wrapper">
+    <input type="text" id="txtInput" placeholder="Type or select">
+    <div class="arrow-btn" onclick="toggleList()">▼</div>
+</div>
 
-        <div id="clayList" class="list-box">
-            <div onclick="selectItem(this)">LRH</div>
-            <div onclick="selectItem(this)">UBQ</div>
-            <div onclick="selectItem(this)">SARVESH</div>
-            <div onclick="selectItem(this)">CALDYRS</div>
-            <div onclick="selectItem(this)">HARIMA</div>
-            <div onclick="selectItem(this)">OTHERS</div>
-        </div>
-    </div>
+<div id="list" class="list-box">
+    <div onclick="selectItem(this)">VISUVUS</div>
+    <div onclick="selectItem(this)">ETNA</div>
+    <div onclick="selectItem(this)">FUJI</div>
+    <div onclick="selectItem(this)">OTHERS</div>
+</div>
 
-    <!-- Other Clay Input -->
-    <input type="text" id="otherClay"
-           class="form-control mt-10"
-           placeholder="Enter Other Clay"
-           style="display:none; width:250px;" />
+<script>
+function toggleList() {
+    var list = document.getElementById("list");
+    list.style.display = list.style.display === "block" ? "none" : "block";
+}
 
-    <script>
-        function showList() {
-            document.getElementById("clayList").style.display = "block";
-        }
+function selectItem(el) {
+    document.getElementById("txtInput").value = el.innerText;
+    document.getElementById("list").style.display = "none";
+}
 
-        function filterList() {
-            var input = document.getElementById("clayInput").value.toUpperCase();
-            var items = document.getElementById("clayList").getElementsByTagName("div");
-
-            document.getElementById("clayList").style.display = "block";
-
-            for (var i = 0; i < items.length; i++) {
-                var txt = items[i].innerText.toUpperCase();
-                items[i].style.display = (txt.indexOf(input) > -1) ? "" : "none";
-            }
-        }
-
-        function selectItem(el) {
-            var value = el.innerText;
-            document.getElementById("clayInput").value = value;
-            document.getElementById("clayList").style.display = "none";
-
-            if (value === "OTHERS") {
-                document.getElementById("otherClay").style.display = "block";
-            } else {
-                document.getElementById("otherClay").style.display = "none";
-            }
-        }
-
-        // Close list when clicking outside
-        document.addEventListener("click", function (e) {
-            if (!e.target.closest(".container")) {
-                document.getElementById("clayList").style.display = "none";
-            }
-        });
-    </script>
+// close list when clicking outside
+document.addEventListener("click", function (e) {
+    if (!e.target.closest(".input-wrapper") &&
+        !e.target.closest("#list")) {
+        document.getElementById("list").style.display = "none";
+    }
+});
+</script>
 
 </body>
 </html>
