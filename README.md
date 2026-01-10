@@ -1,87 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Steel Plant Table Theme</title>
-
+    <title>Down Arrow Add Row</title>
     <style>
-        /* ====== TABLE BORDER ====== */
-        #TAP_Hot_Metal_Details {
-            border: 2px solid #6c757d;   /* steel grey */
-            background-color: #ffffff;
+        table {
+            border-collapse: collapse;
+            width: 70%;
         }
 
-        /* ====== TABLE HEADER ====== */
-        #TAP_Hot_Metal_Details thead th {
-            background: linear-gradient(180deg, #5a6d7c, #3f4f5c); /* steel blue-grey */
-            color: #ffffff;
-            font-weight: 700;            /* bold heading */
-            border: 1px solid #2f3e46;
-            text-align: center;
-            vertical-align: middle;
-            padding: 8px;
-        }
-
-        /* ====== TABLE BODY ====== */
-        #TAP_Hot_Metal_Details tbody td {
-            border: 1px solid #b0b8bf;
+        th, td {
+            border: 1px solid #000;
             padding: 6px;
-            background-color: #f8f9fa;
+            text-align: center;
         }
 
-        /* ====== ROW HOVER ====== */
-        #TAP_Hot_Metal_Details tbody tr:hover {
-            background-color: #e3edf5;
-        }
-
-        /* ====== STICKY HEADER FOR SCROLL ====== */
-        .scrollable-table thead th {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        /* ====== OPTIONAL: HEADING FONT ====== */
-        .Long_Heading,
-        .Long_Heading_Medium {
-            font-size: 13px;
-            letter-spacing: 0.4px;
+        input, select {
+            width: 95%;
+            height: 28px;
         }
     </style>
 </head>
-
 <body>
 
-<div class="table-responsive scrollable-table" style="max-height:300px;">
-    <table class="table table-bordered table-sm text-center align-middle" id="TAP_Hot_Metal_Details">
-        <thead>
-            <tr>
-                <th class="Long_Heading_Medium">Cast No</th>
-                <th>Trough No</th>
-                <th class="Long_Heading_Medium">Cast Start</th>
-                <th class="Long_Heading_Medium">Cast End</th>
-                <th class="Long_Heading_Medium">Gutko</th>
-                <th class="Long_Heading_Medium">Cast Duration</th>
-                <th class="Long_Heading_Medium">Casting Rate (t/min)</th>
-                <th class="Long_Heading_Medium">TLC</th>
-                <th class="Long_Heading_Medium">OT</th>
-                <th class="Long_Heading_Medium">Cast Ready Time</th>
-                <th class="Long_Heading_Medium" style="max-width:90px;white-space:normal;">
-                    Splashing / Wetness Time
-                </th>
-                <th class="Long_Heading" style="width:132px;">Cast Type</th>
-                <th style="width:132px;">Clay Condition</th>
-                <th style="width:220px;">Taphole Behaviour at End Cast</th>
-                <th class="Long_Heading_Medium">HMT Before Slag</th>
-                <th class="Long_Heading_Medium">HMT After Slag</th>
-                <th class="Long_Heading_Medium">Final HM Temp</th>
-                <th class="Long_Heading_Medium">HM Weight</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data rows -->
-        </tbody>
-    </table>
-</div>
+<h3>Press ↓ Down Arrow in Last Column to Add Row</h3>
+
+<table id="myTable">
+    <thead>
+        <tr>
+            <th>Sl No</th>
+            <th>Item Name</th>
+            <th>Type (↓)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td><input type="text"></td>
+            <td>
+                <select onkeydown="checkDownArrow(event,this)">
+                    <option value="">Select</option>
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+function checkDownArrow(e, element) {
+
+    // Down Arrow key only (40)
+    if (e.keyCode === 40) {
+
+        let table = document.getElementById("myTable");
+        let row = element.closest("tr");
+        let tbody = table.tBodies[0];
+
+        let rowIndex = row.rowIndex - 1;
+        let lastRowIndex = tbody.rows.length - 1;
+
+        let colIndex = element.parentElement.cellIndex;
+        let lastColIndex = row.cells.length - 1;
+
+        // LAST ROW + LAST COLUMN
+        if (rowIndex === lastRowIndex && colIndex === lastColIndex) {
+            e.preventDefault();
+            addNewRow(table);
+        }
+    }
+}
+
+function addNewRow(table) {
+
+    let tbody = table.tBodies[0];
+    let rowNo = tbody.rows.length + 1;
+
+    let newRow = tbody.insertRow();
+
+    newRow.innerHTML = `
+        <td>${rowNo}</td>
+        <td><input type="text"></td>
+        <td>
+            <select onkeydown="checkDownArrow(event,this)">
+                <option value="">Select</option>
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+            </select>
+        </td>
+    `;
+
+    // Focus dropdown of new row
+    newRow.querySelector("select").focus();
+}
+</script>
 
 </body>
 </html>
