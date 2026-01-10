@@ -6,8 +6,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")" media="screen">
     <link href="@Url.Content("~/bower_components/bootstrap-daterangepicker/bootstrap-daterangepicker-1.3.21.css")" rel="stylesheet" />
-    <link href="@Url.Content("~/bower_components/bootstrap/dist/css/bootstrap-multiselect.css")" rel="stylesheet" />
-    <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap/dist/css/bootstrap-multiselect.min.css")" media="screen">
     <link href="~/bower_components/folder-explorer/font-awesome.min.css" rel="stylesheet" />
     <link href="~/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
