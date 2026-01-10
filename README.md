@@ -125,3 +125,106 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function () {
+
+    // SIMULATED AJAX RESPONSE
+    let parsedData = [
+        { CAST_NO: 101, MG_CLAY_USED: "" },
+        { CAST_NO: 102, MG_CLAY_USED: "" },
+        { CAST_NO: 103, MG_CLAY_USED: "" }
+    ];
+
+    let tableBody = "";
+
+    for (let i = 0; i < parsedData.length; i++) {
+
+        tableBody += `
+        <tr>
+            <td>
+                <input class="form-control" value="${parsedData[i].CAST_NO}" readonly>
+            </td>
+
+            <td>
+                <div class="input-wrapper">
+                    <input type="text" class="form-control"
+                           id="clayInput_${i}"
+                           value="${parsedData[i].MG_CLAY_USED}">
+                    <div class="arrow-btn" onclick="toggleList(${i}, event)">▼</div>
+
+                    <div class="list-box" id="list_${i}">
+                        <div onclick="selectItem(this, ${i}, event)">ACE</div>
+                        <div onclick="selectItem(this, ${i}, event)">BRL</div>
+                        <div onclick="selectItem(this, ${i}, event)">LRH</div>
+                        <div onclick="selectItem(this, ${i}, event)">UBQ</div>
+                        <div onclick="selectItem(this, ${i}, event)">OTHERS</div>
+                    </div>
+                </div>
+            </td>
+        </tr>`;
+    }
+
+    $("#Mudgun_Details tbody").html(tableBody);
+});
+</script>
+<script>
+let currentClayRowIndex = null;
+
+// OPEN / CLOSE LIST
+function toggleList(index, event) {
+    event.stopPropagation();
+
+    document.querySelectorAll(".list-box").forEach(l => l.style.display = "none");
+
+    document.getElementById("list_" + index).style.display = "block";
+}
+
+// ITEM CLICK
+function selectItem(el, index, event) {
+    event.stopPropagation();
+
+    let value = el.innerText.trim();
+
+    document.getElementById("clayInput_" + index).value = value;
+    document.getElementById("list_" + index).style.display = "none";
+
+    if (value === "OTHERS") {
+        currentClayRowIndex = index;
+
+        clay1.value = "";
+        clay2.value = "";
+        clay3.value = "";
+
+        new bootstrap.Modal(document.getElementById("clayModal")).show();
+    }
+}
+
+// SAVE MODAL DATA
+function saveClay() {
+
+    let c1 = clay1.value;
+    let c2 = clay2.value;
+    let c3 = clay3.value;
+
+    if (!c1 && !c2 && !c3) {
+        alert("Select at least one clay");
+        return;
+    }
+
+    let result = [c1, c2, c3].filter(x => x).join(" + ");
+
+    document.getElementById("clayInput_" + currentClayRowIndex).value = result;
+
+    bootstrap.Modal.getInstance(document.getElementById("clayModal")).hide();
+}
+
+// CLICK OUTSIDE CLOSE
+document.addEventListener("click", function () {
+    document.querySelectorAll(".list-box").forEach(l => l.style.display = "none");
+});
+</script>
+
+</body>
+</html>
+
