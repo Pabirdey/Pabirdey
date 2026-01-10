@@ -1,17 +1,28 @@
-function selectItem(el, rowIndex) {
+<script>
+function toggleList(index) {
+    var list = document.getElementById("list_" + index);
+    list.style.display = (list.style.display === "block") ? "none" : "block";
+}
 
-    var value = el.innerText.trim();
-    var input = document.getElementById("clayInput_" + rowIndex);
+function selectItem(el, index) {
+    document.getElementById("clayInput_" + index).value = el.innerText;
+    document.getElementById("list_" + index).style.display = "none";
 
-    // Set value in textbox
-    input.value = value;
-
-    // Hide list
-    document.getElementById("list_" + rowIndex).style.display = "none";
-
-    // 🔥 IF OTHERS CLICKED → OPEN MODAL
-    if (value === "OTHERS") {
-        var modal = new bootstrap.Modal(document.getElementById('clayModal'));
-        modal.show();
+    // OPTIONAL: if OTHERS clicked
+    if (el.innerText === "OTHERS") {
+        // open modal / show textbox / anything
+        console.log("OTHERS selected at row:", index);
     }
 }
+
+// Close all lists when clicking outside
+document.addEventListener("click", function (e) {
+    if (!e.target.closest(".input-wrapper") &&
+        !e.target.closest(".list-box")) {
+
+        document.querySelectorAll(".list-box").forEach(function (l) {
+            l.style.display = "none";
+        });
+    }
+});
+</script>
