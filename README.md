@@ -3,20 +3,14 @@
 <head>
     <title>Cast House Details</title>
 
-    <!-- ================= BOOTSTRAP 5 (LATEST) ================= -->
+    <!-- ========== BOOTSTRAP 5 LATEST ========== -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- ================= FLATPICKR DATE PICKER ================= -->
-    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-
-    <!-- ================= JQUERY ================= -->
+    <!-- ========== JQUERY ========== -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- ================= BOOTSTRAP JS ================= -->
+    <!-- ========== BOOTSTRAP JS ========== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- ================= FLATPICKR JS ================= -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
         body {
@@ -27,16 +21,16 @@
             font-size: 6vh;
             font-weight: bold;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
         }
 
         th {
             background: #343a40;
             color: white;
             font-size: 14px;
-            text-align: center;
             position: sticky;
             top: 0;
+            text-align: center;
         }
 
         .highlight td {
@@ -87,16 +81,18 @@
 
 <div class="container-fluid">
 
-    <!-- ================= DATE & FURNACE ================= -->
+    <!-- ========== DATE + FURNACE ========== -->
     <div class="border rounded p-3 mb-3" style="width:520px;">
         <label class="fw-bold fs-4">Date :</label>
-        <input id="tbFDatePick"
+
+        <!-- ✅ Native Date Picker -->
+        <input type="date"
+               id="tbFDatePick"
                class="form-control d-inline-block"
-               style="width:160px;text-align:center"
-               readonly>
+               style="width:180px;">
 
         <label class="fw-bold fs-4 ms-4">Furnace :</label>
-        <select id="lstFur" class="form-select d-inline-block" style="width:80px;">
+        <select id="lstFur" class="form-select d-inline-block" style="width:90px;">
             <option value="C">C</option>
             <option value="E">E</option>
             <option value="F">F</option>
@@ -106,16 +102,16 @@
         </select>
     </div>
 
-    <!-- ================= MUDGUN DETAILS ================= -->
+    <!-- ========== MUDGUN DETAILS TABLE ========== -->
     <div class="table-responsive" style="max-height:320px;">
         <table class="table table-bordered table-sm text-center align-middle" id="Mudgun_Details">
             <thead>
-            <tr>
-                <th>Cast No</th>
-                <th>Closure Mode</th>
-                <th>MG Clay Type</th>
-                <th>Lot No</th>
-            </tr>
+                <tr>
+                    <th>Cast No</th>
+                    <th>Closure Mode</th>
+                    <th>MG Clay Type</th>
+                    <th>Lot No</th>
+                </tr>
             </thead>
             <tbody></tbody>
         </table>
@@ -127,22 +123,20 @@
     let lsSelectedFDate = "";
     let IsSelectedFur = "C";
 
-    // ================= PAGE LOAD =================
+    // ========== PAGE LOAD ==========
     $(document).ready(function () {
 
-        // ===== FLATPICKR INIT =====
-        flatpickr("#tbFDatePick", {
-            dateFormat: "d/m/Y",
-            defaultDate: new Date(),
-            onChange: function (selectedDates, dateStr) {
-                lsSelectedFDate = dateStr;
-                loadMudgunData();
-            }
+        // Set today date
+        let today = new Date().toISOString().split('T')[0];
+        $("#tbFDatePick").val(today);
+        lsSelectedFDate = today;
+
+        $("#tbFDatePick").on("change", function () {
+            lsSelectedFDate = $(this).val();
+            loadMudgunData();
         });
 
-        lsSelectedFDate = $("#tbFDatePick").val();
-
-        $("#lstFur").change(function () {
+        $("#lstFur").on("change", function () {
             IsSelectedFur = $(this).val();
             loadMudgunData();
         });
@@ -150,10 +144,10 @@
         loadMudgunData();
     });
 
-    // ================= LOAD TABLE (DEMO DATA) =================
+    // ========== LOAD TABLE (DEMO / AJAX READY) ==========
     function loadMudgunData() {
 
-        // Replace this array with your AJAX result
+        // Replace with AJAX response
         let data = [
             { CAST_NO: "101", CLOSURE_MODE: "MUDGUN", MG_CLAY_USED: "ACE", LOT_NO: "L001" },
             { CAST_NO: "102", CLOSURE_MODE: "NULL", MG_CLAY_USED: "BRL", LOT_NO: "L002" }
@@ -162,7 +156,6 @@
         let html = "";
 
         for (let i = 0; i < data.length; i++) {
-
             html += `
             <tr data-castno="${data[i].CAST_NO}">
                 <td>${data[i].CAST_NO}</td>
@@ -197,7 +190,7 @@
         $("#Mudgun_Details tbody").html(html);
     }
 
-    // ================= CUSTOM DROPDOWN =================
+    // ========== CUSTOM DROPDOWN ==========
     function toggleList(index) {
         $("#list_" + index).toggle();
     }
@@ -211,7 +204,7 @@
         }
     }
 
-    // Close dropdown on outside click
+    // Close dropdown when clicking outside
     document.addEventListener("click", function (e) {
         if (!e.target.closest(".input-wrapper")) {
             document.querySelectorAll(".list-box").forEach(l => l.style.display = "none");
