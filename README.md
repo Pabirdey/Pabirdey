@@ -1,136 +1,279 @@
 @{
-    Layout = null;
+    Layout = null;   /* for testing – remove if using _Layout */
 }
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Cast House Details</title>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- Bootstrap 5 -->
+    <!-- Bootstrap & jQuery -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Bootstrap Datepicker (ONLY ONCE) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    
+    <!-- Datepicker (load only once!) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
 
     <style>
-        .input-wrapper { display:flex; border:1px solid #999 }
-        .arrow-btn { width:30px; cursor:pointer; background:#eee; text-align:center }
-        .list-box {
-            display:none; position:absolute; background:#fff;
-            border:1px solid #999; z-index:9999
+        .input-wrapper {
+            display: flex;
+            border: 1px solid #999;
         }
-        .list-box div { padding:5px; cursor:pointer }
-        .list-box div:hover { background:#e6e6e6 }
-    </style>
-</head>
+        .input-wrapper input {
+            border: none;
+            outline: none;
+        }
+        .arrow-btn {
+            width: 30px;
+            text-align: center;
+            cursor: pointer;
+            background: #f0f0f0;
+        }
+        .list-box {
+            border: 1px solid #999;
+            display: none;
+            background: #fff;
+            position: absolute;
+            z-index: 999;
+        }
+        .list-box div {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .list-box div:hover {
+            background: #e6e6e6;
+        }
 
+        /* Your original CSS below */
+        .table-input { font-size:1rem; padding:2px 4px; border:2px solid;}
+        .my-swal-popup { font-family:Arial,sans-serif; }
+        .my-swal-title { font-family:Georgia,serif; font-size:22px; }
+        .my-swal-text { font-family:Verdana,sans-serif; font-size:18px; }
+        .form-section { background:#fff; padding:20px; border-radius:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); margin-bottom:25px; overflow:visible; font-family:Courier New, monospace;}
+        .section-title { background:#EEB86D; color:black; padding:5px 10px; margin-bottom:10px; font-weight:bold; border-radius:10px; text-align:left; font-family:Courier New, monospace; font-size:18px;}
+        .form-control-lg { font-size:1.5rem; font-family:Courier New, monospace; color:black; }
+        th { font-family:Courier New, monospace; font-size:14px; font-weight:bold; border:1px solid; color:white; }
+        .scrollable-table { overflow-y:auto; }
+        .table thead th { position:sticky; top:0; z-index:2; border:5px solid; }
+        .Long_Heading_Medium { min-width:100px; border:1px solid black; }
+        .Heading_Tiny { width:20px; white-space:nowrap; }
+        .Long_Heading { min-width:130px; }
+        .section_Exception-title { background:#EEB86D; color:black; padding:5px 10px; margin-bottom:10px; font-weight:bold; border-radius:10px; text-align:left; font-family:Courier New, monospace; font-size:15px; width:15vh; }
+        .Heading_Small { width:10px; white-space:nowrap; }
+        .section-Drill-title { background:#EEB86D; color:black; padding:5px 10px; margin-bottom:10px; font-weight:bold; border-radius:4px; text-align:left; font-family:Courier New, monospace; font-size:20px; }
+        .form-group { border-radius:25px; border:4px solid #73AD21; padding:10px; margin:10px; width:500px; }
+        select { appearance:auto !important; -webkit-appearance:auto !important; -moz-appearance:auto !important; }
+        .Main-Heading { font-family:Allan,cursive; font-weight:bold; font-size:6vh; text-align:center; padding:20px; color:rgb(57,57,57); text-shadow: rgba(13,0,77,0.08) 0px 2px 4px, rgba(13,0,77,0.08) 0px 3px 6px, rgba(13,0,77,0.08) 0px 8px 16px; border-radius:10px;}
+        #backgrcol_Tap_hole { color:white; font-weight:bold; padding:8px; }
+        fieldset { border:2px solid #ccc !important; padding:10px 12px 12px 12px; }
+        legend { font-size:24px; font-weight:800; padding:0 8px; }
+    </style>    
+</head>
 <body>
 
-<div class="container mt-3">
-    <label>Date:</label>
-    <input id="tbFDatePick" class="form-control w-25">
+<div class="Main-Heading mt-0">Cast House Details</div>
+<div class="container-fluid mt-0">
+    <div class="form-group">
+        <label for="tbFDatePick" class="LabelControl" style="font-family:Allan,cursive;font-size:22px;">Date:&nbsp;</label>
+        <input id="tbFDatePick" size="14" style="height:28px;text-align:center">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+            <lable style="font-family:Allan,cursive;font-size:25px;">Furnace</lable>
+            <select id="lstFur">
+                <option value="C">C</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+                <option value="H">H</option>
+                <option value="I">I</option>
+            </select>
+        </span>
+    </div>
 
-    <table class="table table-bordered mt-3" id="Mudgun_Details">
-        <thead>
-            <tr>
-                <th>Cast No</th>
-                <th>MG Clay</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="mt-1">           
+        <!-- Mudgun Details -->
+        <div class="form-section">
+            <div class="section-title">Mudgun Details</div>
+            <div class="table-responsive scrollable-table" style="max-height:318px;">
+                <table class="table table-bordered table-sm text-center align-middle" id="Mudgun_Details">
+                    <thead>
+                        <tr>
+                            <th class="Long_Heading_Medium">Cast No</th>
+                            <th style="width:115px;min-width:115px;box-sizing:border-box;">Closure Mode</th>
+                            <th style="width:115px;min-width:115px;box-sizing:border-box;">Clay Qty. Pushed</th>
+                            <th style="width:195px;min-width:195px;box-sizing:border-box;">MG Clay Type</th>
+                            <th class="Long_Heading_Medium">Lot No</th>
+                            <th class="Long_Heading_Medium">No. of Bags</th>
+                            <th class="Long_Heading_Medium">Mudgun Holding Time</th>
+                            <th style="width:195px;min-width:150px;box-sizing:border-box;">Mudgun Nozzle</th>
+                            <th class="Long_Heading_Medium">M.Nozzle Temp Before Closing</th>
+                            <th class="Long_Heading_Medium">M.Nozzle Temp after Closing</th>
+                            <th class="Long_Heading_Medium">Initial Plugin Pressure</th>
+                            <th class="Long_Heading_Medium">Max Plugin Pressure</th>
+                            <th class="Long_Heading_Medium">Final Plugin Pressure</th>
+                            <th class="Long_Heading_Medium">Pressure On Force</th>
+                            <th class="Long_Heading_Medium">Clay Leakage</th>
+                            <th class="Long_Heading_Medium">Back Fire</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>           
+    </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal fade" id="clayModal">
-    <div class="modal-dialog modal-dialog-centered">
+<!-- ================= MODAL ================= -->
+<div class="modal fade" id="clayModal" tabindex="-1">
+    <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">MG Clay Details</h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title w-100 text-center">MG CLAY DETAILS</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <select class="form-select mb-2">
-                    <option>Clay A</option>
-                    <option>Clay B</option>
-                </select>
-                <select class="form-select">
-                    <option>Clay A</option>
-                    <option>Clay B</option>
-                </select>
+                <div class="mb-3">
+                    <label>Clay 1</label>
+                    <select class="form-select">
+                        <option>Clay A</option>
+                        <option>Clay B</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label>Clay 2</label>
+                    <select class="form-select">
+                        <option>Clay A</option>
+                        <option>Clay B</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label>Clay 3</label>
+                    <select class="form-select">
+                        <option>Clay A</option>
+                        <option>Clay B</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-success" data-bs-dismiss="modal">Save</button>
+                <button class="btn btn-danger" data-bs-dismiss="modal">Exit</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-/* ============ GLOBAL FUNCTIONS ============ */
+// ===================== GLOBAL =====================
 var activeRowIndex = null;
-
-function toggleList(index) {
-    $("#list_" + index).toggle();
-}
-
-function selectItem(el, index) {
-    $("#clayInput_" + index).val(el.innerText);
-    $("#list_" + index).hide();
-
-    if (el.innerText.trim() === "OTHERS") {
-        bootstrap.Modal
-            .getOrCreateInstance(document.getElementById("clayModal"))
-            .show();
+function toggleList(index){ $("#list_"+index).toggle(); }
+function selectItem(el,index){
+    $("#clayInput_"+index).val(el.innerText);
+    $("#list_"+index).hide();
+    if(el.innerText==="OTHERS"){
+        activeRowIndex=index;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("clayModal")).show();
     }
 }
-
-/* ============ DOCUMENT READY ============ */
-$(document).ready(function () {
-
-    // DATEPICKER ✅
-    $('#tbFDatePick').datepicker({
-        format: "dd/mm/yyyy",
-        autoclose: true,
-        todayHighlight: true
-    });
-
-    // DEMO AJAX DATA
-    var data = [
-        { CAST_NO: 101 },
-        { CAST_NO: 102 }
-    ];
-
-    var html = "";
-    for (var i = 0; i < data.length; i++) {
-        html += `
-<tr>
-<td>${data[i].CAST_NO}</td>
-<td>
-<div class="input-wrapper">
-<input id="clayInput_${i}" class="form-control">
-<div class="arrow-btn" onclick="toggleList(${i})">▼</div>
-</div>
-<div class="list-box" id="list_${i}">
-<div onclick="selectItem(this, ${i})">ACE</div>
-<div onclick="selectItem(this, ${i})">OTHERS</div>
-</div>
-</td>
-</tr>`;
-    }
-    $("#Mudgun_Details tbody").html(html);
-});
-
-// Close dropdown
-document.addEventListener("click", function (e) {
-    if (!e.target.closest(".input-wrapper") &&
-        !e.target.closest(".list-box")) {
+document.addEventListener("click",function(e){
+    if(!e.target.closest(".input-wrapper") && !e.target.closest(".list-box")){
         $(".list-box").hide();
     }
 });
-</script>
 
+// ===================== READY =====================
+$(document).ready(function(){
+    var lsSelectedFDate='@DateTime.Today.ToString("dd/MM/yyyy")';
+    var IsSelectedFur=$('#lstFur').val();
+
+    $('#tbFDatePick').datepicker({
+        format:"dd/mm/yyyy",
+        autoclose:true,
+        todayHighlight:true
+    }).datepicker('setDate', lsSelectedFDate);
+
+    $('#tbFDatePick').on('changeDate',function(){
+        lsSelectedFDate=$(this).datepicker('getFormattedDate');
+        Display_Mudgun_Details(lsSelectedFDate,IsSelectedFur);
+    });
+
+    $('#lstFur').change(function(){
+        IsSelectedFur=$(this).val();
+        Display_Mudgun_Details(lsSelectedFDate,IsSelectedFur);
+    });
+
+    Display_Mudgun_Details(lsSelectedFDate,IsSelectedFur);
+
+    function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur){
+        $.ajax({
+            url:'@Url.Action("Get_Display_Mudgun_Details","CastHouse")',
+            type:'GET',
+            data:{Fdate:lsSelectedFDate,Fur:IsSelectedFur},
+            success:function(result_Mudgun_Details){
+                var parsedData=JSON.parse(result_Mudgun_Details);
+                var tableBody="";
+                for(var i=0;i<parsedData.length;i++){
+                    tableBody+=`<tr data-castno='${parsedData[i].CAST_NO}'>`;
+                    tableBody+=`<td><input name="CAST_NO" class='form-control form-control-lg' value='${parsedData[i].CAST_NO}' readonly/></td>`;
+                    tableBody+=`<td>
+                        <select name="CLOSURE_MODE" class='form-select form-select-lg'>
+                            <option ${!parsedData[i].CLOSURE_MODE?'selected':''} value=""></option>
+                            <option ${parsedData[i].CLOSURE_MODE==='MUDGUN'?'selected':''}>MUDGUN</option>
+                            <option ${parsedData[i].CLOSURE_MODE==='NULL'?'selected':''}>NULL</option>
+                        </select>
+                    </td>`;
+                    tableBody+=`<td>
+                        <div class="input-wrapper">
+                            <input type="text" class="form-control form-control-lg clay-input" id="clayInput_${i}" name="MG_CLAY_USED" value="${parsedData[i].MG_CLAY_USED||''}">
+                            <div class ="arrow-btn" onclick="toggleList(${i})">▼</div>
+                        </div>
+                        <div class="list-box" id="list_${i}">
+                            <div onclick="selectItem(this, ${i})">ACE</div>
+                            <div onclick="selectItem(this, ${i})">BRL</div>
+                            <div onclick="selectItem(this, ${i})">LRH</div>
+                            <div onclick="selectItem(this, ${i})">UBQ</div>
+                            <div onclick="selectItem(this, ${i})">SARVESH</div>
+                            <div onclick="selectItem(this, ${i})">OTHERS</div>
+                            <div onclick="selectItem(this, ${i})">CALDYRS</div>
+                        </div>
+                    </td>`;
+                    tableBody+=`<td class="d-flex gap-0"><input name="LOT_NO" style="width:120px;"  value='${parsedData[i].LOT_NO}' />
+                        <button type="button" class ="btn btn-primary btn-sm getLot" data-castno="${parsedData[i].LOT_NO}">::</button></td>`;
+                    tableBody+=`<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
+                    tableBody+=`<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
+                    tableBody+=`<td>
+                        <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
+                            <option ${!parsedData[i].MUDGUN_NOZZLE?'selected':''} value=""></option>
+                            <option ${parsedData[i].MUDGUN_NOZZLE==='REPLACEMENT'?'selected':''}>REPLACEMENT</option>
+                            <option ${parsedData[i].MUDGUN_NOZZLE==='WEILD'?'selected':''}>WEILD</option>
+                        </select>
+                    </td>`;
+                    tableBody+=`<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
+                    tableBody+=`<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
+                    tableBody+=`<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
+                    tableBody+=`<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
+                    tableBody+=`<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
+                    tableBody+=`<td><input name="PRESS_ON_FORCE" class='form-control form-control-lg' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
+                    tableBody+=`<td>
+                        <select name="CLAY_LEAKAGE" class='form-select form-select-lg'>
+                            <option ${!parsedData[i].CLAY_LEAKAGE?'selected':''} value=""></option>
+                            <option ${parsedData[i].CLAY_LEAKAGE==='YES'?'selected':''}>YES</option>
+                            <option ${parsedData[i].CLAY_LEAKAGE==='NO'?'selected':''}>NO</option>
+                        </select>
+                    </td>`;
+                    tableBody+=`<td>
+                        <select name="BACK_FIRE" class='form-select form-select-lg'>
+                            <option ${!parsedData[i].BACK_FIRE?'selected':''} value=""></option>
+                            <option ${parsedData[i].BACK_FIRE==='YES'?'selected':''}>YES</option>
+                            <option ${parsedData[i].BACK_FIRE==='NO'?'selected':''}>NO</option>
+                        </select>
+                    </td>`;
+                    tableBody+=`</tr>`;
+                }
+                $("#Mudgun_Details tbody").html(tableBody);
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>
