@@ -3,24 +3,20 @@
 <head>
     <title>Cast House Details</title>
 
-    <!-- ================= REQUIRED CSS ================= -->
-    <!-- Bootstrap 4 (datepicker compatible) -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!-- ================= BOOTSTRAP 5 (LATEST) ================= -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Datepicker -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css">
+    <!-- ================= FLATPICKR DATE PICKER ================= -->
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-    <!-- ================= REQUIRED JS ================= -->
-    <!-- jQuery -->
+    <!-- ================= JQUERY ================= -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- Bootstrap 4 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ================= BOOTSTRAP JS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Datepicker JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- ================= FLATPICKR JS ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
         body {
@@ -28,18 +24,10 @@
         }
 
         .Main-Heading {
-            font-size: 40px;
+            font-size: 6vh;
             font-weight: bold;
             text-align: center;
-            margin: 20px;
-        }
-
-        .form-group-box {
-            border: 3px solid #73AD21;
             padding: 15px;
-            border-radius: 15px;
-            width: 520px;
-            margin-bottom: 20px;
         }
 
         th {
@@ -47,6 +35,8 @@
             color: white;
             font-size: 14px;
             text-align: center;
+            position: sticky;
+            top: 0;
         }
 
         .highlight td {
@@ -66,9 +56,9 @@
 
         .arrow-btn {
             width: 30px;
-            background: #e9ecef;
             text-align: center;
             cursor: pointer;
+            background: #e9ecef;
         }
 
         .list-box {
@@ -76,7 +66,8 @@
             position: absolute;
             background: white;
             border: 1px solid #999;
-            z-index: 999;
+            z-index: 9999;
+            width: 100%;
         }
 
         .list-box div {
@@ -96,16 +87,16 @@
 
 <div class="container-fluid">
 
-    <!-- ================= DATE + FURNACE ================= -->
-    <div class="form-group-box">
-        <label style="font-size:22px;">Date :</label>
+    <!-- ================= DATE & FURNACE ================= -->
+    <div class="border rounded p-3 mb-3" style="width:520px;">
+        <label class="fw-bold fs-4">Date :</label>
         <input id="tbFDatePick"
                class="form-control d-inline-block"
-               style="width:150px;text-align:center"
+               style="width:160px;text-align:center"
                readonly>
 
-        <label class="ml-4" style="font-size:22px;">Furnace :</label>
-        <select id="lstFur" class="form-control d-inline-block" style="width:80px;">
+        <label class="fw-bold fs-4 ms-4">Furnace :</label>
+        <select id="lstFur" class="form-select d-inline-block" style="width:80px;">
             <option value="C">C</option>
             <option value="E">E</option>
             <option value="F">F</option>
@@ -115,14 +106,14 @@
         </select>
     </div>
 
-    <!-- ================= MUDGUN TABLE ================= -->
-    <div class="table-responsive" style="max-height:300px;">
-        <table class="table table-bordered table-sm text-center" id="Mudgun_Details">
+    <!-- ================= MUDGUN DETAILS ================= -->
+    <div class="table-responsive" style="max-height:320px;">
+        <table class="table table-bordered table-sm text-center align-middle" id="Mudgun_Details">
             <thead>
             <tr>
                 <th>Cast No</th>
                 <th>Closure Mode</th>
-                <th>Clay Used</th>
+                <th>MG Clay Type</th>
                 <th>Lot No</th>
             </tr>
             </thead>
@@ -136,25 +127,22 @@
     let lsSelectedFDate = "";
     let IsSelectedFur = "C";
 
+    // ================= PAGE LOAD =================
     $(document).ready(function () {
 
-        // ================= DATEPICKER INIT =================
-        $('#tbFDatePick').datepicker({
-            format: 'dd/mm/yyyy',
-            autoclose: true,
-            todayHighlight: true
-        }).datepicker('setDate', new Date());
-
-        lsSelectedFDate = $('#tbFDatePick').val();
-
-        // ================= DATE CHANGE =================
-        $('#tbFDatePick').on('changeDate', function () {
-            lsSelectedFDate = $(this).val();
-            loadMudgunData();
+        // ===== FLATPICKR INIT =====
+        flatpickr("#tbFDatePick", {
+            dateFormat: "d/m/Y",
+            defaultDate: new Date(),
+            onChange: function (selectedDates, dateStr) {
+                lsSelectedFDate = dateStr;
+                loadMudgunData();
+            }
         });
 
-        // ================= FURNACE CHANGE =================
-        $('#lstFur').change(function () {
+        lsSelectedFDate = $("#tbFDatePick").val();
+
+        $("#lstFur").change(function () {
             IsSelectedFur = $(this).val();
             loadMudgunData();
         });
@@ -162,9 +150,10 @@
         loadMudgunData();
     });
 
-    // ================= DUMMY DATA LOAD =================
+    // ================= LOAD TABLE (DEMO DATA) =================
     function loadMudgunData() {
 
+        // Replace this array with your AJAX result
         let data = [
             { CAST_NO: "101", CLOSURE_MODE: "MUDGUN", MG_CLAY_USED: "ACE", LOT_NO: "L001" },
             { CAST_NO: "102", CLOSURE_MODE: "NULL", MG_CLAY_USED: "BRL", LOT_NO: "L002" }
@@ -173,16 +162,19 @@
         let html = "";
 
         for (let i = 0; i < data.length; i++) {
+
             html += `
             <tr data-castno="${data[i].CAST_NO}">
                 <td>${data[i].CAST_NO}</td>
+
                 <td>
-                    <select class="form-control">
+                    <select class="form-select">
                         <option></option>
                         <option ${data[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
                         <option ${data[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
                     </select>
                 </td>
+
                 <td style="position:relative;">
                     <div class="input-wrapper">
                         <input id="clayInput_${i}" value="${data[i].MG_CLAY_USED}">
@@ -195,7 +187,10 @@
                         <div onclick="selectItem(this,${i})">OTHERS</div>
                     </div>
                 </td>
-                <td><input class="form-control" value="${data[i].LOT_NO}"></td>
+
+                <td>
+                    <input class="form-control" value="${data[i].LOT_NO}">
+                </td>
             </tr>`;
         }
 
@@ -216,7 +211,7 @@
         }
     }
 
-    // Close dropdown when clicking outside
+    // Close dropdown on outside click
     document.addEventListener("click", function (e) {
         if (!e.target.closest(".input-wrapper")) {
             document.querySelectorAll(".list-box").forEach(l => l.style.display = "none");
