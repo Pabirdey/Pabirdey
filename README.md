@@ -1,304 +1,110 @@
-@{
-    Layout = null;   /* for testing – remove if using _Layout */
-}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Cast House Details</title>
-    <!-- Bootstrap & jQuery -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+                $.ajax({
+                    url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
+                    type: 'GET',
+                    data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                    success: function (result_Mudgun_Details) {
 
-    <!-- Datepicker (load only once!) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+                        var parsedData = JSON.parse(result_Mudgun_Details);
+                        var tableBody = "";
 
-    <style>
-        /* Remove all borders while keeping layout */
-        .table-bordered, .table-bordered th, .table-bordered td {
-            border: none !important;
-        }
+                        for (var i = 0; i < parsedData.length; i++) {
 
-        .input-wrapper {
-            border: none !important;
-        }
+                            tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
 
-        .input-wrapper input {
-            border: none !important;
-        }
+                            tableBody += `<td>
+                                <input name="CAST_NO"
+                                       class='form-control form-control-lg'
+                                       value='${parsedData[i].CAST_NO}' readonly/>
+                              </td>`;
 
-        fieldset {
-            border: none !important;
-        }
+                            tableBody += `<td>
+                    <select name="CLOSURE_MODE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
+                        <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
+                    </select>
+                </td>`;
 
-        .btnSaveCastHouse, .btnHMLogistics {
-            border: none !important;
-        }
+                            tableBody += `
+                                        <td>
+                                        <div class="input-wrapper">
+                                        <input type="text" class="form-control form-control-lg clay-input" id="clayInput_${i}" name="MG_CLAY_USED" value="${parsedData[i].MG_CLAY_USED || ''}">
+                                        <div class ="arrow-btn" onclick="toggleList(${i})">▼</div>
+                                        </div>
+                                        <div class="list-box" id="list_${i}">
+                                        <div onclick="selectItem(this, ${i})">ACE</div>
+                                        <div onclick="selectItem(this, ${i})">BRL</div>
+                                        <div onclick="selectItem(this, ${i})">LRH</div>
+                                        <div onclick="selectItem(this, ${i})">UBQ</div>
+                                        <div onclick="selectItem(this, ${i})">SARVESH</div>
+                                        <div onclick="selectItem(this, ${i})">OTHERS</div>
+                                        <div onclick="selectItem(this, ${i})">CALDYRS</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(S)</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D) </div>
+                                        <div onclick="selectItem(this, ${i})">CORUS </div>
+                                        <div onclick="selectItem(this, ${i})">TRB</div>
+                                        <div onclick="selectItem(this, ${i})">VISUVIUS</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA-TWH4</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA-CPH4</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D)-TWH5</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D)-TWH5K</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D)TWH-5T</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-3</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-4</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(S) RW5F</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-5</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-6</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA CB 1</div>
+                                        <div onclick="selectItem(this, ${i})">RW5F</div>
+                                        <div onclick="selectItem(this, ${i})">RG15</div>
+                                        <div onclick="selectItem(this, ${i})">RG15K</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D) TWH-7</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA CB 2</div>
+                                        <div onclick="selectItem(this, ${i})">TWH5(BELPAHAR)</div>
+                                        <div onclick="selectItem(this, ${i})">CB2(BELPAHAR)</div>
+                                        <div onclick="selectItem(this, ${i})">TWH 8(BELPAHAR)</div>
+                                        <div onclick="selectItem(this, ${i})">TWH 8 K 1(BELPAHAR)</div>
+                                </div>
+                            </td>`;
+                            /* ******** LOT NO TEXTBOX + BUTTON HERE ******** */
+                            tableBody += `<td class="d-flex gap-0"><input name="LOT_NO" style="width:120px;"  value='${parsedData[i].LOT_NO}' />
+                            <button type="button" class ="btn btn-primary btn-sm getLot" data-castno="${parsedData[i].LOT_NO}">::</button></td>`;
+                            tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
+                            tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
+                            tableBody += `<td>
+                                    <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
+                                            <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
+                                            <option ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>REPLACEMENT</option>
+                                            <option ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>WEILD</option>
+                                    </select>
+                            </td>`;
+                            tableBody += `<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
+                            tableBody += `<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
+                            tableBody += `<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
+                            tableBody += `<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
+                            tableBody += `<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
+                            tableBody += `<td><input name="PRESS_ON_FORCE" class='form-control form-control-lg' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
+                            tableBody += `<td>
+                            <select name="CLAY_LEAKAGE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLAY_LEAKAGE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
 
-        .list-box {
-            border: 1px solid #999; /* keep dropdown list visible */
-        }
+                            tableBody += `<td>
+                    <select name="BACK_FIRE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].BACK_FIRE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].BACK_FIRE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].BACK_FIRE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
 
-        .table thead th {
-            border: none !important; /* remove sticky header border */
-        }
+                            tableBody += `</tr>`;
+                        }
 
-        /* Retain all your previous styles */
-        .table-input {
-            font-size: 1rem;
-            padding: 2px 4px;
-        }
-
-        .my-swal-popup { font-family: 'Arial', sans-serif; }
-        .my-swal-title { font-family: 'Georgia', serif; font-size: 22px; }
-        .my-swal-text { font-family: 'Verdana', sans-serif; font-size: 18px; }
-
-        .form-section {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-            overflow: visible;
-            font-family: Courier New, Courier, monospace;
-        }
-
-        .section-title {
-            background: #EEB86D;
-            color: black;
-            padding: 5px 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            border-radius: 10px;
-            text-align: left;
-            font-family: Courier New, Courier, monospace;
-            font-size: 18px;
-        }
-
-        .form-control-lg {
-            font-size: 1.5rem;
-            font-family: Courier New, Courier, monospace;
-            color: black;
-        }
-
-        .scrollable-table {
-            overflow-y: auto;
-        }
-
-        .Long_Heading_Medium { min-width: 100px; }
-        .Long_Heading { min-width: 130px; }
-        .Heading_Small { width: 10px; white-space: nowrap; }
-        .section-Drill-title {
-            background: #EEB86D;
-            color: black;
-            padding: 5px 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            border-radius: 4px;
-            text-align: left;
-            font-family: Courier New, Courier, monospace;
-            font-size: 20px;
-        }
-
-        .form-group {
-            border-radius: 25px;
-            padding: 10px;
-            margin: 10px;
-            width: 500px;
-        }
-
-        select { appearance: auto !important; -webkit-appearance: auto !important; -moz-appearance: auto !important; }
-
-        .Main-Heading {
-            font-family: Allan,cursive;
-            font-weight: bold;
-            font-size: 6vh;
-            text-align: center;
-            padding: 20px;
-            color: rgb(57,57,57);
-            text-shadow: rgba(13, 0, 77, 0.08) 0px 2px 4px, rgba(13, 0, 77, 0.08) 0px 3px 6px, rgba(13, 0, 77, 0.08) 0px 8px 16px;
-            border-radius: 10px;
-        }
-
-        .input-wrapper {
-            display: flex;
-        }
-
-        .arrow-btn {
-            width: 30px;
-            text-align: center;
-            cursor: pointer;
-            background: #f0f0f0;
-        }
-
-        .list-box div {
-            padding: 5px;
-            cursor: pointer;
-        }
-
-        .list-box div:hover { background: #e6e6e6; }
-    </style>
-</head>
-<body>
-    <div class="Main-Heading mt-0">Cast House Details</div>
-    <div class="container-fluid mt-0">
-        <div class="form-group">
-            <label for="tbFDatePick" class="LabelControl" style="font-family:Allan,cursive;font-size:22px;">Date:&nbsp;</label>
-            <input id="tbFDatePick" size="14" style="height:28px;text-align:center">
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <span>
-                <lable style="font-family:Allan,cursive;font-size:25px;">Furnace</lable>
-                <select id="lstFur">
-                    <option value="C">C</option>
-                    <option value="E">E</option>
-                    <option value="F">F</option>
-                    <option value="G">G</option>
-                    <option value="H">H</option>
-                    <option value="I">I</option>
-                </select>
-            </span>
-        </div>
-
-        <!-- Tables: Tap Hole, Drilling, Mudgun, Other Details -->
-        <!-- Keep your existing HTML structure exactly the same -->
-        <div class="mt-1">
-            <!-- Tap Hole Table -->
-            <div class="form-section">
-                <div class="section-title">Tap Hole Details/Hot Metal Details</div>
-                <div class="table-responsive scrollable-table" style="max-height:300px;">
-                    <table class="table table-bordered table-sm text-center align-middle" id="TAP_Hot_Metal_Details">
-                        <thead>
-                            <tr>
-                                <th class="Long_Heading_Medium">Cast No</th>
-                                <th>Trough No</th>
-                                <th class="Long_Heading_Medium">Cast Start</th>
-                                <th class="Long_Heading_Medium">Cast End</th>
-                                <th class="Long_Heading_Medium">Gutko</th>
-                                <th class="Long_Heading_Medium">Cast Duration</th>
-                                <th class="Long_Heading_Medium">Casting Rate(t/min)</th>
-                                <th class="Long_Heading_Medium">TLC</th>
-                                <th class="Long_Heading_Medium">OT</th>
-                                <th class="Long_Heading_Medium">Cast Ready Time</th>
-                                <th class="Long_Heading_Medium" style="max-width:90px;white-space:normal;word-wrap:break-word;">Splashing/Wetness Time</th>
-                                <th class="Long_Heading" style="width:132px;min-width:132px;">Cast Type</th>
-                                <th style="width:132px;min-width:132px;">Clay Condition</th>
-                                <th style="width:220px;min-width:220px;">Taphole Behaviour at End Cast</th>
-                                <th class="Long_Heading_Medium">HMT Before Slag</th>
-                                <th class="Long_Heading_Medium">HMT After Slag</th>
-                                <th class="Long_Heading_Medium">Final HM Temp</th>
-                                <th class="Long_Heading_Medium">HM Weight</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Drilling Table -->
-            <div class="form-section">
-                <div class="section-Drill-title">Drilling Details/Slag Details</div>
-                <div class="table-responsive scrollable-table" style="max-height:320px;">
-                    <table class="table table-bordered text-center align-middle" id="Driling_Slag_Details">
-                        <thead>
-                            <tr>
-                                <th class="Long_Heading_Medium">Cast No</th>
-                                <th class="Long_Heading_Medium">Drill Dia</th>
-                                <th style="width:152px;min-width:152px;">Drill Type</th>
-                                <th class="Long_Heading_Medium">Total Drilling Time</th>
-                                <th class="Long_Heading_Medium">No of Drill Bars</th>
-                                <th class="Long_Heading_Medium">No of Drill Bits</th>
-                                <th class="Long_Heading_Medium">No of Lancing Pipe</th>
-                                <th class="Long_Heading_Medium">No of Poking Rods</th>
-                                <th class="Long_Heading_Medium">Drill Air Pressure</th>
-                                <th class="Long_Heading_Medium">TAP Hole Length</th>
-                                <th class="Long_Heading_Medium">Length Drilled Hammer</th>
-                                <th class="Long_Heading_Medium">Color of Furnes During Drilling</th>
-                                <th class="Long_Heading_Medium">Slag Start Time</th>
-                                <th class="Long_Heading_Medium">Slag Time Ratio</th>
-                                <th class="Long_Heading_Medium">Slag Retention Time</th>
-                                <th class="Long_Heading_Medium">No of Slag Ladle</th>
-                                <th class="Long_Heading_Medium">No of Cinder Granulation</th>
-                                <th class="Long_Heading_Medium">Granulation Perc</th>
-                                <th class="Long_Heading_Medium">Cinder Theoretical Wt</th>
-                                <th class="Long_Heading_Medium">Slag Rate</th>
-                                <th class="Long_Heading_Medium">Total Slag</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Mudgun Table -->
-            <div class="form-section">
-                <div class="section-title">Mudgun Details</div>
-                <div class="table-responsive scrollable-table" style="max-height:318px;">
-                    <table class="table table-bordered table-sm text-center align-middle" id="Mudgun_Details">
-                        <thead>
-                            <tr>
-                                <th class="Long_Heading_Medium">Cast No</th>
-                                <th>Closure Mode</th>
-                                <th>Clay Qty. Pushed</th>
-                                <th>MG Clay Type</th>
-                                <th>Lot No</th>
-                                <th>No. of Bags</th>
-                                <th>Mudgun Holding Time</th>
-                                <th>Mudgun Nozzle</th>
-                                <th>M.Nozzle Temp Before Closing</th>
-                                <th>M.Nozzle Temp after Closing</th>
-                                <th>Initial Plugin Pressure</th>
-                                <th>Max Plugin Pressure</th>
-                                <th>Final Plugin Pressure</th>
-                                <th>Pressure On Force</th>
-                                <th>Clay Leakage</th>
-                                <th>Back Fire</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= MODAL ================= -->
-    <div class="modal fade" id="clayModal" tabindex="-1">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title w-100 text-center">MG CLAY DETAILS</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Clay 1</label>
-                        <select class="form-select">
-                            <option>Clay A</option>
-                            <option>Clay B</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Clay 2</label>
-                        <select class="form-select">
-                            <option>Clay A</option>
-                            <option>Clay B</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Clay 3</label>
-                        <select class="form-select">
-                            <option>Clay A</option>
-                            <option>Clay B</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button class="btn btn-success" data-bs-dismiss="modal">Save</button>
-                    <button class="btn btn-danger" data-bs-dismiss="modal">Exit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+                        $("#Mudgun_Details tbody").html(tableBody);
+                    }
+                });
+            }
