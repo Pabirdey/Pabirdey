@@ -1,4 +1,4 @@
- function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
                 $.ajax({
                     url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
                     type: 'GET',
@@ -37,6 +37,7 @@
                                         <div onclick="selectItem(this, ${i})">BRL</div>
                                         <div onclick="selectItem(this, ${i})">LRH</div>
                                         <div onclick="selectItem(this, ${i})">UBQ</div>
+                                        <div onclick="selectItem(this, ${i})">OTHERS</div>
                                         <div onclick="selectItem(this, ${i})">SARVESH</div>
                                         <div onclick="selectItem(this, ${i})">CALDYRS</div>
                                         <div onclick="selectItem(this, ${i})">HARIMA(S)</div>
