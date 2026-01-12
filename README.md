@@ -108,3 +108,23 @@
             }
         });
     }
+
+    var activeRowIndex = null;
+function toggleList(index){ $("#list_"+index).toggle(); }
+function selectItem(el,index){
+    $("#clayInput_"+index).val(el.innerText);
+    $("#list_"+index).hide();
+    if(el.innerText==="OTHERS"){
+        activeRowIndex=index;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("clayModal")).show();
+    }
+}
+document.addEventListener("click",function(e){
+    if(!e.target.closest(".input-wrapper") && !e.target.closest(".list-box")){
+        $(".list-box").hide();
+    }
+});
+function toggleList(index) {
+    var list = document.getElementById("list_" + index);
+    list.style.display = (list.style.display === "block") ? "none" : "block";
+}
