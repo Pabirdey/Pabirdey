@@ -1,22 +1,31 @@
 <script>
-function toggleList(index) {
-    $(".list-box").hide(); // close other lists
-    $("#list_" + index).toggle();
-}
+    var activeRowIndex = null;
 
-function selectItem(el, index) {
-    $("#clayInput_" + index).val(el.innerText);
-    $("#list_" + index).hide();
+    /* 🔥 MUST be window.function */
+    window.toggleList = function (index) {
+        var list = document.getElementById("list_" + index);
+        if (!list) return;
 
-    if (el.innerText === "OTHERS") {
-        alert("OTHERS selected"); // later you can open modal
-    }
-}
+        list.style.display = (list.style.display === "block") ? "none" : "block";
+    };
 
-// Close dropdown when clicking outside
-document.addEventListener("click", function (e) {
-    if (!e.target.closest(".input-wrapper")) {
-        $(".list-box").hide();
-    }
-});
+    window.selectItem = function (event, el, index) {
+        event.stopPropagation();
+
+        document.getElementById("clayInput_" + index).value = el.innerText;
+        document.getElementById("list_" + index).style.display = "none";
+
+        if (el.innerText === "OTHERS") {
+            activeRowIndex = index;
+            bootstrap.Modal
+                .getOrCreateInstance(document.getElementById("clayModal"))
+                .show();
+        }
+    };
+
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest(".input-wrapper")) {
+            document.querySelectorAll(".list-box").forEach(x => x.style.display = "none");
+        }
+    });
 </script>
