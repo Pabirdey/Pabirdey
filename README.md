@@ -29,3 +29,51 @@
         }
     });
 </script>
+
+<script>
+function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+
+    $.ajax({
+        url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
+        type: 'GET',
+        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+        success: function (result) {
+
+            var parsedData = JSON.parse(result);
+            var html = "";
+
+            for (var i = 0; i < parsedData.length; i++) {
+
+                html += `
+                <tr>
+                    <td>
+                        <input class="form-control" value="${parsedData[i].CAST_NO}" readonly>
+                    </td>
+
+                    <td>
+                        <div class="input-wrapper position-relative">
+                            <input type="text"
+                                   id="clayInput_${i}"
+                                   class="form-control"
+                                   value="${parsedData[i].MG_CLAY_USED || ''}">
+
+                            <span class="arrow-btn"
+                                  onclick="toggleList(${i})">▼</span>
+
+                            <div class="list-box" id="list_${i}">
+                                <div onclick="selectItem(event,this,${i})">ACE</div>
+                                <div onclick="selectItem(event,this,${i})">BRL</div>
+                                <div onclick="selectItem(event,this,${i})">LRH</div>
+                                <div onclick="selectItem(event,this,${i})">OTHERS</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+            }
+
+            $("#Mudgun_Details tbody").html(html);
+        }
+    });
+}
+</script>
+
