@@ -1,96 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Bootstrap + jQuery Date Picker</title>
+ function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+                $.ajax({
+                    url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
+                    type: 'GET',
+                    data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                    success: function (result_Mudgun_Details) {
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                        var parsedData = JSON.parse(result_Mudgun_Details);
+                        var tableBody = "";
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                        for (var i = 0; i < parsedData.length; i++) {
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                            tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
 
-    <style>
-        body {
-            font-family: Courier New, Courier, monospace;
-            background: #f4f6f9;
-        }
+                            tableBody += `<td>
+                                <input name="CAST_NO"
+                                       class='form-control form-control-lg'
+                                       value='${parsedData[i].CAST_NO}' readonly/>
+                              </td>`;
 
-        .card-box {
-            width: 420px;
-            margin: 80px auto;
-            padding: 25px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 0 18px rgba(0,0,0,0.15);
-        }
+                            tableBody += `<td>
+                    <select name="CLOSURE_MODE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
+                        <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
+                    </select>
+                </td>`;
 
-        label {
-            font-size: 18px;
-            font-weight: bold;
-        }
-    </style>
-</head>
+                            tableBody += `
+                                        <td>
+                                        <div class="input-wrapper">
+                                        <input type="text" class="form-control form-control-lg clay-input" id="clayInput_${i}" name="MG_CLAY_USED" value="${parsedData[i].MG_CLAY_USED || ''}">
+                                        <div class ="arrow-btn" onclick="toggleList(${i})">▼</div>
+                                        </div>
+                                        <div class="list-box" id="list_${i}">
+                                        <div onclick="selectItem(this, ${i})">ACE</div>
+                                        <div onclick="selectItem(this, ${i})">BRL</div>
+                                        <div onclick="selectItem(this, ${i})">LRH</div>
+                                        <div onclick="selectItem(this, ${i})">UBQ</div>
+                                        <div onclick="selectItem(this, ${i})">SARVESH</div>
+                                        <div onclick="selectItem(this, ${i})">CALDYRS</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(S)</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D) </div>
+                                        <div onclick="selectItem(this, ${i})">CORUS </div>
+                                        <div onclick="selectItem(this, ${i})">TRB</div>
+                                        <div onclick="selectItem(this, ${i})">VISUVIUS</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA-TWH4</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA-CPH4</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D)-TWH5</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D)-TWH5K</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D)TWH-5T</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-3</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-4</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(S) RW5F</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-5</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA RWH-6</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA CB 1</div>
+                                        <div onclick="selectItem(this, ${i})">RW5F</div>
+                                        <div onclick="selectItem(this, ${i})">RG15</div>
+                                        <div onclick="selectItem(this, ${i})">RG15K</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA(D) TWH-7</div>
+                                        <div onclick="selectItem(this, ${i})">HARIMA CB 2</div>
+                                        <div onclick="selectItem(this, ${i})">TWH5(BELPAHAR)</div>
+                                        <div onclick="selectItem(this, ${i})">CB2(BELPAHAR)</div>
+                                        <div onclick="selectItem(this, ${i})">TWH 8(BELPAHAR)</div>
+                                        <div onclick="selectItem(this, ${i})">TWH 8 K 1(BELPAHAR)</div>
+                                </div>
+                            </td>`;
+                            /* ******** LOT NO TEXTBOX + BUTTON HERE ******** */
+                            tableBody += `<td class="d-flex gap-0"><input name="LOT_NO" style="width:120px;"  value='${parsedData[i].LOT_NO}' />
+                            <button type="button" class ="btn btn-primary btn-sm getLot" data-castno="${parsedData[i].LOT_NO}">::</button></td>`;
+                            tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
+                            tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
+                            tableBody += `<td>
+                                    <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
+                                            <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
+                                            <option ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>REPLACEMENT</option>
+                                            <option ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>WEILD</option>
+                                    </select>
+                            </td>`;
+                            tableBody += `<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
+                            tableBody += `<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
+                            tableBody += `<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
+                            tableBody += `<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
+                            tableBody += `<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
+                            tableBody += `<td><input name="PRESS_ON_FORCE" class='form-control form-control-lg' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
+                            tableBody += `<td>
+                            <select name="CLAY_LEAKAGE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLAY_LEAKAGE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
 
-<body>
+                            tableBody += `<td>
+                    <select name="BACK_FIRE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].BACK_FIRE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].BACK_FIRE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].BACK_FIRE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
 
-<div class="card-box">
+                            tableBody += `</tr>`;
+                        }
 
-    <!-- DATE -->
-    <div class="mb-3">
-        <label>Select Date</label>
-        <input type="date"
-               id="tbFDatePick"
-               class="form-control text-center">
-    </div>
-
-    <!-- DATE TIME -->
-    <div class="mb-3">
-        <label>Select Date & Time</label>
-        <input type="datetime-local"
-               id="tbFDateTime"
-               class="form-control text-center">
-    </div>
-
-    <div class="text-center">
-        <button class="btn btn-primary" id="btnShow">
-            Show Values
-        </button>
-    </div>
-
-</div>
-
-<script>
-    let selectedDate = "";
-    let selectedDateTime = "";
-
-    $(document).ready(function () {
-
-        // Date change
-        $("#tbFDatePick").on("change", function () {
-            selectedDate = $(this).val();   // yyyy-mm-dd
-            console.log("Date:", selectedDate);
-        });
-
-        // DateTime change
-        $("#tbFDateTime").on("change", function () {
-            selectedDateTime = $(this).val(); // yyyy-mm-ddTHH:mm
-            console.log("DateTime:", selectedDateTime);
-        });
-
-        // Button click
-        $("#btnShow").on("click", function () {
-            alert(
-                "Selected Date : " + selectedDate +
-                "\nSelected DateTime : " + selectedDateTime
-            );
-        });
-
-    });
-</script>
-
-</body>
-</html>
+                        $("#Mudgun_Details tbody").html(tableBody);
+                    }
+                });
+            }
