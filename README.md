@@ -1,75 +1,22 @@
-let currentIndex = null;
+create or replace PROCEDURE PROC_TSM_DRI_DELAY_DAILY AS
+    vMAXDATE DATE;
+BEGIN
+  
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_DATE_FORMAT=''DD-MON-YYYY HH24:MI:SS''';  
+    SELECT MAX(DATE_TIME) INTO vMAXDATE FROM TSBSL.T_TSM_DRI_DELAYS_DAILY;
+    IF vMAXDATE IS NULL THEN
+        vMAXDATE := TO_DATE('01-DEC-2025', 'DD-MON-YYYY');
+    END IF;
+    For k in (Select START_TIMESTAMP,PLANT,AGENCY From TSBSL.T_TSM_DRI_DELAYS where PLANT='DRI - KILN 1' AND START_TIMESTAMP>='01-NOV-2025' AND END_TIMESTAMP<='01-DEC-2025' AND AGENCY='Operation' Order by Timestamp)
+    Loop
+        Begin
+        
+        Exception
+        When Others Then NUll;
+        END:
+END LOOP;  
 
-        function toggleList(i) {
-            const list = document.getElementById("list_" + i);
-            if (list) {
-                list.classList.toggle("show");
-            }
-        }
-
-        function selectItem(el, i) {
-            const value = el.innerText;
-            const input = document.getElementById("clayInput_" + i);
-            const list = document.getElementById("list_" + i);
-
-            if (input) {
-                input.value = value;
-            }
-
-            if (list) {
-                list.classList.remove("show");
-            }
-
-            // Handle "OTHERS" option
-            if (value === "OTHERS") {
-                debugger;
-                currentIndex = i;
-                const modalElement = document.getElementById("clayModal");
-                if (modalElement) {
-                    // Clear modal input if it exists
-                    const modalInput = modalElement.querySelector('input[type="text"]');
-                    if (modalInput) {
-                        modalInput.value = "";
-                    }
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                }
-            }
-        }
-         <div class="modal fade" id="clayModal" tabindex="-1">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title w-100 text-center">MG CLAY DETAILS</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Clay 1</label>
-                        <select class="form-select">
-                            <option>Clay A</option>
-                            <option>Clay B</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Clay 2</label>
-                        <select class="form-select">
-                            <option>Clay A</option>
-                            <option>Clay B</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Clay 3</label>
-                        <select class="form-select">
-                            <option>Clay A</option>
-                            <option>Clay B</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button class="btn btn-success" data-bs-dismiss="modal">Save</button>
-                    <button class="btn btn-danger" data-bs-dismiss="modal">Exit</button>
-                </div>
-            </div>
-        </div>
-    </div>
+EXCEPTION
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE('General Error: ' || SQLERRM);
+END;
