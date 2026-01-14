@@ -1,60 +1,50 @@
-CREATE OR REPLACE PROCEDURE PROC_TSM_DRI_DELAY_DAILY AS
+CREATE OR REPLACE PROCEDURE PROC_TSM_DRI_ALERT_UPDATE AS
 
-    v_curr_date DATE;
+    v_sql        CLOB;
+    v_value      NUMBER;
 
 BEGIN
-    EXECUTE IMMEDIATE
-        'ALTER SESSION SET NLS_DATE_FORMAT = ''DD-MON-YYYY HH24:MI:SS''';
-
-    FOR k IN (
-        SELECT START_TIMESTAMP,
-               END_TIMESTAMP,
+    FOR rec IN (
+        SELECT COLUMN_NAME,
+               SOURCE_TABLE,
+               DESTINATION_TABLE,
+               LCL,
+               UCL,
                PLANT,
-               AGENCY
-        FROM TSBSL.T_TSM_DRI_DELAYS
-        WHERE START_TIMESTAMP >= DATE '2025-11-01'
-          AND END_TIMESTAMP   <= DATE '2025-12-01'
-        ORDER BY PLANT, AGENCY, START_TIMESTAMP
+               SOURCE
+        FROM TSBSL.T_TSM_DRI_ALERT_CONFIG
     )
     LOOP
-        -- start date
-        v_curr_date := TRUNC(k.START_TIMESTAMP);
+        /* 1️⃣ Read value dynamically from source table */
+        v_sql :=
+            'SELECT ' || rec.COLUMN_NAME ||
+            ' FROM ' || rec.SOURCE_TABLE ||
+            ' WHERE PLANT = :1';
 
-        -- loop for each day
-        WHILE v_curr_date <= TRUNC(k.END_TIMESTAMP)
-        LOOP
-            BEGIN
-                INSERT INTO TSBSL.T_TSM_DRI_DELAYS_DAILY
-                (
-                    DATE_TIME,
-                    PLANT,
-                    AGENCY
-                )
-                VALUES
-                (
-                    v_curr_date,
-                    k.PLANT,
-                    k.AGENCY
-                );
+        EXECUTE IMMEDIATE v_sql
+        INTO v_value
+        USING rec.PLANT;
 
-            EXCEPTION
-                WHEN DUP_VAL_ON_INDEX THEN
-                    NULL; -- skip existing day
-                WHEN OTHERS THEN
-                    DBMS_OUTPUT.PUT_LINE(
-                        'Insert Error [' || k.PLANT || ' - ' || k.AGENCY || '] : ' || SQLERRM
-                    );
-            END;
+        /* 2️⃣ Check limit */
+        IF v_value < rec.LCL OR v_value > rec.UCL THEN
 
-            v_curr_date := v_curr_date + 1;
-        END LOOP;
+            /* 3️⃣ Update destination table dynamically */
+            v_sql :=
+                'UPDATE ' || rec.DESTINATION_TABLE || '
+                 SET ACTUAL_VALUE = :1,
+                     ALERT_STATUS = ''Y'',
+                     ALERT_DATE = SYSDATE
+                 WHERE PLANT = :2
+                   AND TAG_NAME = :3';
+
+            EXECUTE IMMEDIATE v_sql
+            USING v_value, rec.PLANT, rec.COLUMN_NAME;
+
+        END IF;
 
     END LOOP;
 
     COMMIT;
 
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('General Error: ' || SQLERRM);
-END;
+END PROC_TSM_DRI_ALERT_UPDATE;
 /
