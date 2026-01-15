@@ -12,98 +12,38 @@ BEGIN
         vMAXDATE := TO_DATE('01-JAN-2026','DD-MON-YYYY');
     END IF;
 
-    vSTDATE := vMAXDATE;
-    vTODATE := TRUNC(SYSDATE);
+    vSTDATE :='05-JAN-2026';
+    vTODATE :='06-JAN-2026';
 
-    FOR k IN (
-        SELECT SL_NO, PLANT, COLUMN_NAME, SOURCE_TABLE,
-               DESTINATION_TABLE, LCL, UCL
-        FROM TSBSL.T_TSM_DRI_ALERT_MASTER
-        ORDER BY SL_NO
-    )
-    LOOP
-    BEGIN
-        ---------------------------------------------------
-        -- CHECK RECORD EXIST OR NOT
-        ---------------------------------------------------
-        SELECT COUNT(*) INTO vCount
-        FROM TSBSL.T_TSM_DRI_ALERT
-        WHERE DATE_TIME = vMAXDATE
-          AND PLANT = k.PLANT
-          AND COLUMN_NAME = k.COLUMN_NAME;
-
-        IF vCount = 0 THEN
-            INSERT INTO TSBSL.T_TSM_DRI_ALERT
-            (DATE_TIME, PLANT, COLUMN_NAME, TOTAL_COUNT,
-             COUNT_BEYOND_LCL_MIN, COUNT_BEYOND_UCL_MAX)
-            VALUES
-            (vMAXDATE, k.PLANT, k.COLUMN_NAME, 0, 0, 0);
+    FOR k IN (SELECT SL_NO, PLANT, COLUMN_NAME, SOURCE_TABLE,DESTINATION_TABLE, LCL, UCL FROM TSBSL.T_TSM_DRI_ALERT_MASTER ORDER BY SL_NO)
+        LOOP
+            BEGIN       
+                SELECT COUNT(*) INTO vCount FROM TSBSL.T_TSM_DRI_ALERT WHERE DATE_TIME = vSTDATE  AND PLANT = k.PLANT AND COLUMN_NAME = k.COLUMN_NAME;     
+                IF vCount = 0 THEN
+                    INSERT INTO TSBSL.T_TSM_DRI_ALERT
+                    (DATE_TIME, PLANT, COLUMN_NAME, TOTAL_COUNT,
+                    COUNT_BEYOND_LCL_MIN, COUNT_BEYOND_UCL_MAX)
+                    VALUES(vSTDATE, k.PLANT, k.COLUMN_NAME, 0, 0, 0);
+                END IF;        
+        vSql :='SELECT COUNT(*) FROM ' || k.SOURCE_TABLE ||' WHERE TIMESTAMP >= TO_DATE(''' ||TO_CHAR(vSTDATE,'DD-MON-YYYY HH24:MI:SS') ||''',''DD-MON-YYYY HH24:MI:SS'')' ||' AND TIMESTAMP <= TO_DATE(''' ||TO_CHAR(vTODATE,'DD-MON-YYYY HH24:MI:SS') ||''',''DD-MON-YYYY HH24:MI:SS'')' ||' AND ' || k.COLUMN_NAME || ' < ' || k.LCL;     
+        EXECUTE IMMEDIATE vSql INTO vValue;
+        IF vValue > 0 THEN
+            EXECUTE IMMEDIATE
+            'UPDATE ' || k.DESTINATION_TABLE ||' SET COUNT_BEYOND_LCL_MIN = NVL(COUNT_BEYOND_LCL_MIN,0) + ' || vValue ||' WHERE DATE_TIME = TO_DATE(''' ||TO_CHAR(vSTDATE,'DD-MON-YYYY HH24:MI:SS') ||''',''DD-MON-YYYY HH24:MI:SS'')' ||' AND PLANT = ''' || k.PLANT || '''' ||' AND COLUMN_NAME = ''' || k.COLUMN_NAME || '''';
         END IF;
-
-        ---------------------------------------------------
-        -- ✅ LCL COUNT (FIXED)
-        ---------------------------------------------------
-        vSql :=
-        'SELECT COUNT(*) FROM ' || k.SOURCE_TABLE ||
-        ' WHERE DATE_TIME >= TO_DATE(''' ||
-            TO_CHAR(vSTDATE,'DD-MON-YYYY HH24:MI:SS') ||
-            ''',''DD-MON-YYYY HH24:MI:SS'')' ||
-
-        ' AND DATE_TIME <= TO_DATE(''' ||
-            TO_CHAR(vTODATE,'DD-MON-YYYY HH24:MI:SS') ||
-            ''',''DD-MON-YYYY HH24:MI:SS'')' ||
-
-        ' AND ' || k.COLUMN_NAME || ' < ' || k.LCL;
+        
+        vSql :='SELECT COUNT(*) FROM ' || k.SOURCE_TABLE ||' WHERE TIMESTAMP >= TO_DATE(''' ||TO_CHAR(vSTDATE,'DD-MON-YYYY HH24:MI:SS') ||''',''DD-MON-YYYY HH24:MI:SS'')' ||' AND TIMESTAMP <= TO_DATE(''' ||TO_CHAR(vTODATE,'DD-MON-YYYY HH24:MI:SS') ||''',''DD-MON-YYYY HH24:MI:SS'')' ||' AND ' || k.COLUMN_NAME || ' > ' || k.UCL;
 
         EXECUTE IMMEDIATE vSql INTO vValue;
 
         IF vValue > 0 THEN
             EXECUTE IMMEDIATE
-            'UPDATE ' || k.DESTINATION_TABLE ||
-            ' SET COUNT_BEYOND_LCL_MIN = NVL(COUNT_BEYOND_LCL_MIN,0) + ' || vValue ||
-            ' WHERE DATE_TIME = TO_DATE(''' ||
-                TO_CHAR(vMAXDATE,'DD-MON-YYYY HH24:MI:SS') ||
-                ''',''DD-MON-YYYY HH24:MI:SS'')' ||
-
-            ' AND PLANT = ''' || k.PLANT || '''' ||
-            ' AND COLUMN_NAME = ''' || k.COLUMN_NAME || '''';
-        END IF;
-
-        ---------------------------------------------------
-        -- ✅ UCL COUNT (FIXED)
-        ---------------------------------------------------
-        vSql :=
-        'SELECT COUNT(*) FROM ' || k.SOURCE_TABLE ||
-        ' WHERE DATE_TIME >= TO_DATE(''' ||
-            TO_CHAR(vSTDATE,'DD-MON-YYYY HH24:MI:SS') ||
-            ''',''DD-MON-YYYY HH24:MI:SS'')' ||
-
-        ' AND DATE_TIME <= TO_DATE(''' ||
-            TO_CHAR(vTODATE,'DD-MON-YYYY HH24:MI:SS') ||
-            ''',''DD-MON-YYYY HH24:MI:SS'')' ||
-
-        ' AND ' || k.COLUMN_NAME || ' > ' || k.UCL;
-
-        EXECUTE IMMEDIATE vSql INTO vValue;
-
-        IF vValue > 0 THEN
-            EXECUTE IMMEDIATE
-            'UPDATE ' || k.DESTINATION_TABLE ||
-            ' SET COUNT_BEYOND_UCL_MAX = NVL(COUNT_BEYOND_UCL_MAX,0) + ' || vValue ||
-            ' WHERE DATE_TIME = TO_DATE(''' ||
-                TO_CHAR(vMAXDATE,'DD-MON-YYYY HH24:MI:SS') ||
-                ''',''DD-MON-YYYY HH24:MI:SS'')' ||
-
-            ' AND PLANT = ''' || k.PLANT || '''' ||
-            ' AND COLUMN_NAME = ''' || k.COLUMN_NAME || '''';
+            'UPDATE ' || k.DESTINATION_TABLE ||' SET COUNT_BEYOND_UCL_MAX = NVL(COUNT_BEYOND_UCL_MAX,0) + ' || vValue ||' WHERE DATE_TIME = TO_DATE(''' ||TO_CHAR(vSTDATE,'DD-MON-YYYY HH24:MI:SS') ||''',''DD-MON-YYYY HH24:MI:SS'')' ||' AND PLANT = ''' || k.PLANT || '''' ||' AND COLUMN_NAME = ''' || k.COLUMN_NAME || '''';
         END IF;
 
     EXCEPTION
-        WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE(
-              'ERROR IN SL_NO=' || k.SL_NO ||
-              ' : ' || SQLERRM
-            );
+    WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR IN SL_NO=' || k.SL_NO ||' : ' || SQLERRM);
     END;
 
     END LOOP;
@@ -111,4 +51,3 @@ BEGIN
     COMMIT;
 
 END PROC_TSM_DRI_ALERT;
-/
