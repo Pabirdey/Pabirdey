@@ -9,7 +9,6 @@ public string SaveCarbonPaste(string DATE_TIME,
 
     con.Open();
 
-    // ----- FIRST UPDATE -----
     string updateSql = @"
     UPDATE CARBON_PASTE SET
         BELOW_TUYERE = :BELOW_TUYERE,
@@ -19,14 +18,18 @@ public string SaveCarbonPaste(string DATE_TIME,
 
     OracleCommand upCmd = new OracleCommand(updateSql, con);
 
-    upCmd.Parameters.Add(":BELOW_TUYERE", BELOW_TUYERE);
-    upCmd.Parameters.Add(":NO_OF_DRUM", NO_OF_DRUM);
-    upCmd.Parameters.Add(":DATE_TIME", DATE_TIME);
-    upCmd.Parameters.Add(":SHIFT", SHIFT);
+    // ===== EXPLICIT TYPE BINDING =====
+    upCmd.Parameters.Add(":BELOW_TUYERE", OracleDbType.Varchar2).Value =
+        string.IsNullOrEmpty(BELOW_TUYERE) ? (object)DBNull.Value : BELOW_TUYERE;
+
+    upCmd.Parameters.Add(":NO_OF_DRUM", OracleDbType.Varchar2).Value =
+        string.IsNullOrEmpty(NO_OF_DRUM) ? (object)DBNull.Value : NO_OF_DRUM;
+
+    upCmd.Parameters.Add(":DATE_TIME", OracleDbType.Varchar2).Value = DATE_TIME;
+    upCmd.Parameters.Add(":SHIFT", OracleDbType.Varchar2).Value = SHIFT;
 
     int rows = upCmd.ExecuteNonQuery();
 
-    // ----- IF NOT UPDATED → INSERT -----
     if (rows == 0)
     {
         string insertSql = @"
@@ -37,10 +40,14 @@ public string SaveCarbonPaste(string DATE_TIME,
 
         OracleCommand inCmd = new OracleCommand(insertSql, con);
 
-        inCmd.Parameters.Add(":DATE_TIME", DATE_TIME);
-        inCmd.Parameters.Add(":SHIFT", SHIFT);
-        inCmd.Parameters.Add(":BELOW_TUYERE", BELOW_TUYERE);
-        inCmd.Parameters.Add(":NO_OF_DRUM", NO_OF_DRUM);
+        inCmd.Parameters.Add(":DATE_TIME", OracleDbType.Varchar2).Value = DATE_TIME;
+        inCmd.Parameters.Add(":SHIFT", OracleDbType.Varchar2).Value = SHIFT;
+
+        inCmd.Parameters.Add(":BELOW_TUYERE", OracleDbType.Varchar2).Value =
+            string.IsNullOrEmpty(BELOW_TUYERE) ? (object)DBNull.Value : BELOW_TUYERE;
+
+        inCmd.Parameters.Add(":NO_OF_DRUM", OracleDbType.Varchar2).Value =
+            string.IsNullOrEmpty(NO_OF_DRUM) ? (object)DBNull.Value : NO_OF_DRUM;
 
         inCmd.ExecuteNonQuery();
     }
