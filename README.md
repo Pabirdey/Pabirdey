@@ -1,21 +1,22 @@
 [HttpPost]
-public string Save_Carbon_Paste(string jsonData)
+public string Save_Carbon_Paste(
+      string DATE_TIME,
+      string SHIFT,
+      string BELOW_TUYERE,
+      string NO_OF_DRUM)
 {
+    OracleConnection con =
+      new OracleConnection("User Id=xxx;Password=xxx;Data Source=xxx");
+
     try
     {
-        JArray arr = JArray.Parse(jsonData);
-
-        OracleConnection con =
-          new OracleConnection("User Id=xxx;Password=xxx;Data Source=xxx");
-
         con.Open();
 
-        foreach (var item in arr)
-        {
-            string sql = @"
+        string sql = @"
 MERGE INTO T_CARBON_PASTE t
 USING dual
-ON (t.DATE_TIME = TO_DATE(:DATE_TIME,'YYYY-MM-DD HH24:MI:SS')
+ON (t.DATE_TIME =
+      TO_DATE(:DATE_TIME,'YYYY-MM-DD HH24:MI:SS')
     AND t.SHIFT = :SHIFT)
 
 WHEN MATCHED THEN
@@ -30,30 +31,24 @@ WHEN NOT MATCHED THEN
   (TO_DATE(:DATE_TIME,'YYYY-MM-DD HH24:MI:SS'),
    :SHIFT, :BELOW_TUYERE, :NO_OF_DRUM)";
 
-            OracleCommand cmd =
-                new OracleCommand(sql, con);
+        OracleCommand cmd =
+            new OracleCommand(sql, con);
 
-            cmd.Parameters.Add(":DATE_TIME",
-                item["DATE_TIME"].ToString());
+        cmd.Parameters.Add(":DATE_TIME", DATE_TIME);
+        cmd.Parameters.Add(":SHIFT", SHIFT);
+        cmd.Parameters.Add(":BELOW_TUYERE", BELOW_TUYERE);
+        cmd.Parameters.Add(":NO_OF_DRUM", NO_OF_DRUM);
 
-            cmd.Parameters.Add(":SHIFT",
-                item["SHIFT"].ToString());
+        cmd.ExecuteNonQuery();
 
-            cmd.Parameters.Add(":BELOW_TUYERE",
-                item["BELOW_TUYERE"].ToString());
-
-            cmd.Parameters.Add(":NO_OF_DRUM",
-                item["NO_OF_DRUM"].ToString());
-
-            cmd.ExecuteNonQuery();
-        }
-
-        con.Close();
-
-        return "Data Saved Successfully";
+        return "OK";
     }
     catch (Exception ex)
     {
         return ex.Message;
+    }
+    finally
+    {
+        con.Close();
     }
 }
