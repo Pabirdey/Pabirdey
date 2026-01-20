@@ -1,26 +1,114 @@
 //=====================================================
-// SHIFT LOGIC AS PER YOUR RULE
+// YOUR DISPLAY FUNCTION – MODIFIED
 //=====================================================
-function getShiftFromTime(dt) {
+function Display_Carbon_Paste_Inj(lsSelectedFDate, IsSelectedFur) {
 
-    if (!dt) return "A";
+    $.ajax({
+        url: '@Url.Action("Get_Display_Carbon_Paste_Inj", "CastHouse")',
+        type: 'GET',
+        data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
 
-    var date = new Date(dt);
-    var hour = date.getHours();
-    var min = date.getMinutes();
+        success: function (result_Carbon_Paste_Inj) {
 
-    var totalMin = hour * 60 + min;
+            var parsedData = JSON.parse(result_Carbon_Paste_Inj);
+            var tableBody = "";
 
-    // 06:00 – 13:59  → A
-    if (totalMin >= 360 && totalMin < 840) {
-        return "A";
-    }
+            //==========================================
+            // NO DATA FOUND → BLANK ROW
+            //==========================================
+            if (!parsedData || parsedData.length == 0) {
 
-    // 14:00 – 21:59 → B
-    if (totalMin >= 840 && totalMin < 1320) {
-        return "B";
-    }
+                let autoShift = getShiftFromTime(lsSelectedFDate);
 
-    // 22:00 – 05:59 → C
-    return "C";
+                tableBody += "<tr>";
+
+                tableBody += `<td>
+                    <input name="DATE_TIME"
+                           class='form-control form-control-sm dt'
+                           value='${lsSelectedFDate || ""}'/>
+                </td>`;
+
+                tableBody += `
+                <td>
+                    <select name="SHIFT"
+                            class="form-control form-control-sm">
+
+                        <option value="">Select</option>
+                        <option value="A" ${autoShift=="A"?"selected":""}>A</option>
+                        <option value="B" ${autoShift=="B"?"selected":""}>B</option>
+                        <option value="C" ${autoShift=="C"?"selected":""}>C</option>
+
+                    </select>
+                </td>`;
+
+                tableBody += `<td>
+                    <input name="BELOW_TUYERE"
+                           class='form-control form-control-sm'/>
+                </td>`;
+
+                tableBody += `<td>
+                    <input name="NO_OF_DRUM"
+                           class='form-control form-control-sm'/>
+                </td>`;
+
+                tableBody += "</tr>";
+
+                $("#carbon_paste_inj tbody").html(tableBody);
+                return;
+            }
+
+
+            //==========================================
+            // DATA FOUND
+            //==========================================
+            for (var i = 0; i < parsedData.length; i++) {
+
+                let finalDate = lsSelectedFDate ||
+                                parsedData[i].DATE_TIME;
+
+                let autoShift = getShiftFromTime(finalDate);
+
+                let shift =
+                    parsedData[i].SHIFT || autoShift;
+
+                tableBody += "<tr>";
+
+                tableBody += `<td>
+                    <input name="DATE_TIME"
+                           class='form-control form-control-sm dt'
+                           value='${finalDate}'/>
+                </td>`;
+
+                tableBody += `
+                <td>
+                    <select name="SHIFT"
+                            class="form-control form-control-sm">
+
+                        <option value="">Select</option>
+
+                        <option value="A" ${shift=="A"?"selected":""}>A</option>
+                        <option value="B" ${shift=="B"?"selected":""}>B</option>
+                        <option value="C" ${shift=="C"?"selected":""}>C</option>
+
+                    </select>
+                </td>`;
+
+                tableBody += `<td>
+                    <input name="BELOW_TUYERE"
+                           class='form-control form-control-sm'
+                           value='${parsedData[i].BELOW_TUYERE || ""}'/>
+                </td>`;
+
+                tableBody += `<td>
+                    <input name="NO_OF_DRUM"
+                           class='form-control form-control-sm'
+                           value='${parsedData[i].NO_OF_DRUM || ""}'/>
+                </td>`;
+
+                tableBody += "</tr>";
+            }
+
+            $("#carbon_paste_inj tbody").html(tableBody);
+        }
+    });
 }
