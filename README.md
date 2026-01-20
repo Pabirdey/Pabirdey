@@ -1,101 +1,51 @@
-function saveCarbonPaste() {
-
-    debugger;
-
-    var rows =
-      document.querySelectorAll("#carbon_paste_inj tbody tr");
-
-    for (var i = 0; i < rows.length; i++) {
-
-        var dt =
-          rows[i].querySelector("[name='DATE_TIME']").value;
-
-        var shift =
-          rows[i].querySelector("[name='SHIFT']").value;
-
-        var tuyere =
-          rows[i].querySelector("[name='BELOW_TUYERE']").value;
-
-        var drum =
-          rows[i].querySelector("[name='NO_OF_DRUM']").value;
-
-        $.ajax({
-
-            url: '@Url.Action("Save_Carbon_Paste", "CastHouse")',
-
-            type: 'POST',
-
-            data: {
-                DATE_TIME: dt,
-                SHIFT: shift,
-                BELOW_TUYERE: tuyere,
-                NO_OF_DRUM: drum
-            },
-
-            success: function (res) {
-                console.log(res);
-            },
-
-            error: function (err) {
-                alert("Controller not hit");
-            }
-        });
-    }
-
-    alert("Saved Successfully!");
-}
-
 [HttpPost]
-public string Save_Carbon_Paste(
-    string DATE_TIME,
-    string SHIFT,
-    string BELOW_TUYERE,
-    string NO_OF_DRUM)
+public string SaveCarbonPaste(string DATE_TIME,
+                              string SHIFT,
+                              string BELOW_TUYERE,
+                              string NO_OF_DRUM)
 {
     OracleConnection con =
-      new OracleConnection(iMonitorWebUtils.msConRWString);
+      new OracleConnection("User Id=xxx;Password=xxx;Data Source=xxx");
 
-    try
+    con.Open();
+
+    // ----- FIRST UPDATE -----
+    string updateSql = @"
+    UPDATE CARBON_PASTE SET
+        BELOW_TUYERE = :BELOW_TUYERE,
+        NO_OF_DRUM = :NO_OF_DRUM
+    WHERE DATE_TIME = :DATE_TIME
+    AND SHIFT = :SHIFT";
+
+    OracleCommand upCmd = new OracleCommand(updateSql, con);
+
+    upCmd.Parameters.Add(":BELOW_TUYERE", BELOW_TUYERE);
+    upCmd.Parameters.Add(":NO_OF_DRUM", NO_OF_DRUM);
+    upCmd.Parameters.Add(":DATE_TIME", DATE_TIME);
+    upCmd.Parameters.Add(":SHIFT", SHIFT);
+
+    int rows = upCmd.ExecuteNonQuery();
+
+    // ----- IF NOT UPDATED → INSERT -----
+    if (rows == 0)
     {
-        con.Open();
+        string insertSql = @"
+        INSERT INTO CARBON_PASTE
+        (DATE_TIME, SHIFT, BELOW_TUYERE, NO_OF_DRUM)
+        VALUES
+        (:DATE_TIME, :SHIFT, :BELOW_TUYERE, :NO_OF_DRUM)";
 
-        string sql = @"
-MERGE INTO Test.T_FUR_CARBON_PASTE_INJECTION t
-USING dual
-ON (t.DATE_TIME =
-      TO_DATE(:DATE_TIME,'YYYY-MM-DD HH24:MI:SS')
-    AND t.SHIFT = :SHIFT)
+        OracleCommand inCmd = new OracleCommand(insertSql, con);
 
-WHEN MATCHED THEN
-  UPDATE SET
-     BELOW_TUYERE = :BELOW_TUYERE,
-     NO_OF_DRUM   = :NO_OF_DRUM
+        inCmd.Parameters.Add(":DATE_TIME", DATE_TIME);
+        inCmd.Parameters.Add(":SHIFT", SHIFT);
+        inCmd.Parameters.Add(":BELOW_TUYERE", BELOW_TUYERE);
+        inCmd.Parameters.Add(":NO_OF_DRUM", NO_OF_DRUM);
 
-WHEN NOT MATCHED THEN
-  INSERT
-  (DATE_TIME, SHIFT, BELOW_TUYERE, NO_OF_DRUM)
-  VALUES
-  (TO_DATE(:DATE_TIME,'YYYY-MM-DD HH24:MI:SS'),
-   :SHIFT, :BELOW_TUYERE, :NO_OF_DRUM)";
-
-        OracleCommand cmd =
-            new OracleCommand(sql, con);
-
-        cmd.Parameters.Add(":DATE_TIME", DATE_TIME);
-        cmd.Parameters.Add(":SHIFT", SHIFT);
-        cmd.Parameters.Add(":BELOW_TUYERE", BELOW_TUYERE);
-        cmd.Parameters.Add(":NO_OF_DRUM", NO_OF_DRUM);
-
-        cmd.ExecuteNonQuery();
-
-        return "OK";
+        inCmd.ExecuteNonQuery();
     }
-    catch (Exception ex)
-    {
-        return ex.Message;
-    }
-    finally
-    {
-        con.Close();
-    }
+
+    con.Close();
+
+    return "Saved Successfully";
 }
