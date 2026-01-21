@@ -1,27 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Auto Row Add on Down Arrow</title>
+<meta charset="UTF-8">
+<title>Auto Row + Scroll</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            background: #f5f5f5;
-        }
+<style>
+    body {
+        background: #f2f2f2;
+    }
 
-        table input, table select {
-            width: 100%;
-            text-align: center;
-        }
+    .table-wrapper {
+        max-height: 260px;      /* 4 rows visible */
+        overflow-y: auto;       /* vertical scroll */
+        overflow-x: hidden;
+    }
 
-        th {
-            font-size: 14px;
-        }
-    </style>
+    table input, table select {
+        width: 100%;
+        text-align: center;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #dee2e6;
+        z-index: 2;
+        font-size: 14px;
+    }
+</style>
 </head>
+
 <body>
 
 <div class="container mt-4">
@@ -31,83 +42,69 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered text-center" id="exceptionTable">
-                <thead class="table-secondary">
-                    <tr>
-                        <th>Id No</th>
-                        <th>Date</th>
-                        <th>HH24</th>
-                        <th>MM</th>
-                        <th>Taphole Length</th>
-                        <th>Clay Pushed</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
+            <div class="table-wrapper">
+                <table class="table table-bordered text-center" id="exceptionTable">
+                    <thead>
+                        <tr>
+                            <th>Id No</th>
+                            <th>Date</th>
+                            <th>HH24</th>
+                            <th>MM</th>
+                            <th>Taphole Length</th>
+                            <th>Clay Pushed</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    <tr>
-                        <td><input type="text" class="form-control"></td>
-                        <td><input type="date" class="form-control"></td>
-                        <td>
-                            <select class="form-select">
-                                <option></option>
-                                <option>00</option><option>01</option><option>02</option>
-                                <option>03</option><option>04</option><option>05</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select">
-                                <option></option>
-                                <option>00</option><option>15</option><option>30</option><option>45</option>
-                            </select>
-                        </td>
-                        <td><input type="text" class="form-control"></td>
-                        <td><input type="text" class="form-control"></td>
-                        <td>
-                            <select class="form-select">
-                                <option></option>
-                                <option>A</option>
-                                <option>B</option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    <tbody>
+                        <!-- 4 Default Rows -->
+                        <tr></tr>
+                        <tr></tr>
+                        <tr></tr>
+                        <tr></tr>
+                    </tbody>
+                </table>
+            </div>
 
-            <button class="btn btn-primary float-end">Save</button>
+            <button class="btn btn-primary mt-2 float-end">Save</button>
         </div>
     </div>
 </div>
 
 <script>
+// Create default rows
+document.querySelectorAll("#exceptionTable tbody tr").forEach(r => fillRow(r));
+
+// Down arrow logic
 document.addEventListener("keydown", function (e) {
 
     if (e.key === "ArrowDown") {
 
-        let table = document.getElementById("exceptionTable");
-        let tbody = table.querySelector("tbody");
+        let tbody = document.querySelector("#exceptionTable tbody");
         let rows = tbody.querySelectorAll("tr");
-
         let active = document.activeElement;
 
-        if (!active || (active.tagName !== "INPUT" && active.tagName !== "SELECT")) {
-            return;
-        }
+        if (!active || !active.closest("tr")) return;
 
         let currentRow = active.closest("tr");
         let lastRow = rows[rows.length - 1];
 
-        // If cursor is on LAST row → add new row
         if (currentRow === lastRow) {
-            addNewRow(tbody);
+            let newRow = document.createElement("tr");
+            fillRow(newRow);
+            tbody.appendChild(newRow);
+
+            // Scroll to bottom
+            document.querySelector(".table-wrapper").scrollTop =
+                document.querySelector(".table-wrapper").scrollHeight;
+
+            newRow.querySelector("input, select").focus();
         }
     }
 });
 
-function addNewRow(tbody) {
-
-    let row = document.createElement("tr");
-
+// Function to fill row cells
+function fillRow(row) {
     row.innerHTML = `
         <td><input type="text" class="form-control"></td>
         <td><input type="date" class="form-control"></td>
@@ -134,11 +131,6 @@ function addNewRow(tbody) {
             </select>
         </td>
     `;
-
-    tbody.appendChild(row);
-
-    // Auto focus first field of new row
-    row.querySelector("input, select").focus();
 }
 </script>
 
