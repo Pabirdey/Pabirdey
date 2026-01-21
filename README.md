@@ -1,69 +1,146 @@
-using System.Collections.Generic;
-using Oracle.ManagedDataAccess.Client;
-using System.Web.Mvc;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Row Add on Down Arrow</title>
 
-[HttpPost]
-public string SaveCarbonPaste(List<Dictionary<string, string>> list)
-{
-    OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString);
-    con.Open();
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    foreach (var row in list)
-    {
-        string DATE_TIME = row["DATE_TIME"];
-        string SHIFT = row["SHIFT"];
-        string BELOW_TUYERE = row["BELOW_TUYERE"];
-        string NO_OF_DRUM = row["NO_OF_DRUM"];
-        string FUR = row["FUR"];
+    <style>
+        body {
+            background: #f5f5f5;
+        }
 
-        // 1️⃣ First try to UPDATE
-        string updateSql = @"
-            UPDATE TEST.T_FUR_CARBON_PASTE_INJECTION
-            SET BELOW_TUYERE = :BELOW_TUYERE,
-                NO_OF_DRUM = :NO_OF_DRUM
-            WHERE TO_CHAR(DATE_TIME,'DD-MON-YYYY') = :DATE_TIME
-              AND SHIFT = :SHIFT
-              AND FUR_NAME = :FUR";
+        table input, table select {
+            width: 100%;
+            text-align: center;
+        }
 
-        OracleCommand upCmd = new OracleCommand(updateSql, con);
+        th {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
 
-        upCmd.Parameters.Add(":BELOW_TUYERE", OracleDbType.Varchar2).Value =
-            string.IsNullOrEmpty(BELOW_TUYERE) ? (object)DBNull.Value : BELOW_TUYERE;
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header fw-bold">
+            Exception Cast Entry
+        </div>
 
-        upCmd.Parameters.Add(":NO_OF_DRUM", OracleDbType.Varchar2).Value =
-            string.IsNullOrEmpty(NO_OF_DRUM) ? (object)DBNull.Value : NO_OF_DRUM;
+        <div class="card-body">
+            <table class="table table-bordered text-center" id="exceptionTable">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Id No</th>
+                        <th>Date</th>
+                        <th>HH24</th>
+                        <th>MM</th>
+                        <th>Taphole Length</th>
+                        <th>Clay Pushed</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
 
-        upCmd.Parameters.Add(":DATE_TIME", OracleDbType.Varchar2).Value = DATE_TIME;
-        upCmd.Parameters.Add(":SHIFT", OracleDbType.Varchar2).Value = SHIFT;
-        upCmd.Parameters.Add(":FUR", OracleDbType.Varchar2).Value = FUR;
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="form-control"></td>
+                        <td><input type="date" class="form-control"></td>
+                        <td>
+                            <select class="form-select">
+                                <option></option>
+                                <option>00</option><option>01</option><option>02</option>
+                                <option>03</option><option>04</option><option>05</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select">
+                                <option></option>
+                                <option>00</option><option>15</option><option>30</option><option>45</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-control"></td>
+                        <td><input type="text" class="form-control"></td>
+                        <td>
+                            <select class="form-select">
+                                <option></option>
+                                <option>A</option>
+                                <option>B</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-        int rowsAffected = upCmd.ExecuteNonQuery();
+            <button class="btn btn-primary float-end">Save</button>
+        </div>
+    </div>
+</div>
 
-        // 2️⃣ If no row updated → INSERT
-        if (rowsAffected == 0)
-        {
-            string insertSql = @"
-                INSERT INTO TEST.T_FUR_CARBON_PASTE_INJECTION
-                (DATE_TIME, SHIFT, FUR_NAME, BELOW_TUYERE, NO_OF_DRUM)
-                VALUES
-                (TO_DATE(:DATE_TIME,'DD-MON-YYYY'),
-                 :SHIFT, :FUR, :BELOW_TUYERE, :NO_OF_DRUM)";
+<script>
+document.addEventListener("keydown", function (e) {
 
-            OracleCommand inCmd = new OracleCommand(insertSql, con);
+    if (e.key === "ArrowDown") {
 
-            inCmd.Parameters.Add(":DATE_TIME", OracleDbType.Varchar2).Value = DATE_TIME;
-            inCmd.Parameters.Add(":SHIFT", OracleDbType.Varchar2).Value = SHIFT;
-            inCmd.Parameters.Add(":FUR", OracleDbType.Varchar2).Value = FUR;
-            inCmd.Parameters.Add(":BELOW_TUYERE", OracleDbType.Varchar2).Value =
-                string.IsNullOrEmpty(BELOW_TUYERE) ? (object)DBNull.Value : BELOW_TUYERE;
-            inCmd.Parameters.Add(":NO_OF_DRUM", OracleDbType.Varchar2).Value =
-                string.IsNullOrEmpty(NO_OF_DRUM) ? (object)DBNull.Value : NO_OF_DRUM;
+        let table = document.getElementById("exceptionTable");
+        let tbody = table.querySelector("tbody");
+        let rows = tbody.querySelectorAll("tr");
 
-            inCmd.ExecuteNonQuery();
+        let active = document.activeElement;
+
+        if (!active || (active.tagName !== "INPUT" && active.tagName !== "SELECT")) {
+            return;
+        }
+
+        let currentRow = active.closest("tr");
+        let lastRow = rows[rows.length - 1];
+
+        // If cursor is on LAST row → add new row
+        if (currentRow === lastRow) {
+            addNewRow(tbody);
         }
     }
+});
 
-    con.Close();
+function addNewRow(tbody) {
 
-    return "All rows inserted/updated successfully!";
+    let row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td><input type="text" class="form-control"></td>
+        <td><input type="date" class="form-control"></td>
+        <td>
+            <select class="form-select">
+                <option></option>
+                <option>00</option><option>01</option><option>02</option>
+                <option>03</option><option>04</option><option>05</option>
+            </select>
+        </td>
+        <td>
+            <select class="form-select">
+                <option></option>
+                <option>00</option><option>15</option><option>30</option><option>45</option>
+            </select>
+        </td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td>
+            <select class="form-select">
+                <option></option>
+                <option>A</option>
+                <option>B</option>
+            </select>
+        </td>
+    `;
+
+    tbody.appendChild(row);
+
+    // Auto focus first field of new row
+    row.querySelector("input, select").focus();
 }
+</script>
+
+</body>
+</html>
