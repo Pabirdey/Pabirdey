@@ -1,88 +1,91 @@
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    let tbody = document.querySelector("#exception_cast tbody");
-
-    // Create minimum 4 rows
-    for (let i = 0; i < 4; i++) {
-        addRow();
-    }
-});
-
-// Down arrow key event
-document.addEventListener("keydown", function (e) {
-
-    if (e.key === "ArrowDown") {
-
-        let active = document.activeElement;
-        if (!active || !active.closest("#exception_cast tbody tr")) return;
-
-        let tbody = document.querySelector("#exception_cast tbody");
-        let rows = tbody.querySelectorAll("tr");
-        let currentRow = active.closest("tr");
-        let lastRow = rows[rows.length - 1];
-
-        // If cursor is in last row → add new row
-        if (currentRow === lastRow) {
-            addRow();
-
-            // Auto scroll to bottom
-            let wrapper = document.querySelector(".scrollable-table");
-            wrapper.scrollTop = wrapper.scrollHeight;
-
-            // Focus first field of new row
-            tbody.lastElementChild.querySelector("input, select").focus();
-        }
-    }
-});
-
-// Function to add row
-function addRow() {
-
-    let tbody = document.querySelector("#exception_cast tbody");
-    let tr = document.createElement("tr");
-
-    tr.innerHTML = `
-        <td><input type="text" class="form-control form-control-sm"></td>
-        <td><input type="text" class="form-control form-control-sm"></td>
-        <td><input type="datetime-local" class="form-control form-control-sm"></td>
-        <td>
-            <select class="form-select form-select-sm">
-                <option></option>
-                ${createOptions(0,23)}
-            </select>
-        </td>
-        <td>
-            <select class="form-select form-select-sm">
-                <option></option>
-                <option>00</option><option>15</option><option>30</option><option>45</option>
-            </select>
-        </td>
-        <td><input type="text" class="form-control form-control-sm"></td>
-        <td><input type="text" class="form-control form-control-sm"></td>
-        <td>
-            <select class="form-select form-select-sm">
-                <option></option>
-                <option>A</option>
-                <option>B</option>
-            </select>
-        </td>
-    `;
-
-    tbody.appendChild(tr);
-}
-
-// HH24 dropdown values
-function createOptions(start, end) {
-    let opt = "";
-    for (let i = start; i <= end; i++) {
-        opt += `<option>${String(i).padStart(2, '0')}</option>`;
-    }
-    return opt;
-}
-
-// Dummy save function
-function saveExceptionCast() {
-    alert("Save clicked (AJAX logic can be added)");
-}
-</script>
+PROCEDURE PROC_JODA_IOPP_PROCESS_HOURLY
+AS
+vMAXDATE DATE;
+Begin
+    Execute immediate 'Alter session set nls_date_format=''DD-MON-YYYY HH24:MI''';
+    Select MAX(TIMESTAMP) into vMAXDATE From imtg.T_JODA_IOPP_PROCESS_HOURLY;
+    IF vMAXDATE IS NULL THEN
+        vMAXDATE:='01-NOV-2025';
+    END IF;
+    Merge INTO imtg.T_JODA_IOPP_PROCESS_HOURLY t
+    Using (
+            Select  TRUNC(vMAXDATE,'HH24') TIMESTAMP,
+                AVG(NULLIF(SCRUBBER_MASSFEED_RATE_1,0))SCRUBBER_MASSFEED_RATE_1,
+                AVG(NULLIF(SCRUBBER_MASSFEED_RATE_2,0))SCRUBBER_MASSFEED_RATE_2,
+                AVG(NULLIF(SCRUBBER_WATERFLOW_RATE_1,0))SCRUBBER_WATERFLOW_RATE_1,
+                AVG(NULLIF(SCRUBBER_WATERFLOW_RATE_2,0))SCRUBBER_WATERFLOW_RATE_2,
+                AVG(NULLIF(PRIMARY_SCREEN_PRDT_CONV_CV01,0))PRIMARY_SCREEN_PRDT_CONV_CV01,
+                AVG(NULLIF(SECONDARY_SCREEN_PRDT1_CONV_CV03,0))SECONDARY_SCREEN_PRDT1_CONV_CV03,
+                AVG(NULLIF(SECONDARY_SCREEN_PRDT2_CONV_CV05,0))SECONDARY_SCREEN_PRDT2_CONV_CV05,
+                AVG(NULLIF(SCRUBBER_BUILDING_TANK_LVL_1,0))SCRUBBER_BUILDING_TANK_LVL_1,
+                AVG(NULLIF(SCRUBBER_BUILDING_TANK_LVL_2,0))SCRUBBER_BUILDING_TANK_LVL_2,
+                AVG(NULLIF(HC_TANK_LVL_1,0))HC_TANK_LVL_1,
+                AVG(NULLIF(HC_TANK_LVL_3,0))HC_TANK_LVL_3,
+                AVG(NULLIF(HC_TANK_LVL_2,0))HC_TANK_LVL_2,
+                AVG(NULLIF(HC_TANK_LVL_4,0))HC_TANK_LVL_4,
+                AVG(NULLIF(HC_DENSITY_1,0))HC_DENSITY_1,
+                AVG(NULLIF(HC_FLOW_1,0))HC_FLOW_1,
+                AVG(NULLIF(HC_PRESSURE_1,0))HC_PRESSURE_1,
+                AVG(NULLIF(HC_DENSITY_2,0))HC_DENSITY_2,
+                AVG(NULLIF(HC_FLOW_2,0))HC_FLOW_2,
+                AVG(NULLIF(HC_PRESSURE_2,0))HC_PRESSURE_2,
+                AVG(NULLIF(HFS_CONC_CONY_TPH,0))HFS_CONC_CONY_TPH,
+                AVG(NULLIF(HFS_CONC_CONY_AMP,0))HFS_CONC_CONY_AMP,
+                AVG(NULLIF(HRT_BED_MASS,0))HRT_BED_MASS,
+                AVG(NULLIF(HRT_RAKE_TORQUE,0))HRT_RAKE_TORQUE,
+                AVG(NULLIF(HRT_BED_LEVEL,0))HRT_BED_LEVEL,
+                AVG(NULLIF(HRT_TURBIDITY_ANALYZER,0))HRT_TURBIDITY_ANALYZER,
+                AVG(NULLIF(HRT_U_F_FLOWRATE,0))HRT_U_F_FLOWRATE,
+                AVG(NULLIF(HRT_U_F_DENSITY,0))HRT_U_F_DENSITY,
+                AVG(NULLIF(HRT_U_F_PRESSURE,0))HRT_U_F_PRESSURE
+                From imtg.T_JODA_IOPP_PROCESS_RAW Where TIMESTAMP>=vMAXDATE+1/24 AND TIMESTAMP<vMAXDATE+1/24
+                Group by TRUNC(vMAXDATE,'HH24')  Order by TRUNC(vMAXDATE,'HH24')
+    )s
+    ON (
+        t.TIMESTAMP=s.TIMESTAMP       
+        )
+    When Matched Then
+        Update Set         
+            t.SCRUBBER_MASSFEED_RATE_1=s.SCRUBBER_MASSFEED_RATE_1,
+            t.SCRUBBER_MASSFEED_RATE_2=s.SCRUBBER_MASSFEED_RATE_2,
+            t.SCRUBBER_WATERFLOW_RATE_1=s.SCRUBBER_WATERFLOW_RATE_1,
+            t.SCRUBBER_WATERFLOW_RATE_2=s.SCRUBBER_WATERFLOW_RATE_2,
+            t.PRIMARY_SCREEN_PRDT_CONV_CV01=s.PRIMARY_SCREEN_PRDT_CONV_CV01,
+            t.SECONDARY_SCREEN_PRDT1_CONV_CV03=s.SECONDARY_SCREEN_PRDT1_CONV_CV03,
+            t.SECONDARY_SCREEN_PRDT2_CONV_CV05=s.SECONDARY_SCREEN_PRDT2_CONV_CV05,
+            t.SCRUBBER_BUILDING_TANK_LVL_1=s.SCRUBBER_BUILDING_TANK_LVL_1,
+            t.SCRUBBER_BUILDING_TANK_LVL_2=s.SCRUBBER_BUILDING_TANK_LVL_2,
+            t.HC_TANK_LVL_1=s.HC_TANK_LVL_1,
+            t.HC_TANK_LVL_3=s.HC_TANK_LVL_3,
+            t.HC_TANK_LVL_2=s.HC_TANK_LVL_2,
+            t.HC_TANK_LVL_4=s.HC_TANK_LVL_4,
+            t.HC_DENSITY_1=s.HC_DENSITY_1,
+            t.HC_FLOW_1=s.HC_FLOW_1,
+            t.HC_PRESSURE_1=s.HC_PRESSURE_1,
+            t.HC_DENSITY_2=s.HC_DENSITY_2,
+            t.HC_FLOW_2=s.HC_FLOW_2,
+            t.HC_PRESSURE_2=s.HC_PRESSURE_2,           
+            t.HFS_CONC_CONY_TPH=s.HFS_CONC_CONY_TPH,
+            t.HFS_CONC_CONY_AMP=s.HFS_CONC_CONY_AMP,
+            t.HRT_BED_MASS=s.HRT_BED_MASS,
+            t.HRT_RAKE_TORQUE=s.HRT_RAKE_TORQUE,
+            t.HRT_BED_LEVEL=s.HRT_BED_LEVEL,
+            t.HRT_TURBIDITY_ANALYZER=s.HRT_TURBIDITY_ANALYZER,
+            t.HRT_U_F_FLOWRATE=s.HRT_U_F_FLOWRATE,
+            t.HRT_U_F_DENSITY=s.HRT_U_F_DENSITY,
+            t.HRT_U_F_PRESSURE=s.HRT_U_F_PRESSURE           
+    When Not Matched Then
+    INSERT(TIMESTAMP,SCRUBBER_MASSFEED_RATE_1,SCRUBBER_MASSFEED_RATE_2,SCRUBBER_WATERFLOW_RATE_1,
+    SCRUBBER_WATERFLOW_RATE_2,PRIMARY_SCREEN_PRDT_CONV_CV01,SECONDARY_SCREEN_PRDT1_CONV_CV03,
+    SECONDARY_SCREEN_PRDT2_CONV_CV05,SCRUBBER_BUILDING_TANK_LVL_1,SCRUBBER_BUILDING_TANK_LVL_2,
+    HC_TANK_LVL_1,HC_TANK_LVL_3,HC_TANK_LVL_2,HC_TANK_LVL_4,HC_DENSITY_1,HC_FLOW_1,
+    HC_PRESSURE_1,HC_DENSITY_2,HC_FLOW_2,HC_PRESSURE_2,HFS_CONC_CONY_TPH,HFS_CONC_CONY_AMP,HRT_BED_MASS,HRT_RAKE_TORQUE,HRT_BED_LEVEL,
+    HRT_TURBIDITY_ANALYZER,HRT_U_F_FLOWRATE,HRT_U_F_DENSITY,HRT_U_F_PRESSURE)
+    VALUES(s.TIMESTAMP,s.SCRUBBER_MASSFEED_RATE_1,s.SCRUBBER_MASSFEED_RATE_2,s.SCRUBBER_WATERFLOW_RATE_1
+    ,s.SCRUBBER_WATERFLOW_RATE_2,s.PRIMARY_SCREEN_PRDT_CONV_CV01,s.SECONDARY_SCREEN_PRDT1_CONV_CV03,
+    s.SECONDARY_SCREEN_PRDT2_CONV_CV05,s.SCRUBBER_BUILDING_TANK_LVL_1,s.SCRUBBER_BUILDING_TANK_LVL_2,
+    s.HC_TANK_LVL_1,s.HC_TANK_LVL_3,s.HC_TANK_LVL_2,s.HC_TANK_LVL_4,s.HC_DENSITY_1,s.HC_FLOW_1,
+    s.HC_PRESSURE_1,s.HC_DENSITY_2,s.HC_FLOW_2,s.HC_PRESSURE_2,s.HFS_CONC_CONY_TPH,s.HFS_CONC_CONY_AMP,s.HRT_BED_MASS,s.HRT_RAKE_TORQUE,
+    s.HRT_BED_LEVEL,s.HRT_TURBIDITY_ANALYZER,s.HRT_U_F_FLOWRATE,s.HRT_U_F_DENSITY,s.HRT_U_F_PRESSURE);
+    Commit;                   
+End PROC_JODA_IOPP_PROCESS_HOURLY;
