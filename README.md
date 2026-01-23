@@ -1,22 +1,28 @@
 <script>
 function toggleList(i) {
-    // Close all other lists
-    document.querySelectorAll('.list-box').forEach(box => box.style.display = 'none');
-    // Toggle this one
-    const list = document.getElementById('list_' + i);
+    // Close all other lists using a simple for loop
+    var lists = document.getElementsByClassName('list-box');
+    for (var j = 0; j < lists.length; j++) {
+        lists[j].style.display = 'none';
+    }
+
+    // Toggle current list
+    var list = document.getElementById('list_' + i);
     list.style.display = (list.style.display === 'block') ? 'none' : 'block';
 }
 
 function selectItem(el, i) {
-    const val = el.innerText.trim();
-    // Always close the dropdown first
+    var val = el.innerText.trim();
+
+    // Close the dropdown
     document.getElementById('list_' + i).style.display = 'none';
 
     if (val === "OTHERS") {
         // Show modal for other value
         document.getElementById('hdnRowIndex').value = i;
         document.getElementById('txtOtherMGClay').value = '';
-        const modal = new bootstrap.Modal(document.getElementById('mgClayOtherModal'));
+        var modalEl = document.getElementById('mgClayOtherModal');
+        var modal = new bootstrap.Modal(modalEl);
         modal.show();
         return;
     }
@@ -25,10 +31,13 @@ function selectItem(el, i) {
     document.getElementById('clayInput_' + i).value = val;
 }
 
-// Optional: close dropdown if clicking outside
+// Close all dropdowns if clicking outside
 document.addEventListener('click', function(e) {
     if (!e.target.classList.contains('arrow-btn') && !e.target.closest('.list-box')) {
-        document.querySelectorAll('.list-box').forEach(box => box.style.display = 'none');
+        var lists = document.getElementsByClassName('list-box');
+        for (var j = 0; j < lists.length; j++) {
+            lists[j].style.display = 'none';
+        }
     }
 });
 </script>
