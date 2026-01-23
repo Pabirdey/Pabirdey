@@ -93,7 +93,6 @@ let lsSelectedFDate;
 let IsSelectedFur;
 
 $(document).ready(function() {
-    // Initialize datepicker with today's date
     let today = new Date();
     lsSelectedFDate = ("0" + today.getDate()).slice(-2) + "/" + ("0"+(today.getMonth()+1)).slice(-2) + "/" + today.getFullYear();
 
@@ -117,7 +116,6 @@ $(document).ready(function() {
     });
 });
 
-// AJAX call to controller
 function Display_Mudgun_Details(date, furnace){
     $.ajax({
         url: '@Url.Action("Get_Display_Mudgun_Details","CastHouse")',
@@ -138,10 +136,10 @@ function Display_Mudgun_Details(date, furnace){
                               </td>`;
                 tableBody += `<td><input class="form-control form-control-sm" value="${parsedData[i].CLAY_QUANTITY}"></td>`;
 
-                // MG Clay Type input + dropdown + modal
+                // Editable MG Clay input + dropdown + modal
                 tableBody += `<td>
                                 <div class="mgClayWrapper">
-                                    <input type="text" class="form-control form-control-sm mgClayInput" value="${parsedData[i].MG_CLAY}" readonly>
+                                    <input type="text" class="form-control form-control-sm mgClayInput" value="${parsedData[i].MG_CLAY}">
                                     <button type="button" class="btn btn-sm btn-secondary" onclick="showDropdown(this)">▼</button>
                                     <div class="mgClayList">
                                         <div onclick="selectClay(this, ${i})">ACE</div>
@@ -162,17 +160,12 @@ function Display_Mudgun_Details(date, furnace){
     });
 }
 
-// MG Clay dropdown functions
+// Show dropdown
 function showDropdown(btn){
-    // Hide all other dropdowns
     var lists = document.querySelectorAll('.mgClayList');
     for(var i=0;i<lists.length;i++){ lists[i].style.display='none'; }
-
-    // Show this row's dropdown
     var list = btn.nextElementSibling;
     list.style.display = 'block';
-
-    // Close dropdown if clicked outside
     document.addEventListener('click', function handler(e){
         if(!list.contains(e.target) && e.target !== btn){
             list.style.display = 'none';
@@ -181,13 +174,13 @@ function showDropdown(btn){
     });
 }
 
+// Select item from dropdown
 function selectClay(item, rowIndex){
     var list = item.parentElement;
     var input = list.previousElementSibling;
-
     if(item.innerText === "OTHERS"){
         $("#hdnRowIndex").val(rowIndex);
-        $("#txtOtherMGClay").val('');
+        $("#txtOtherMGClay").val(input.value); // show current value
         let modalEl = document.getElementById("mgClayOtherModal");
         let modal = new bootstrap.Modal(modalEl);
         modal.show();
@@ -203,12 +196,10 @@ function saveOtherMGClay(){
     let val = $("#txtOtherMGClay").val().trim();
     if(!val){ alert("Enter value"); return; }
 
-    // Update input in table
     var row = document.querySelectorAll("#Mudgun_Details tbody tr")[rowIndex];
     var input = row.querySelector(".mgClayInput");
     input.value = val;
 
-    // Hide modal
     let modalEl = document.getElementById("mgClayOtherModal");
     let modal = bootstrap.Modal.getInstance(modalEl);
     if(modal) modal.hide();
