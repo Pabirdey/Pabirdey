@@ -1,44 +1,28 @@
-.scroll-x {
-    overflow-x: auto;
-    position: relative;
-}
-
-/* Freeze CAST_NO column */
-#Mudgun_Details th:first-child,
-#Mudgun_Details td:first-child {
-    position: sticky;
-    left: 0;
-    background: #ffffff;
-    z-index: 5;
-    min-width: 130px;
-}
-
-/* Header above body */
-#Mudgun_Details th:first-child {
-    z-index: 6;
-    background: #f8f9fa;
-}
-<div class="table-responsive scroll-x">
-    <table id="Mudgun_Details" class="table table-bordered table-sm align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>CAST NO</th>
-                <th>CLOSURE MODE</th>
-                <th>MG CLAY USED</th>
-                <th>LOT NO</th>
-                <th>NO OF BAGS</th>
-                <th>MUDGUN HOLD TIME</th>
-                <th>MUDGUN NOZZLE</th>
-                <th>NOZZLE BEF</th>
-                <th>NOZZLE AFT</th>
-                <th>INIT PRESS</th>
-                <th>MAX PRESS</th>
-                <th>FINAL PRESS</th>
-                <th>PRESS FORCE</th>
-                <th>CLAY LEAK</th>
-                <th>BACK FIRE</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+  <div class="form-section">
+                <div class="section-title">Mudgun Details</div>
+                <div class="table-responsive scrollable-table" style="max-height:318px;">
+                    <table class="table table-bordered table-sm text-center align-middle" id="Mudgun_Details">
+                        <thead>
+                            <tr>
+                                <th class="Long_Heading_Medium">Cast No</th>
+                                <th style="width:115px;min-width:115px;box-sizing:border-box;">Closure Mode</th>
+                                <th style="width:115px;min-width:115px;box-sizing:border-box;">Clay Qty. Pushed</th>
+                                <th style="width:195px;min-width:195px;box-sizing:border-box;">MG Clay Type</th>
+                                <th class="Long_Heading_Medium">Lot No</th>
+                                <th class="Long_Heading_Medium">No. of Bags</th>
+                                <th class="Long_Heading_Medium">Mudgun Holding Time</th>
+                                <th style="width:195px;min-width:150px;box-sizing:border-box;">Mudgun Nozzle</th>
+                                <th class="Long_Heading_Medium">M.Nozzle Temp Before Closing</th>
+                                <th class="Long_Heading_Medium">M.Nozzle Temp after Closing</th>
+                                <th class="Long_Heading_Medium">Initial Plugin Pressure</th>
+                                <th class="Long_Heading_Medium">Max Plugin Pressure</th>
+                                <th class="Long_Heading_Medium">Final Plugin Pressure</th>
+                                <th class="Long_Heading_Medium">Pressure On Force</th>
+                                <th class="Long_Heading_Medium">Clay Leakage</th>
+                                <th class="Long_Heading_Medium">Back Fire</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
