@@ -64,6 +64,26 @@
     </div>
 </div>
 
+<!-- Modal for Other MG Clay -->
+<div class="modal fade" id="mgClayOtherModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Other MG Clay Type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="hdnRowIndex">
+        <input type="text" id="txtOtherMGClay" class="form-control" placeholder="Enter MG Clay Type">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="saveOtherMGClay()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
@@ -118,17 +138,17 @@ function Display_Mudgun_Details(date, furnace){
                               </td>`;
                 tableBody += `<td><input class="form-control form-control-sm" value="${parsedData[i].CLAY_QUANTITY}"></td>`;
 
-                // MG Clay Type input + dropdown
+                // MG Clay Type input + dropdown + modal
                 tableBody += `<td>
                                 <div class="mgClayWrapper">
-                                    <input type="text" class="form-control form-control-sm mgClayInput" value="${parsedData[i].MG_CLAY}">
+                                    <input type="text" class="form-control form-control-sm mgClayInput" value="${parsedData[i].MG_CLAY}" readonly>
                                     <button type="button" class="btn btn-sm btn-secondary" onclick="showDropdown(this)">▼</button>
                                     <div class="mgClayList">
-                                        <div onclick="selectClay(this)">ACE</div>
-                                        <div onclick="selectClay(this)">BRL</div>
-                                        <div onclick="selectClay(this)">LRH</div>
-                                        <div onclick="selectClay(this)">UBQ</div>
-                                        <div onclick="selectClay(this)">OTHERS</div>
+                                        <div onclick="selectClay(this, ${i})">ACE</div>
+                                        <div onclick="selectClay(this, ${i})">BRL</div>
+                                        <div onclick="selectClay(this, ${i})">LRH</div>
+                                        <div onclick="selectClay(this, ${i})">UBQ</div>
+                                        <div onclick="selectClay(this, ${i})">OTHERS</div>
                                     </div>
                                 </div>
                               </td>`;
@@ -161,11 +181,37 @@ function showDropdown(btn){
     });
 }
 
-function selectClay(item){
+function selectClay(item, rowIndex){
     var list = item.parentElement;
     var input = list.previousElementSibling;
-    input.value = item.innerText;
+
+    if(item.innerText === "OTHERS"){
+        $("#hdnRowIndex").val(rowIndex);
+        $("#txtOtherMGClay").val('');
+        let modalEl = document.getElementById("mgClayOtherModal");
+        let modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    } else {
+        input.value = item.innerText;
+    }
     list.style.display = 'none';
+}
+
+// Save from modal
+function saveOtherMGClay(){
+    let rowIndex = $("#hdnRowIndex").val();
+    let val = $("#txtOtherMGClay").val().trim();
+    if(!val){ alert("Enter value"); return; }
+
+    // Update input in table
+    var row = document.querySelectorAll("#Mudgun_Details tbody tr")[rowIndex];
+    var input = row.querySelector(".mgClayInput");
+    input.value = val;
+
+    // Hide modal
+    let modalEl = document.getElementById("mgClayOtherModal");
+    let modal = bootstrap.Modal.getInstance(modalEl);
+    if(modal) modal.hide();
 }
 </script>
 
