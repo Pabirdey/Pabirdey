@@ -16,8 +16,12 @@
         .form-section { padding: 15px; border: 1px solid #ccc; border-radius: 10px; margin-bottom: 20px; }
         .section-title { font-weight: bold; background: #EEB86D; padding: 5px 10px; border-radius: 5px; margin-bottom: 10px; }
         .table th, .table td { text-align: center; vertical-align: middle; }
-        .input-wrapper { position: relative; display: flex; flex-direction: column; }
-        .mgClayInput { margin-top: 3px; }
+        .mgClayWrapper { position: relative; display: flex; align-items: center; }
+        .mgClayWrapper .mgClayInput { width: 100%; }
+        .mgClayWrapper button { margin-left: 5px; }
+        .mgClayList { display: none; position: absolute; background:white; border:1px solid #ccc; z-index:1000; top:30px; left:0; width:150px; max-height:150px; overflow-y:auto; }
+        .mgClayList div { padding:5px; cursor:pointer; }
+        .mgClayList div:hover { background:#eee; }
     </style>
 </head>
 <body>
@@ -114,19 +118,19 @@ function Display_Mudgun_Details(date, furnace){
                               </td>`;
                 tableBody += `<td><input class="form-control form-control-sm" value="${parsedData[i].CLAY_QUANTITY}"></td>`;
 
-                // MG Clay Type dropdown + inline input
-                let mgClay = parsedData[i].MG_CLAY || '';
-                let isOther = ['ACE','BRL','LRH','UBQ'].includes(mgClay) ? 'none' : 'block';
-                tableBody += `<td class="input-wrapper">
-                                <select class="form-select form-select-sm mgClaySelect" onchange="checkOtherInline(this)">
-                                    <option value="">Select</option>
-                                    <option value="ACE" ${mgClay==='ACE'?'selected':''}>ACE</option>
-                                    <option value="BRL" ${mgClay==='BRL'?'selected':''}>BRL</option>
-                                    <option value="LRH" ${mgClay==='LRH'?'selected':''}>LRH</option>
-                                    <option value="UBQ" ${mgClay==='UBQ'?'selected':''}>UBQ</option>
-                                    <option value="OTHERS" ${isOther==='block'?'selected':''}>OTHERS</option>
-                                </select>
-                                <input type="text" class="form-control form-control-sm mgClayInput" style="display:${isOther}" value="${isOther==='block'?mgClay:''}" placeholder="Enter MG Clay Type"/>
+                // MG Clay Type input + dropdown
+                tableBody += `<td>
+                                <div class="mgClayWrapper">
+                                    <input type="text" class="form-control form-control-sm mgClayInput" value="${parsedData[i].MG_CLAY}">
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="showDropdown(this)">▼</button>
+                                    <div class="mgClayList">
+                                        <div onclick="selectClay(this)">ACE</div>
+                                        <div onclick="selectClay(this)">BRL</div>
+                                        <div onclick="selectClay(this)">LRH</div>
+                                        <div onclick="selectClay(this)">UBQ</div>
+                                        <div onclick="selectClay(this)">OTHERS</div>
+                                    </div>
+                                </div>
                               </td>`;
 
                 tableBody += `<td>${parsedData[i].LOT_NO}</td>`;
@@ -138,18 +142,30 @@ function Display_Mudgun_Details(date, furnace){
     });
 }
 
-// Inline 'OTHERS' handling
-function checkOtherInline(sel){
-    let row = sel.closest('td');
-    let input = row.querySelector('.mgClayInput');
-    if(sel.value === 'OTHERS'){
-        input.style.display = 'block';
-        input.value = '';
-        input.focus();
-    } else {
-        input.style.display = 'none';
-        input.value = sel.value;
-    }
+// MG Clay dropdown functions
+function showDropdown(btn){
+    // Hide all other dropdowns
+    var lists = document.querySelectorAll('.mgClayList');
+    for(var i=0;i<lists.length;i++){ lists[i].style.display='none'; }
+
+    // Show this row's dropdown
+    var list = btn.nextElementSibling;
+    list.style.display = 'block';
+
+    // Close dropdown if clicked outside
+    document.addEventListener('click', function handler(e){
+        if(!list.contains(e.target) && e.target !== btn){
+            list.style.display = 'none';
+            document.removeEventListener('click', handler);
+        }
+    });
+}
+
+function selectClay(item){
+    var list = item.parentElement;
+    var input = list.previousElementSibling;
+    input.value = item.innerText;
+    list.style.display = 'none';
 }
 </script>
 
