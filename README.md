@@ -1,258 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Cast House Details</title>
+function Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur) {
+                 $.ajax({
+                 url: '@Url.Action("Get_Display_Mudgun_Details", "CastHouse")',
+                 type: 'GET',
+                 data: { Fdate: lsSelectedFDate, Fur: IsSelectedFur },
+                 success: function (result_Mudgun_Details) {
+                    var parsedData = JSON.parse(result_Mudgun_Details);
+                    var tableBody = "";
+            for (var i = 0; i < parsedData.length; i++) {
+                tableBody += `<tr data-castno='${parsedData[i].CAST_NO}'>`;
+                tableBody += `<td><input name="CAST_NO" class='form-control form-control-lg' value='${parsedData[i].CAST_NO}' readonly/></td>`;
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                tableBody += `<td>
+                    <select name="CLOSURE_MODE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLOSURE_MODE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLOSURE_MODE === 'MUDGUN' ? 'selected' : ''}>MUDGUN</option>
+                        <option ${parsedData[i].CLOSURE_MODE === 'NULL' ? 'selected' : ''}>NULL</option>
+                    </select>
+                </td>`;
+                tableBody += `<td><input name="CLAY_QUANTITY" class='form-control form-control-lg' value='${parsedData[i].CLAY_QUANTITY}'/></td>`;
+                tableBody += `<td>
+                            <div class="input-wrapper"><input type="text" class="form-control form-control-lg" id="clayInput_${i}" name="MG_CLAY_USED">
+                                <div class="arrow-btn" onclick="toggleList(${i})">▼</div>
+                                    <div class="list-box" id="list_${i}">
+                                    <div onclick="selectItem(this, ${i})">ACE</div>
+                                    <div onclick="selectItem(this, ${i})">BRL</div>
+                                    <div onclick="selectItem(this, ${i})">LRH</div>
+                                    <div onclick="selectItem(this, ${i})">UBQ</div>
+                                    <div onclick="selectItem(this, ${i})">SARVESH</div>
+                                    <div onclick="selectItem(this, ${i})">OTHERS</div>
+                                </div>
+                            </div>
+                        </td>`;
+                /* ******** LOT NO TEXTBOX + BUTTON HERE ******** */
+                tableBody += `
+<td class="d-flex gap-0">
+    <input name="LOT_NO" style="width:120px;" value="${parsedData[i].LOT_NO}" />
+    <button type="button"
+            class="btn btn-primary btn-sm getLot"
+            data-castno="${parsedData[i].LOT_NO}">
+        ::
+    </button>
+</td>`;
 
-    <!-- Datepicker -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+                tableBody += `
+<td>
+    <input name="NO_OF_BAGS"
+           class="form-control form-control-lg"
+           value="${parsedData[i].NO_OF_BAGS}" />
+</td>`;
 
-    <style>
-        .scrollable-table {
-            max-height: 318px;
-            overflow-x: auto;
-            overflow-y: auto;
-            position: relative;
+                tableBody += `
+<td>
+    <input name="MUDGUN_HOLD_TIME"
+           class="form-control form-control-lg"
+           value="${parsedData[i].MUDGUN_HOLD_TIME}" />
+</td>`;
+
+                tableBody += `
+<td>
+    <select name="MUDGUN_NOZZLE" class="form-select form-select-lg">
+        <option value="" ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''}></option>
+        <option value="REPLACEMENT"
+            ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>
+            REPLACEMENT
+        </option>
+        <option value="WEILD"
+            ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>
+            WEILD
+        </option>
+    </select>
+</td>`;
+
+
+                tableBody += `<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
+                tableBody += `<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-lg' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
+                tableBody += `<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
+                tableBody += `<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
+                tableBody += `<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-lg' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
+                tableBody += `<td><input name="PRESS_ON_FORCE" class='form-control form-control-lg' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
+
+                tableBody += `<td>
+                    <select name="CLAY_LEAKAGE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].CLAY_LEAKAGE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].CLAY_LEAKAGE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
+
+                tableBody += `<td>
+                    <select name="BACK_FIRE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].BACK_FIRE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].BACK_FIRE === 'YES' ? 'selected' : ''}>YES</option>
+                        <option ${parsedData[i].BACK_FIRE === 'NO' ? 'selected' : ''}>NO</option>
+                    </select>
+                </td>`;
+
+                tableBody += "</tr>";
+            }
+
+            $("#Mudgun_Details tbody").html(tableBody);
         }
-
-        /* Freeze Cast No column */
-        #Mudgun_Details th:first-child,
-        #Mudgun_Details td:first-child {
-            position: sticky;
-            left: 0;
-            background: #fff;
-            z-index: 5;
-            min-width: 120px;
-        }
-
-        /* Sticky header */
-        #Mudgun_Details thead th {
-            position: sticky;
-            top: 0;
-            z-index: 4;
-            background: #343a40;
-            color: white;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .arrow-btn {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .list-box {
-            display: none;
-            position: absolute;
-            background: #fff;
-            border: 1px solid #ccc;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 9999;
-        }
-
-        .list-box div {
-            padding: 6px;
-            cursor: pointer;
-        }
-
-        .list-box div:hover {
-            background: #f0f0f0;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container-fluid mt-2">
-
-    <h2 class="text-center mb-3">Cast House Details</h2>
-
-    <!-- Date & Furnace -->
-    <div class="mb-3">
-        <input id="tbFDatePick" style="width:140px;text-align:center" />
-        <select id="lstFur">
-            <option value="">Select Furnace</option>
-            <option>C</option><option>E</option><option>F</option>
-            <option>G</option><option>H</option><option>I</option>
-        </select>
-    </div>
-
-    <!-- Mudgun Details -->
-    <div class="form-section">
-        <h5>Mudgun Details</h5>
-
-        <div class="table-responsive scrollable-table">
-            <table class="table table-bordered table-sm text-center align-middle" id="Mudgun_Details">
-                <thead>
-                    <tr>
-                        <th>Cast No</th>
-                        <th>Closure Mode</th>
-                        <th>Clay Qty</th>
-                        <th>MG Clay Type</th>
-                        <th>Back Fire</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-
-<!-- ================= MODAL ================= -->
-<div class="modal fade" id="mgClayOtherModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Other MG Clay Type</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <input type="hidden" id="hdnRowIndex" />
-                <input type="text"
-                       id="txtOtherMGClay"
-                       class="form-control form-control-lg"
-                       placeholder="Enter MG Clay Type">
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" onclick="saveOtherMGClay()">Save</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
-
-<script>
-let lsSelectedFDate = '';
-let IsSelectedFur = '';
-
-$(document).ready(function () {
-
-    lsSelectedFDate = '@DateTime.Today.ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
-
-    $('#tbFDatePick').datepicker({
-        format: "dd/mm/yyyy",
-        autoclose: true
-    }).val(lsSelectedFDate);
-
-    $('#tbFDatePick, #lstFur').on('change', function () {
-        IsSelectedFur = $('#lstFur').val();
-        Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur);
     });
-
-    Display_Mudgun_Details(lsSelectedFDate, IsSelectedFur);
-});
-
-/* ================= DISPLAY TABLE ================= */
-function Display_Mudgun_Details(fdate, fur) {
-
-    // DEMO DATA (replace with AJAX result)
-    let data = [
-        { CAST_NO: 1 },
-        { CAST_NO: 2 },
-        { CAST_NO: 3 }
-    ];
-
-    let html = '';
-
-    for (let i = 0; i < data.length; i++) {
-
-        html += `
-        <tr>
-            <td>
-                <input class="form-control" value="${data[i].CAST_NO}" readonly>
-            </td>
-
-            <td>
-                <select class="form-select">
-                    <option></option>
-                    <option>MUDGUN</option>
-                    <option>NULL</option>
-                </select>
-            </td>
-
-            <td>
-                <input class="form-control">
-            </td>
-
-            <td>
-                <select class="form-select"
-                        onchange="onMGClayChange(this, ${i})">
-                    <option></option>
-                    <option>ACE</option>
-                    <option>BRL</option>
-                    <option>LRH</option>
-                    <option>OTHERS</option>
-                </select>
-            </td>
-
-            <td>
-                <select class="form-select">
-                    <option></option>
-                    <option>YES</option>
-                    <option>NO</option>
-                </select>
-            </td>
-        </tr>`;
-    }
-
-    $("#Mudgun_Details tbody").html(html);
 }
-
-/* ================= OPEN MODAL ================= */
-function onMGClayChange(ctrl, rowIndex) {
-
-    if (ctrl.value === "OTHERS") {
-
-        $("#hdnRowIndex").val(rowIndex);
-        $("#txtOtherMGClay").val("");
-
-        let modal = new bootstrap.Modal(
-            document.getElementById("mgClayOtherModal")
-        );
-        modal.show();
-    }
-}
-
-/* ================= SAVE MODAL VALUE ================= */
-function saveOtherMGClay() {
-
-    let rowIndex = $("#hdnRowIndex").val();
-    let val = $("#txtOtherMGClay").val().trim();
-
-    if (val === '') {
-        alert("Enter MG Clay Type");
-        return;
-    }
-
-    let row = $("#Mudgun_Details tbody tr").eq(rowIndex);
-    let select = row.find("select").eq(1);
-
-    select.append(`<option selected>${val}</option>`);
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("mgClayOtherModal")
-    ).hide();
-}
-</script>
-
-</body>
-</html>
