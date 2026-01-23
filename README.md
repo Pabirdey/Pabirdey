@@ -1,22 +1,11 @@
-.scrollable-table {
-    max-height: 318px;
-    overflow-x: auto;
-    overflow-y: auto;
-    position: relative;
-}
-
-/* Freeze Cast No column horizontally */
-#Mudgun_Details th:first-child,
-#Mudgun_Details td:first-child {
-    position: sticky;
-    left: 0;
-    background: #ffffff;
-    z-index: 3;
-    min-width: 120px;
-}
-
-/* Keep header above body */
-#Mudgun_Details thead th:first-child {
-    background: #f8f9fa;
-    z-index: 5;
-}
+ tableBody += `<td class="d-flex gap-0"><input name="LOT_NO" style="width:120px;"  value='${parsedData[i].LOT_NO}' />
+                <button type="button" class ="btn btn-primary btn-sm getLot" data-castno="${parsedData[i].LOT_NO}">::</button></td>`;
+                tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-lg' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
+                tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-lg' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;                                
+                tableBody += `<td>
+                    <select name="MUDGUN_NOZZLE" class='form-select form-select-lg'>
+                        <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
+                        <option ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>REPLACEMENT</option>
+                        <option ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>WEILD</option>
+                    </select>
+                </td>`;
