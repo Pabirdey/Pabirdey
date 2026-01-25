@@ -71,3 +71,32 @@ function selectClay(item, rowIndex){
     }
     list.style.display = 'none';
 }
+[HttpGet]
+        public JsonResult Get_Display_Mudgun_Details(string Fdate, string Fur)
+        {
+            DataTable dt_Mudgun_Details = new DataTable();
+            string sql = string.Empty;
+            sql = "SELECT Decode(CAST_NO,NULL,' ',CAST_NO) CAST_NO, Decode(CLOSURE_MODE,NULL,' ',CLOSURE_MODE) CLOSURE_MODE,";
+            sql += "Decode(CLAY_QUANTITY,NULL,' ',CLAY_QUANTITY) CLAY_QUANTITY, Decode(MG_CLAY_USED,NULL,' ',MG_CLAY_USED) MG_CLAY_USED,";
+            sql += "Decode(LOT_NO,NULL,' ',LOT_NO) LOT_NO, Decode(NO_OF_BAGS,NULL,' ',NO_OF_BAGS) NO_OF_BAGS,";
+            sql += "Decode(MUDGUN_HOLD_TIME,NULL,' ',MUDGUN_HOLD_TIME) MUDGUN_HOLD_TIME, Decode(MUDGUN_NOZZLE,NULL,' ',MUDGUN_NOZZLE) MUDGUN_NOZZLE,";
+            sql += "Decode(MNOZZLE_BEF_CLOSING,NULL,' ',MNOZZLE_BEF_CLOSING) MNOZZLE_BEF_CLOSING, Decode(MNOZZLE_AFT_CLOSING,NULL,' ',MNOZZLE_AFT_CLOSING) MNOZZLE_AFT_CLOSING,";
+            sql += "Decode(INIT_PLUGIN_PRESSURE,NULL,' ',INIT_PLUGIN_PRESSURE) INIT_PLUGIN_PRESSURE, Decode(MAX_PLUGIN_PRESSURE,NULL,' ',MAX_PLUGIN_PRESSURE) MAX_PLUGIN_PRESSURE,";
+            sql += "Decode(FINAL_PLUGIN_PRESSURE,NULL,' ',FINAL_PLUGIN_PRESSURE) FINAL_PLUGIN_PRESSURE, Decode(PRESS_ON_FORCE,NULL,' ',PRESS_ON_FORCE) PRESS_ON_FORCE,";
+            sql += "Decode(CLAY_LEAKAGE,NULL,' ',CLAY_LEAKAGE) CLAY_LEAKAGE, Decode(BACK_FIRE,NULL,' ',BACK_FIRE) BACK_FIRE FROM ";
+            sql += "Test.T_CAST_DETAILS WHERE DATE_TIME = TO_DATE('" + Fdate + "', 'DD-MM-YYYY') AND FUR_NAME = '" + Fur + "' ";
+            sql += "UNION ";
+            sql += "SELECT Decode(CAST_NO,NULL,' ',CAST_NO) CAST_NO, Decode(CLOSURE_MODE,NULL,' ',CLOSURE_MODE) CLOSURE_MODE,";
+            sql += "Decode(CLAY_QUANTITY,NULL,' ',CLAY_QUANTITY) CLAY_QUANTITY, Decode(MG_CLAY_USED,NULL,' ',MG_CLAY_USED) MG_CLAY_USED,";
+            sql += "Decode(LOT_NO,NULL,' ',LOT_NO) LOT_NO, Decode(NO_OF_BAGS,NULL,' ',NO_OF_BAGS) NO_OF_BAGS,";
+            sql += "Decode(MUDGUN_HOLD_TIME,NULL,' ',MUDGUN_HOLD_TIME) MUDGUN_HOLD_TIME, Decode(MUDGUN_NOZZLE,NULL,' ',MUDGUN_NOZZLE) MUDGUN_NOZZLE,";
+            sql += "Decode(MNOZZLE_BEF_CLOSING,NULL,' ',MNOZZLE_BEF_CLOSING) MNOZZLE_BEF_CLOSING, Decode(MNOZZLE_AFT_CLOSING,NULL,' ',MNOZZLE_AFT_CLOSING) MNOZZLE_AFT_CLOSING,";
+            sql += "Decode(INIT_PLUGIN_PRESSURE,NULL,' ',INIT_PLUGIN_PRESSURE) INIT_PLUGIN_PRESSURE, Decode(MAX_PLUGIN_PRESSURE,NULL,' ',MAX_PLUGIN_PRESSURE) MAX_PLUGIN_PRESSURE,";
+            sql += "Decode(FINAL_PLUGIN_PRESSURE,NULL,' ',FINAL_PLUGIN_PRESSURE) FINAL_PLUGIN_PRESSURE, Decode(PRESS_ON_FORCE,NULL,' ',PRESS_ON_FORCE) PRESS_ON_FORCE,";
+            sql += "Decode(CLAY_LEAKAGE,NULL,' ',CLAY_LEAKAGE) CLAY_LEAKAGE, Decode(BACK_FIRE,NULL,' ',BACK_FIRE) BACK_FIRE FROM ";
+            sql += "Test.T_CAST_DETAILS WHERE DATE_TIME = TO_DATE('" + Fdate + "', 'DD-MM-YYYY') AND FUR_NAME = '" + Fur + "'";
+            dt_Mudgun_Details = DAL.GetRecords(sql);
+            string result_Mudgun_Details = JsonConvert.SerializeObject(dt_Mudgun_Details, Formatting.None);
+            return Json(result_Mudgun_Details, JsonRequestBehavior.AllowGet);
+        }
+
