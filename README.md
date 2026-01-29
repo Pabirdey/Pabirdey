@@ -1,211 +1,93 @@
-@{
-    ViewBag.Title = "Cast House Details";
-    Layout = null;
-}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Cast House Details</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
-
-    <style>
-        /* ===== Headings ===== */
-        .Main-Heading {
-            font-family: Allan, cursive;
-            font-weight: bold;
-            font-size: 6vh;
-            text-align: center;
-            padding: 20px;
-            color: rgb(57,57,57);
-            text-shadow: rgba(13,0,77,0.08) 0px 2px 4px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        /* ===== Sections ===== */
-        .form-section {
-            background: #fff;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-            border: 1px solid #ccc;
-            font-family: Courier New, Courier, monospace;
-        }
-
-        .section-title {
-            background: #EEB86D;
-            padding: 5px 10px;
-            font-weight: bold;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        /* ===== Table ===== */
-        .scrollable-table {
-            max-height: 280px;
-            overflow-y: auto;
-        }
-
-        /* HEADER FIX */
-        .tap-header {
-            background-color: #343a40 !important;
-            color: white !important;
-            font-weight: bold;
-            font-size: 14px;
-            border: 1px solid #000;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .table td {
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        /* Column widths */
-        .Long_Heading { min-width: 130px; }
-        .Long_Heading_Medium { min-width: 100px; }
-    </style>
-</head>
-
-<body>
-
-<div class="Main-Heading">Cast House Details</div>
-
-<div class="container-fluid">
-    <div class="form-group mb-3">
-        <label style="font-family:Allan,cursive;font-size:22px;">Date :</label>
-        <input id="tbFDatePick" size="14" style="height:28px;text-align:center">
-
-        &nbsp;&nbsp;&nbsp;
-
-        <label style="font-family:Allan,cursive;font-size:22px;">Furnace :</label>
-        <select id="lstFur">
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-            <option value="F">F</option>
-            <option value="G">G</option>
-            <option value="H">H</option>
-            <option value="I">I</option>
-        </select>
-    </div>
-
-    <div class="form-section">
-        <div class="section-title">Tap Hole Details / Hot Metal Details</div>
-
-        <div class="table-responsive scrollable-table">
-            <table class="table table-bordered table-sm" id="TAP_Hot_Metal_Details">
-                <thead>
-                <tr>
-                    <th class="tap-header">Cast No</th>
-                    <th class="tap-header">Trough No</th>
-                    <th class="tap-header">Cast Start</th>
-                    <th class="tap-header">Cast End</th>
-                    <th class="tap-header">Gutko</th>
-                    <th class="tap-header">Cast Duration</th>
-                    <th class="tap-header">Casting Rate</th>
-                    <th class="tap-header">TLC</th>
-                    <th class="tap-header">OT</th>
-                    <th class="tap-header">Cast Ready Time</th>
-                    <th class="tap-header">Splashing / Wetness</th>
-                    <th class="tap-header">Cast Type</th>
-                    <th class="tap-header">Clay Condition</th>
-                    <th class="tap-header">Taphole Behaviour</th>
-                    <th class="tap-header">HMT Before Slag</th>
-                    <th class="tap-header">HMT After Slag</th>
-                    <th class="tap-header">Final HM Temp</th>
-                    <th class="tap-header">HM Weight</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
-
-<script>
-    let lsSelectedFDate;
-    let IsSelectedFur;
-
-    $(document).ready(function () {
-
-        let today = new Date();
-        lsSelectedFDate =
-            ("0" + today.getDate()).slice(-2) + "/" +
-            ("0" + (today.getMonth() + 1)).slice(-2) + "/" +
-            today.getFullYear();
-
-        $('#tbFDatePick').datepicker({
-            format: "dd/mm/yyyy",
-            autoclose: true,
-            todayHighlight: true
-        }).val(lsSelectedFDate);
-
-        IsSelectedFur = $('#lstFur').val();
-        Display_Tap_Hole_Details(lsSelectedFDate, IsSelectedFur);
-
-        $('#lstFur').change(function () {
-            IsSelectedFur = $(this).val();
-            Display_Tap_Hole_Details(lsSelectedFDate, IsSelectedFur);
-        });
-
-        $('#tbFDatePick').on('changeDate', function () {
-            lsSelectedFDate = $(this).val();
-            Display_Tap_Hole_Details(lsSelectedFDate, IsSelectedFur);
-        });
-    });
-
-    function Display_Tap_Hole_Details(date, fur) {
-        $.ajax({
-            url: '/CastHouse/Get_TAP_Hole_Metal_Details',
-            type: 'GET',
-            data: { Fdate: date, Fur: fur },
-            success: function (result) {
-                let data = JSON.parse(result);
-                let rows = "";
-
-                $.each(data, function (i, d) {
-                    rows += `
-                        <tr>
-                            <td><input class="form-control form-control-sm" value="${d.CAST_NO}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.TROUGH_NO}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.CAST_ST_TIME}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.CAST_END_TIME}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.GUTKO}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.CAST_DURATION}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.SPEED}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.NO_TLC}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.NO_OT}" readonly></td>
-                            <td><input class="form-control form-control-sm" value="${d.CH_READY_TIME}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.SPLACING_WETNESS_TIME}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.CAST_TYPE}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.CAST_CLAY_COND}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.TAPHOLE_BEHAVIOUR}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.HM_BEFORE_SLAG}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.HM_AFTER_SLAG}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.HM_TEMP}"></td>
-                            <td><input class="form-control form-control-sm" value="${d.HM_WEIGHT}"></td>
-                        </tr>`;
-                });
-
-                $("#TAP_Hot_Metal_Details tbody").html(rows);
-            }
-        });
-    }
-</script>
-
-</body>
-</html>
+PROCEDURE PROC_JODA_IOPP_PROCESS_DAILY
+AS
+vMAXDATE DATE;
+Begin    
+Execute immediate 'Alter session set nls_date_format=''DD-MON-YYYY HH24:MI:SS''';
+    Select MAX(TIMESTAMP)+1 into vMAXDATE From imtg.T_JODA_IOPP_PROCESS_DAILY;
+    IF vMAXDATE IS NULL THEN
+        vMAXDATE:='01-NOV-2025';
+    END IF; 
+    Merge INTO imtg.T_JODA_IOPP_PROCESS_DAILY t
+    Using (
+            Select  TIMESTAMP,
+                AVG(SCRUBBER_MASSFEED_RATE_1)SCRUBBER_MASSFEED_RATE_1,
+                AVG(SCRUBBER_MASSFEED_RATE_2)SCRUBBER_MASSFEED_RATE_2,
+                AVG(SCRUBBER_WATERFLOW_RATE_1)SCRUBBER_WATERFLOW_RATE_1,
+                AVG(SCRUBBER_WATERFLOW_RATE_2)SCRUBBER_WATERFLOW_RATE_2,
+                AVG(PRIMARY_SCREEN_PRDT_CONV_CV01)PRIMARY_SCREEN_PRDT_CONV_CV01,
+                AVG(SEC_SCREEN_PRDT1_CONV_CV03)SEC_SCREEN_PRDT1_CONV_CV03,
+                AVG(SEC_SCREEN_PRDT2_CONV_CV05)SEC_SCREEN_PRDT2_CONV_CV05,
+                AVG(SCRUBBER_BUILDING_TANK_LVL_1)SCRUBBER_BUILDING_TANK_LVL_1,
+                AVG(SCRUBBER_BUILDING_TANK_LVL_2)SCRUBBER_BUILDING_TANK_LVL_2,
+                AVG(HC_TANK_LVL_1)HC_TANK_LVL_1,
+                AVG(HC_TANK_LVL_3)HC_TANK_LVL_3,
+                AVG(HC_TANK_LVL_2)HC_TANK_LVL_2,
+                AVG(HC_TANK_LVL_4)HC_TANK_LVL_4,
+                AVG(HC_DENSITY_1)HC_DENSITY_1,
+                AVG(HC_FLOW_1)HC_FLOW_1,
+                AVG(HC_PRESSURE_1)HC_PRESSURE_1,
+                AVG(HC_DENSITY_2)HC_DENSITY_2,
+                AVG(HC_FLOW_2)HC_FLOW_2,
+                AVG(HC_PRESSURE_2)HC_PRESSURE_2,
+                AVG(HFS_CONC_CONY_TPH)HFS_CONC_CONY_TPH,
+                AVG(HFS_CONC_CONY_AMP)HFS_CONC_CONY_AMP,
+                AVG(HRT_BED_MASS)HRT_BED_MASS,
+                AVG(HRT_RAKE_TORQUE)HRT_RAKE_TORQUE,
+                AVG(HRT_BED_LEVEL)HRT_BED_LEVEL,
+                AVG(HRT_TURBIDITY_ANALYZER)HRT_TURBIDITY_ANALYZER,
+                AVG(HRT_U_F_FLOWRATE)HRT_U_F_FLOWRATE,
+                AVG(HRT_U_F_DENSITY)HRT_U_F_DENSITY,
+                AVG(HRT_U_F_PRESSURE)HRT_U_F_PRESSURE,
+                SUM(SLIME_TON_ONLINECAL)SLIME_TON_ONLINECAL
+                From imtg.T_JODA_IOPP_PROCESS_HOURLY p Where TIMESTAMP>=TRUNC(TIMESTAMP)+6/24 AND TIMESTAMP<TRUNC(TIMESTAMP)+1+6/24
+                Group by TIMESTAMP  Order by TIMESTAMP
+    )s
+    ON (
+        t.TIMESTAMP=s.TIMESTAMP       
+        )
+    When Matched Then
+        Update Set         
+            t.SCRUBBER_MASSFEED_RATE_1=s.SCRUBBER_MASSFEED_RATE_1,
+            t.SCRUBBER_MASSFEED_RATE_2=s.SCRUBBER_MASSFEED_RATE_2,
+            t.SCRUBBER_WATERFLOW_RATE_1=s.SCRUBBER_WATERFLOW_RATE_1,
+            t.SCRUBBER_WATERFLOW_RATE_2=s.SCRUBBER_WATERFLOW_RATE_2,
+            t.PRIMARY_SCREEN_PRDT_CONV_CV01=s.PRIMARY_SCREEN_PRDT_CONV_CV01,
+            t.SEC_SCREEN_PRDT1_CONV_CV03=s.SEC_SCREEN_PRDT1_CONV_CV03,
+            t.SEC_SCREEN_PRDT2_CONV_CV05=s.SEC_SCREEN_PRDT2_CONV_CV05,
+            t.SCRUBBER_BUILDING_TANK_LVL_1=s.SCRUBBER_BUILDING_TANK_LVL_1,
+            t.SCRUBBER_BUILDING_TANK_LVL_2=s.SCRUBBER_BUILDING_TANK_LVL_2,
+            t.HC_TANK_LVL_1=s.HC_TANK_LVL_1,
+            t.HC_TANK_LVL_3=s.HC_TANK_LVL_3,
+            t.HC_TANK_LVL_2=s.HC_TANK_LVL_2,
+            t.HC_TANK_LVL_4=s.HC_TANK_LVL_4,
+            t.HC_DENSITY_1=s.HC_DENSITY_1,
+            t.HC_FLOW_1=s.HC_FLOW_1,
+            t.HC_PRESSURE_1=s.HC_PRESSURE_1,
+            t.HC_DENSITY_2=s.HC_DENSITY_2,
+            t.HC_FLOW_2=s.HC_FLOW_2,
+            t.HC_PRESSURE_2=s.HC_PRESSURE_2,           
+            t.HFS_CONC_CONY_TPH=s.HFS_CONC_CONY_TPH,
+            t.HFS_CONC_CONY_AMP=s.HFS_CONC_CONY_AMP,
+            t.HRT_BED_MASS=s.HRT_BED_MASS,
+            t.HRT_RAKE_TORQUE=s.HRT_RAKE_TORQUE,
+            t.HRT_BED_LEVEL=s.HRT_BED_LEVEL,
+            t.HRT_TURBIDITY_ANALYZER=s.HRT_TURBIDITY_ANALYZER,
+            t.HRT_U_F_FLOWRATE=s.HRT_U_F_FLOWRATE,
+            t.HRT_U_F_DENSITY=s.HRT_U_F_DENSITY,
+            t.HRT_U_F_PRESSURE=s.HRT_U_F_PRESSURE,
+            t.SLIME_TON_ONLINECAL=s.SLIME_TON_ONLINECAL
+    When Not Matched Then
+    INSERT(TIMESTAMP,SCRUBBER_MASSFEED_RATE_1,SCRUBBER_MASSFEED_RATE_2,SCRUBBER_WATERFLOW_RATE_1,
+    SCRUBBER_WATERFLOW_RATE_2,PRIMARY_SCREEN_PRDT_CONV_CV01,SEC_SCREEN_PRDT1_CONV_CV03,
+    SEC_SCREEN_PRDT2_CONV_CV05,SCRUBBER_BUILDING_TANK_LVL_1,SCRUBBER_BUILDING_TANK_LVL_2,
+    HC_TANK_LVL_1,HC_TANK_LVL_3,HC_TANK_LVL_2,HC_TANK_LVL_4,HC_DENSITY_1,HC_FLOW_1,
+    HC_PRESSURE_1,HC_DENSITY_2,HC_FLOW_2,HC_PRESSURE_2,HFS_CONC_CONY_TPH,HFS_CONC_CONY_AMP,HRT_BED_MASS,HRT_RAKE_TORQUE,HRT_BED_LEVEL,
+    HRT_TURBIDITY_ANALYZER,HRT_U_F_FLOWRATE,HRT_U_F_DENSITY,HRT_U_F_PRESSURE,SLIME_TON_ONLINECAL)
+    VALUES(s.TIMESTAMP,s.SCRUBBER_MASSFEED_RATE_1,s.SCRUBBER_MASSFEED_RATE_2,s.SCRUBBER_WATERFLOW_RATE_1
+    ,s.SCRUBBER_WATERFLOW_RATE_2,s.PRIMARY_SCREEN_PRDT_CONV_CV01,s.SEC_SCREEN_PRDT1_CONV_CV03,
+    s.SEC_SCREEN_PRDT2_CONV_CV05,s.SCRUBBER_BUILDING_TANK_LVL_1,s.SCRUBBER_BUILDING_TANK_LVL_2,
+    s.HC_TANK_LVL_1,s.HC_TANK_LVL_3,s.HC_TANK_LVL_2,s.HC_TANK_LVL_4,s.HC_DENSITY_1,s.HC_FLOW_1,
+    s.HC_PRESSURE_1,s.HC_DENSITY_2,s.HC_FLOW_2,s.HC_PRESSURE_2,s.HFS_CONC_CONY_TPH,s.HFS_CONC_CONY_AMP,s.HRT_BED_MASS,s.HRT_RAKE_TORQUE,
+    s.HRT_BED_LEVEL,s.HRT_TURBIDITY_ANALYZER,s.HRT_U_F_FLOWRATE,s.HRT_U_F_DENSITY,s.HRT_U_F_PRESSURE,s.SLIME_TON_ONLINECAL);
+    Commit;                   
+End PROC_JODA_IOPP_PROCESS_DAILY;
