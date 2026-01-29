@@ -1,18 +1,136 @@
-<div class="modal fade" id="mgClayOtherModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Other MG Clay Type</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="hdnRowIndex">
-                    <input type="text" id="txtOtherMGClay" class="form-control" placeholder="Enter MG Clay Type">
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary" onclick="saveOtherMGClay()">Save</button>
-                </div>
+ .modal-content {
+            border-radius: 25px;
+            border: none;
+        }
+
+        .modal-header {
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 25px 25px 0 0;
+        }
+
+        .title-box {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .clay-box {
+            background: #0d6efd;
+            border-radius: 25px;
+            padding: 20px;
+            color: white;
+        }
+
+        .clay-label {
+            font-weight: 600;
+        }
+
+        .clay-input {
+            border-radius: 10px;
+        }
+
+        .btn-save {
+            background: #198754;
+            color: white;
+            padding: 8px 30px;
+            border-radius: 20px;
+        }
+
+        .btn-exit {
+            background: #dc3545;
+            color: white;
+            padding: 8px 30px;
+            border-radius: 20px;
+        }
+        <div class="modal fade" id="mgClayOtherModal" tabindex="-1">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center">MG_CLAY</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+                <div class="title-box">Weightage of Clay</div>
+                <div class="clay-box">
+                    <!-- Clay 1 (DROPDOWN) -->
+                    <div class="row align-items-center mb-3">
+                        <div class="col-2 clay-label">Clay1</div>
+                        <div class="col-7">
+                            <select class="form-select clay-input" id="clay1">
+                                <option value="">-- Select Clay1 --</option>
+                                <option value="CLAY_A">Clay A</option>
+                                <option value="CLAY_B">Clay B</option>
+                                <option value="CLAY_C">Clay C</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <select class="form-select clay-input">
+                                <option></option>
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Clay 2 -->
+                    <div class="row align-items-center mb-3">
+                        <div class="col-2 clay-label">Clay2</div>
+                        <div class="col-7">
+                            <!-- <input type="text" class="form-control clay-input" id="clay2"> -->
+                             <select class="form-select clay-input" id="clay2">
+                                <option value="">-- Select Clay2 --</option>
+                                <option value="CLAY_A">Clay A</option>
+                                <option value="CLAY_B">Clay B</option>
+                                <option value="CLAY_C">Clay C</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <select class="form-select clay-input">
+                                <option></option>
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Clay 3 -->
+                    <div class="row align-items-center">
+                        <div class="col-2 clay-label">Clay3</div>
+                        <div class="col-7">
+                            <!-- <input type="text" class="form-control clay-input" id="clay3"> -->
+                             <select class="form-select clay-input" id="clay3">
+                                <option value="">-- Select Clay3 --</option>
+                                <option value="CLAY_A">Clay A</option>
+                                <option value="CLAY_B">Clay B</option>
+                                <option value="CLAY_C">Clay C</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <select class="form-select clay-input">
+                                <option></option>
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-save" onclick="saveData()">Save</button>
+                <button class="btn btn-exit" data-bs-dismiss="modal">Exit</button>		
+            </div>
+
         </div>
     </div>
+</div>
