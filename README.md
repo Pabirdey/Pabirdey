@@ -1,12 +1,11 @@
 let lsSelectedFDate;
-let IsSelectedFur;
-
-$(document).ready(function () {
-
-    lsSelectedFDate = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
+        let IsSelectedFur;
+            $(document).ready(function() {
+                let lsSelectedFDate;
+                let IsSelectedFur;
+                lsSelectedFDate = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
 
     $('#currDate-value').text(lsSelectedFDate);
-
     // Attach datepicker to hidden input
     $('#hiddenDate').datepicker({
         format: "dd/mm/yyyy",
@@ -33,5 +32,8 @@ $(document).ready(function () {
         IsSelectedFur = $(this).val();
         Display_Tap_Hole_Details(lsSelectedFDate, IsSelectedFur);
     });
-
-});
+            });
+            <a id="tbFDatePick" class="drpickr btn btn-primary">
+                <i class="fa fa-calendar"></i>
+                <label id="currDate-value" style="font-size:12px;color:white"></label>
+            </a>
