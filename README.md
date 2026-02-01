@@ -1,8 +1,8 @@
-$(document).ready(function () {
-        lsSelectedFDate = '@DateTime.Today.AddDays(0).ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
+ $(document).ready(function () {
+        lsSelectedFDate = '@DateTime.Today.AddDays(0).ToString("dd-MMM-yyyy", new System.Globalization.CultureInfo("en-GB"))';
         $('#currDate-value').text(lsSelectedFDate);
         $('#hiddenDate').datepicker({
-            format: "dd/mm/yyyy",
+            format: "dd/mmm/yyyy",
             autoclose: true,
             todayHighlight: true
         }).datepicker('setDate', lsSelectedFDate);
