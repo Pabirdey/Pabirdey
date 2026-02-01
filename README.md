@@ -1,25 +1,3 @@
-<!-- HTML Table -->
-<div class="scrollable-table" style="max-height:400px; overflow:auto;">
-    <table id="exception_cast" class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID NO</th>
-                <th>TAPHOLE NO</th>
-                <th>DATE TIME</th>
-                <th>HH</th>
-                <th>MM</th>
-                <th>TAPHOLE LENGTH</th>
-                <th>CLAY PUSHED</th>
-                <th>TYPE</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Rows will be added here -->
-        </tbody>
-    </table>
-</div>
-
-<script>
 function generateId(inputBox) {
     // Prevent re-generating if already exists
     if ($(inputBox).val() !== "") return;
@@ -145,23 +123,34 @@ function Display_Exception_Cast(lsSelectedFDate, IsSelectedFur) {
     });
 }
 
-// 🔹 Add new row when pressing ArrowDown on last row
-document.addEventListener("keydown", function (e) {
-    if (e.key === "ArrowDown") {
-        let active = document.activeElement;
-        if (!active || !active.closest("#exception_cast tbody tr")) return;
 
-        let tbody = document.querySelector("#exception_cast tbody");
-        let rows = tbody.querySelectorAll("tr");
-        let currentRow = active.closest("tr");
-        let lastRow = rows[rows.length - 1];
+        
 
-        if (currentRow === lastRow) {
-            addRow();
-            let wrapper = document.querySelector(".scrollable-table");
-            wrapper.scrollTop = wrapper.scrollHeight;
-            tbody.lastElementChild.querySelector("input, select").focus();
-        }
-    }
-});
-</script>
+
+
+    </script>   
+    
+    <script>   
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                let active = document.activeElement;
+                if (!active || !active.closest("#exception_cast tbody tr")) return;
+
+                let tbody = document.querySelector("#exception_cast tbody");
+                let rows = tbody.querySelectorAll("tr");
+                let currentRow = active.closest("tr");
+                let lastRow = rows[rows.length - 1];
+
+                if (currentRow === lastRow) {
+                    addRow();
+                    let wrapper = document.querySelector(".scrollable-table");
+                    wrapper.scrollTop = wrapper.scrollHeight;
+                    tbody.lastElementChild.querySelector("input, select").focus();
+                }
+            }
+        });
+
+
+
+    </script>
+    
