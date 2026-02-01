@@ -1,31 +1,7 @@
-  <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span></span>
-                                <button type="button" class="btn btn-success btn-sm" onclick="SaveExceptionCast()">
-                                    <b>Save</b>
-                                </button>
-                            </div>
-                            <div class="table-responsive scrollable-table" style="max-height:282px; overflow-y:auto;">
-                                <table class="table table-bordered table-sm text-center align-middle" id="exception_cast">
-                                    <thead class="table-secondary sticky-top">
-                                        <tr>
-                                            <th class="idno" style="width:150px;">ID No</th>
-                                            <th class="TapholeNO" style="width:50px;">TAPHOLE No</th>
-                                            <th class="ExceptionDate" style="width:180px;">Date</th>
-                                            <th class="hh" style="width:90px;">HH24</th>
-                                            <th class="mm"style="width:90px;">MM</th>
-                                            <th class="TapholeLength">Taphole Length</th>
-                                            <th class="ClayPaused">Clay Paused</th>
-                                            <th class="Type" style="width:240px;">Type</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- rows created by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <script>
-    function SaveExceptionCast() {
-        var furnace = document.getElementById("IsSelectedFur").value;
+ <script>
+        function SaveExceptionCast() {
+            debugger;
+            var furnace =$('#lstFur').val();
         var rows = document.querySelectorAll("#exception_cast tbody tr"); 
         var dataList = [];
     for (var i = 0; i < rows.length; i++) {
@@ -56,7 +32,57 @@
     });
     }
     </script>
-    [HttpPost]
+    function addRow() {
+    var tr = "<tr>";
+
+    tr += "<td><input name='ID_NO' class='form-control form-control-md idno' autocomplete='off' onclick='generateId(this)'></td>";
+    tr += "<td><select name='TAPHOLE_NO' class='form-select form-select-md TapholeNO'><option></option><option>1</option><option>2</option><option>3</option><option>4</option></select></td>";
+    tr += "<td><input name='DATE_TIME' class='form-control form-control-md' autocomplete='off' onclick='setDeclaredDate(this)'></td>";
+
+    tr += "<td><select name='HH' class='form-select form-select-md'><option></option>";
+    for (var h = 0; h < 24; h++) tr += "<option>" + (h < 10 ? "0" : "") + h + "</option>";
+    tr += "</select></td>";
+
+    tr += "<td><select name='MM' class='form-select form-select-md'><option></option>";
+    for (var m = 0; m <= 55; m += 5) tr += "<option>" + (m < 10 ? "0" : "") + m + "</option>";
+    tr += "</select></td>";
+
+    tr += "<td><input name='TAPHOLE_LENGTH' class='form-control form-control-md' autocomplete='off'></td>";
+    tr += "<td><input name='CLAY_PUSHED' class='form-control form-control-md' autocomplete='off'></td>";
+
+    tr += "<td><select name='TYPE' class='form-select form-select-md'><option></option>";
+    tr += "<option>BLEEDING HOLE</option><option>HOLE THROUGH</option><option>BLANK PUSH</option></select></td>";
+
+    tr += "</tr>";
+
+    $("#exception_cast tbody").append(tr);
+}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span></span>
+                                <button type="button" class="btn btn-success btn-sm" onclick="SaveExceptionCast()">
+                                    <b>Save</b>
+                                </button>
+                            </div>
+                            <div class="table-responsive scrollable-table" style="max-height:282px; overflow-y:auto;">
+                                <table class="table table-bordered table-sm text-center align-middle" id="exception_cast">
+                                    <thead class="table-secondary sticky-top">
+                                        <tr>
+                                            <th class="idno" style="width:150px;">ID No</th>
+                                            <th class="TapholeNO" style="width:50px;">TAPHOLE No</th>
+                                            <th class="ExceptionDate" style="width:180px;">Date</th>
+                                            <th class="hh" style="width:90px;">HH24</th>
+                                            <th class="mm"style="width:90px;">MM</th>
+                                            <th class="TapholeLength">Taphole Length</th>
+                                            <th class="ClayPaused">Clay Paused</th>
+                                            <th class="Type" style="width:240px;">Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- rows created by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                              [HttpPost]
         public JsonResult Save_Exception_Cast(List<dynamic> data)
         {
             using (OracleConnection con =new OracleConnection(iMonitorWebUtils.msConRWString))
