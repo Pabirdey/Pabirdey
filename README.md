@@ -1,73 +1,46 @@
-<!-- ================= MODAL ================= -->
-<div class="modal fade" id="mgClayOtherModal" tabindex="-1">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-        <div class="modal-content">
+/* ---------- DROPDOWN ---------- */
+function showDropdown(btn) {
+    $('.mgClayList').hide();
+    $(btn).next('.mgClayList').show();
+}
 
-            <div class="modal-header">
-                <h5 class="modal-title w-100 text-center">MG CLAY WEIGHTAGE</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+function selectClay(item, rowIndex) {
 
-            <div class="modal-body">
+    let list = item.parentElement;
+    let input = list.previousElementSibling;
 
-                <!-- Clay 1 -->
-                <div class="row mb-2">
-                    <div class="col-6">
-                        <select id="MG_CLAY1" class="form-select">
-                            <option value="">Clay1</option>
-                            <option>ACE</option>
-                            <option>BRL</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <select id="P1" class="form-select">
-                            <option value="">%</option>
-                            <option>50</option>
-                            <option>100</option>
-                        </select>
-                    </div>
-                </div>
+    if (item.innerText === "OTHERS") {
+        $("#hdnRowIndex").val(rowIndex);
+        new bootstrap.Modal(document.getElementById("mgClayOtherModal")).show();
+    } else {
+        input.value = item.innerText;
+    }
 
-                <!-- Clay 2 -->
-                <div class="row mb-2">
-                    <div class="col-6">
-                        <select id="MG_CLAY2" class="form-select">
-                            <option value="">Clay2</option>
-                            <option>ACE</option>
-                            <option>BRL</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <select id="P2" class="form-select">
-                            <option value="">%</option>
-                            <option>50</option>
-                        </select>
-                    </div>
-                </div>
+    list.style.display = "none";
+}
 
-                <!-- Clay 3 -->
-                <div class="row mb-2">
-                    <div class="col-6">
-                        <select id="MG_CLAY3" class="form-select">
-                            <option value="">Clay3</option>
-                            <option>ACE</option>
-                            <option>BRL</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <select id="P3" class="form-select">
-                            <option value="">%</option>
-                        </select>
-                    </div>
-                </div>
+/* ---------- MODAL SAVE ---------- */
+function checkClay() {
 
-            </div>
+    let p1 = Number(P1.value) || 0;
+    let p2 = Number(P2.value) || 0;
+    let p3 = Number(P3.value) || 0;
 
-            <div class="modal-footer justify-content-center">
-                <button class="btn btn-success" onclick="checkClay()">Save</button>
-                <button class="btn btn-danger" data-bs-dismiss="modal">Exit</button>
-            </div>
+    if (p1 + p2 + p3 !== 100) {
+        alert("Percentage must be 100");
+        return;
+    }
 
-        </div>
-    </div>
-</div>
+    let result = "";
+    if (MG_CLAY1.value) result += MG_CLAY1.value + "(" + p1 + "%)";
+    if (MG_CLAY2.value) result += (result ? "+" : "") + MG_CLAY2.value + "(" + p2 + "%)";
+    if (MG_CLAY3.value) result += (result ? "+" : "") + MG_CLAY3.value + "(" + p3 + "%)";
+
+    let rowIndex = $("#hdnRowIndex").val();
+    let row = document.querySelectorAll("#Mudgun_Details tbody tr")[rowIndex];
+    row.querySelector(".mgClayInput").value = result;
+
+    bootstrap.Modal.getInstance(
+        document.getElementById("mgClayOtherModal")
+    ).hide();
+}
