@@ -1,10 +1,6 @@
 <script>
 function SaveExceptionCast() {
     var furnace = $('#lstFur').val();
-    if (furnace === "") {
-        alert("Please select a furnace");
-        return;
-    }
 
     var rows = document.querySelectorAll("#exception_cast tbody tr"); 
     var dataList = [];
@@ -12,31 +8,27 @@ function SaveExceptionCast() {
     for (var i = 0; i < rows.length; i++) {
         var r = rows[i];
 
-        var id = r.querySelector(".idno").value;
-        var date = r.querySelector(".ExceptionDate").value;
+        // Grab values safely, even if empty
+        var id = r.querySelector(".idno") ? r.querySelector(".idno").value : null;
+        var tapholeNo = r.querySelector(".TapholeNo") ? r.querySelector(".TapholeNo").value : null;
+        var date = r.querySelector(".ExceptionDate") ? r.querySelector(".ExceptionDate").value : null;
+        var hh = r.querySelector(".hh") ? r.querySelector(".hh").value : null;
+        var mm = r.querySelector(".mm") ? r.querySelector(".mm").value : null;
+        var tapLen = r.querySelector(".TapholeLength") ? r.querySelector(".TapholeLength").value : null;
+        var clay = r.querySelector(".ClayPaused") ? r.querySelector(".ClayPaused").value : null;
+        var type = r.querySelector(".Type") ? r.querySelector(".Type").value : null;
 
-        // ❌ Skip rows where ID or Date is empty/null
-        if (id === "" || date === "") {
-            continue; // skip this row
-        }
-
-        // Only push rows with valid ID and Date
         dataList[dataList.length] = {
-            FURNACE: furnace,
+            FURNACE: furnace || null,
             ID_NO: id,
-            TAPHOLE_NO: r.querySelector(".TapholeNo").value,
+            TAPHOLE_NO: tapholeNo,
             EXCEPTION_DATE: date,
-            HH24: r.querySelector(".hh").value,
-            MM: r.querySelector(".mm").value,
-            TAPHOLE_LENGTH: r.querySelector(".TapholeLength").value,
-            CLAY_PAUSED: r.querySelector(".ClayPaused").value,
-            TYPE: r.querySelector(".Type").value
+            HH24: hh,
+            MM: mm,
+            TAPHOLE_LENGTH: tapLen,
+            CLAY_PAUSED: clay,
+            TYPE: type
         };
-    }
-
-    if (dataList.length === 0) {
-        alert("No rows with ID and Date to save");
-        return;
     }
 
     $.ajax({
