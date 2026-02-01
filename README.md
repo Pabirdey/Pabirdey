@@ -1,9 +1,1 @@
-  function setDeclaredDate(dateInput) {
-            debugger;
-    if ($(dateInput).val() !== "") return;
-
-    let declaredDate = $('#lsSelectedFDate').text().trim();
-    if (declaredDate != "") {
-        $(dateInput).val(declaredDate);
-    }
-}
+<span id="lsSelectedFDate" style="display:none;">2026-01-31</span>
