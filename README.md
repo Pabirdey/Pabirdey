@@ -1,19 +1,16 @@
-<style>
-    /* Force month/year heading visible */
-    .datepicker-days thead th {
-        color: #000 !important;
-        background-color: #f8f9fa !important;
-        font-weight: bold;
-    }
+[HttpGet]
+public JsonResult GetNextExceptionCastId()
+{
+    string nextId = "";
 
-    /* Prev / Next arrows */
-    .datepicker-days thead th.prev,
-    .datepicker-days thead th.next {
-        color: #000 !important;
+    using (OracleConnection con = new OracleConnection(connectionString))
+    {
+        con.Open();
+        string sql = "SELECT SEQ_EXCEPTION_CAST_ID.NEXTVAL FROM DUAL";
+        using (OracleCommand cmd = new OracleCommand(sql, con))
+        {
+            nextId = cmd.ExecuteScalar().ToString();
+        }
     }
-
-    /* Fix Bootstrap 5 overlap */
-    .datepicker {
-        z-index: 1055 !important;
-    }
-</style>
+    return Json(nextId, JsonRequestBehavior.AllowGet);
+}
