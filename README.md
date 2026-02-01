@@ -1,67 +1,87 @@
-<tr>
-    <td><input class="idno"></td>
-    <td><input class="taphole"></td>
-    <td><input type="date" class="castdate"></td>
-    <td><input class="hh"></td>
-    <td><input class="mm"></td>
-    <td><input class="length"></td>
-    <td>
-        <select class="clay">
-            <option value="Y">Yes</option>
-            <option value="N">No</option>
-        </select>
-    </td>
-    <td>
-        <select class="type">
-            <option value="NORMAL">NORMAL</option>
-            <option value="EXCEPTION">EXCEPTION</option>
-        </select>
-    </td>
-</tr>
-<script>
-function SaveExceptionCast() {
+[HttpPost]
+public JsonResult Save_Exception_Cast(List<dynamic> data)
+{
+    using (OracleConnection con =
+        new OracleConnection(iMonitorWebUtils.msConRWString))
+    {
+        con.Open();
 
-    var furnace = document.getElementById("ddlFurnace").value;
-    if (furnace === "") {
-        alert("Please select Furnace");
-        return;
-    }
+        for (int i = 0; i < data.Count; i++)
+        {
+            string idNo     = Convert.ToString(data[i].ID_NO);
+            string furnace  = Convert.ToString(data[i].FURNACE);
+            string castDate = Convert.ToString(data[i].CAST_DATE);
+            string hh24     = Convert.ToString(data[i].HH24);
+            string mm       = Convert.ToString(data[i].MM);
 
-    var rows = document.querySelectorAll("#exception_cast tbody tr");
-    if (rows.length === 0) {
-        alert("No data to save");
-        return;
-    }
+            // 1️⃣ Skip invalid rows
+            if (string.IsNullOrEmpty(idNo) ||
+                string.IsNullOrEmpty(furnace) ||
+                string.IsNullOrEmpty(castDate))
+            {
+                continue;
+            }
 
-    var dataList = [];
+            // 2️⃣ CHECK (ID_NO + FURNACE)
+            string chkSql = @"
+                SELECT COUNT(1)
+                FROM Test.T_CAST_EXCEPTION
+                WHERE ID_NO = :P_ID
+                  AND FURNACE = :P_FURNACE";
 
-    for (var i = 0; i < rows.length; i++) {
-        var r = rows[i];
+            OracleCommand chkCmd = new OracleCommand(chkSql, con);
+            chkCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
+            chkCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
 
-        dataList.push({
-            FURNACE: furnace,
-            ID_NO: r.querySelector(".idno").value,
-            TAPHOLE_NO: r.querySelector(".taphole").value,
-            CAST_DATE: r.querySelector(".castdate").value,
-            HH24: r.querySelector(".hh").value,
-            MM: r.querySelector(".mm").value,
-            TAPHOLE_LENGTH: r.querySelector(".length").value,
-            CLAY_PAUSED: r.querySelector(".clay").value,
-            TYPE: r.querySelector(".type").value
-        });
-    }
+            int cnt = Convert.ToInt32(chkCmd.ExecuteScalar());
 
-    $.ajax({
-        url: "/CastHouse/Save_Exception_Cast",
-        type: "POST",
-        data: JSON.stringify(dataList),
-        contentType: "application/json",
-        success: function (res) {
-            alert(res);
-        },
-        error: function () {
-            alert("Error while saving");
+            if (cnt > 0)
+            {
+                // 3️⃣ UPDATE
+                string updSql = @"
+                    UPDATE Test.T_CAST_EXCEPTION
+                    SET CAST_DATE =
+                        TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,
+                                'DD/MM/YYYY HH24:MI'),
+                        HH24 = :P_HH,
+                        MM   = :P_MM
+                    WHERE ID_NO = :P_ID
+                      AND FURNACE = :P_FURNACE";
+
+                OracleCommand updCmd = new OracleCommand(updSql, con);
+                updCmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = castDate;
+                updCmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
+                updCmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
+                updCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
+                updCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+
+                updCmd.ExecuteNonQuery();
+            }
+            else
+            {
+                // 4️⃣ INSERT
+                string insSql = @"
+                    INSERT INTO Test.T_CAST_EXCEPTION
+                    (ID_NO, FURNACE, CAST_DATE, HH24, MM)
+                    VALUES
+                    (:P_ID,
+                     :P_FURNACE,
+                     TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,
+                             'DD/MM/YYYY HH24:MI'),
+                     :P_HH,
+                     :P_MM)";
+
+                OracleCommand insCmd = new OracleCommand(insSql, con);
+                insCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
+                insCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+                insCmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = castDate;
+                insCmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
+                insCmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
+
+                insCmd.ExecuteNonQuery();
+            }
         }
-    });
+    }
+
+    return Json("Insert / Update completed successfully");
 }
-</script>
