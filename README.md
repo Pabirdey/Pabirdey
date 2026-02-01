@@ -1,92 +1,214 @@
-[HttpPost]
-public JsonResult Save_Exception_Cast(List<Dictionary<string, string>> data)
-{
-    if (data == null || data.Count == 0)
-        return Json("No data received");
-
-    using (OracleConnection con =
-           new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
-
-        foreach (var row in data)
-        {
-            string idNo          = row["ID_NO"];
-            string furnace       = row["FURNACE"];
-            string tapholeNo     = row["TAPHOLE_NO"];
-            string exceptionDate = row["EXCEPTION_DATE"];
-            string hh24          = row["HH24"] ?? "00";
-            string mm            = row["MM"] ?? "00";
-            string tapLength     = row["TAPHOLE_LENGTH"];
-            string clayPaused    = row["CLAY_PAUSED"];
-            string type          = row["TYPE"];
-
-            // Mandatory fields
-            if (string.IsNullOrWhiteSpace(idNo) ||
-                string.IsNullOrWhiteSpace(exceptionDate))
-                continue;
-
-            // CHECK RECORD
-            OracleCommand chkCmd = new OracleCommand(@"
-                SELECT COUNT(1)
-                FROM Test.T_CAST_EXCEPTION
-                WHERE ID_NO = :P_ID
-                  AND FUR_NAME = :P_FURNACE", con);
-
-            chkCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-            chkCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
-
-            int cnt = Convert.ToInt32(chkCmd.ExecuteScalar());
-
-            OracleCommand cmd = new OracleCommand();
-            cmd.Connection = con;
-
-            if (cnt > 0)
-            {
-                // 🔄 UPDATE
-                cmd.CommandText = @"
-                    UPDATE Test.T_CAST_EXCEPTION
-                    SET DATE_TIME = TO_DATE(
-                            :P_DATE || ' ' || :P_HH || ':' || :P_MM,
-                            'DD/MM/YYYY HH24:MI'
-                        ),
-                        TAPHOLE_LENGTH = :P_TAPLEN,
-                        CLAY_PUSHED    = :P_CLAY,
-                        TYPE           = :P_TYPE,
-                        TAPHOLE_NO     = :P_TAPHOLENO
-                    WHERE ID_NO = :P_ID
-                      AND FUR_NAME = :P_FURNACE";
-            }
-            else
-            {
-                // ➕ INSERT
-                cmd.CommandText = @"
-                    INSERT INTO Test.T_CAST_EXCEPTION
-                    (DATE_TIME, FUR_NAME, ID_NO,
-                     TAPHOLE_LENGTH, CLAY_PUSHED, TYPE, TAPHOLE_NO)
-                    VALUES
-                    (
-                      TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,
-                              'DD/MM/YYYY HH24:MI'),
-                      :P_FURNACE, :P_ID,
-                      :P_TAPLEN, :P_CLAY, :P_TYPE, :P_TAPHOLENO
-                    )";
-            }
-
-            // COMMON PARAMETERS
-            cmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = exceptionDate;
-            cmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
-            cmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
-            cmd.Parameters.Add("P_TAPLEN", OracleDbType.Varchar2).Value = tapLength;
-            cmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = clayPaused;
-            cmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type;
-            cmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeNo;
-            cmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-            cmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
-
-            cmd.ExecuteNonQuery();
-        }
-    }
-
-    return Json("Insert / Update completed successfully");
-}
+  <div class="modal fade" id="mgClayOtherModal" tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center">MG_CLAY</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- BODY -->
+                <div class="modal-body">
+                    <div class="title-box">Weightage of Clay</div>
+                    <div class="clay-box">
+                        <!-- Clay 1 (DROPDOWN) -->
+                        <div class="row align-items-center mb-3">
+                            <div class="col-2 clay-label">Clay1</div>
+                            <div class="col-7">
+                                <select class="form-select clay-input" id="MG_CLAY1">
+                                    <option value="">-- Select Clay1 --</option>
+                                    <option>ACE</option>
+                                    <option>BRL</option>
+                                    <option>LRH</option>
+                                    <option>UBQ</option>
+                                    <option>CALDYRS</option>
+                                    <option>HARIMA(S)</option>
+                                    <option>HARIMA(D)</option>
+                                    <option>CORUS</option>
+                                    <option>TRB</option>
+                                    <option>VISUVIUS</option>
+                                    <option>HARIMA-TWH4</option>
+                                    <option>HARIMA-CPH4</option>
+                                    <option>HARIMA(D)-TWH5</option>
+                                    <option>HARIMA(D)-TWH5K</option>
+                                    <option>HARIMA(D)TWH-5T</option>
+                                    <option>HARIMA RWH-3</option>
+                                    <option>HARIMA RWH-4</option>
+                                    <option>HARIMA(S)RW5F</option>
+                                    <option>HARIMA RWH-5</option>
+                                    <option>HARIMA RWH-6</option>
+                                    <option>HARIMA CB1</option>
+                                    <option>RW5F</option>
+                                    <option>RG15</option>
+                                    <option>RG15K</option>
+                                    <option>HARIMA(D)TWH-7</option>
+                                    <option>HARIMA CB2</option>
+                                    <option>TWH5(BELPAHAR)</option>
+                                    <option>CB2(BELPAHAR)</option>
+                                    <option>TWH 8(BELPAHAR)</option>
+                                    <option>TWH 8 K 1(BELPAHAR)</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select clay-input" id="P1">
+                                    <option value="">%</option>
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>15</option>
+                                    <option>20</option>
+                                    <option>25</option>
+                                    <option>30</option>
+                                    <option>35</option>
+                                    <option>40</option>
+                                    <option>45</option>
+                                    <option>50</option>
+                                    <option>55</option>
+                                    <option>60</option>
+                                    <option>65</option>
+                                    <option>70</option>
+                                    <option>75</option>
+                                    <option>80</option>
+                                    <option>85</option>
+                                    <option>90</option>
+                                    <option>95</option>
+                                    <option>100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Clay 2 -->
+                        <div class="row align-items-center mb-3">
+                            <div class="col-2 clay-label">Clay2</div>
+                            <div class="col-7">
+                                <select class="form-select clay-input" id="MG_CLAY2">
+                                    <option value="">-- Select Clay2 --</option>
+                                    <option>ACE</option>
+                                    <option>BRL</option>
+                                    <option>LRH</option>
+                                    <option>UBQ</option>
+                                    <option>CALDYRS</option>
+                                    <option>HARIMA(S)</option>
+                                    <option>HARIMA(D)</option>
+                                    <option>CORUS</option>
+                                    <option>TRB</option>
+                                    <option>VISUVIUS</option>
+                                    <option>HARIMA-TWH4</option>
+                                    <option>HARIMA-CPH4</option>
+                                    <option>HARIMA(D)-TWH5</option>
+                                    <option>HARIMA(D)-TWH5K</option>
+                                    <option>HARIMA(D)TWH-5T</option>
+                                    <option>HARIMA RWH-3</option>
+                                    <option>HARIMA RWH-4</option>
+                                    <option>HARIMA(S)RW5F</option>
+                                    <option>HARIMA RWH-5</option>
+                                    <option>HARIMA RWH-6</option>
+                                    <option>HARIMA CB1</option>
+                                    <option>RW5F</option>
+                                    <option>RG15</option>
+                                    <option>RG15K</option>
+                                    <option>HARIMA(D)TWH-7</option>
+                                    <option>HARIMA CB2</option>
+                                    <option>TWH5(BELPAHAR)</option>
+                                    <option>CB2(BELPAHAR)</option>
+                                    <option>TWH 8(BELPAHAR)</option>
+                                    <option>TWH 8 K 1(BELPAHAR)</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select clay-input" id="P2">
+                                    <option value="">%</option>
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>15</option>
+                                    <option>20</option>
+                                    <option>25</option>
+                                    <option>30</option>
+                                    <option>35</option>
+                                    <option>40</option>
+                                    <option>45</option>
+                                    <option>50</option>
+                                    <option>55</option>
+                                    <option>60</option>
+                                    <option>65</option>
+                                    <option>70</option>
+                                    <option>75</option>
+                                    <option>80</option>
+                                    <option>85</option>
+                                    <option>90</option>
+                                    <option>95</option>
+                                    <option>100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Clay 3 -->
+                        <div class="row align-items-center">
+                            <div class="col-2 clay-label">Clay3</div>
+                            <div class="col-7">
+                                <select class="form-select clay-input" id="MG_CLAY3">
+                                    <option value="">-- Select Clay3 --</option>
+                                    <option>ACE</option>
+                                    <option>BRL</option>
+                                    <option>LRH</option>
+                                    <option>UBQ</option>
+                                    <option>CALDYRS</option>
+                                    <option>HARIMA(S)</option>
+                                    <option>HARIMA(D)</option>
+                                    <option>CORUS</option>
+                                    <option>TRB</option>
+                                    <option>VISUVIUS</option>
+                                    <option>HARIMA-TWH4</option>
+                                    <option>HARIMA-CPH4</option>
+                                    <option>HARIMA(D)-TWH5</option>
+                                    <option>HARIMA(D)-TWH5K</option>
+                                    <option>HARIMA(D)TWH-5T</option>
+                                    <option>HARIMA RWH-3</option>
+                                    <option>HARIMA RWH-4</option>
+                                    <option>HARIMA(S)RW5F</option>
+                                    <option>HARIMA RWH-5</option>
+                                    <option>HARIMA RWH-6</option>
+                                    <option>HARIMA CB1</option>
+                                    <option>RW5F</option>
+                                    <option>RG15</option>
+                                    <option>RG15K</option>
+                                    <option>HARIMA(D)TWH-7</option>
+                                    <option>HARIMA CB2</option>
+                                    <option>TWH5(BELPAHAR)</option>
+                                    <option>CB2(BELPAHAR)</option>
+                                    <option>TWH 8(BELPAHAR)</option>
+                                    <option>TWH 8 K 1(BELPAHAR)</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select clay-input" id="P3">
+                                    <option value="">%</option>
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>15</option>
+                                    <option>20</option>
+                                    <option>25</option>
+                                    <option>30</option>
+                                    <option>35</option>
+                                    <option>40</option>
+                                    <option>45</option>
+                                    <option>50</option>
+                                    <option>55</option>
+                                    <option>60</option>
+                                    <option>65</option>
+                                    <option>70</option>
+                                    <option>75</option>
+                                    <option>80</option>
+                                    <option>85</option>
+                                    <option>90</option>
+                                    <option>95</option>
+                                    <option>100</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- FOOTER -->
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-save" onclick="checkClay()">Save</button>
+                    <button class="btn btn-exit" data-bs-dismiss="modal">Exit</button>
+                </div>
+            </div>
+        </div>
+    </div>
