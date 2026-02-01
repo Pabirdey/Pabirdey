@@ -1,31 +1,36 @@
 [HttpPost]
-public JsonResult Save_Exception_Cast(List<dynamic> data)
+public JsonResult Save_Exception_Cast(List<object> data)
 {
     using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
     {
         con.Open();
 
-        foreach (var row in data)
+        foreach (var item in data)
         {
-            string idNo = Convert.ToString(row.ID_NO);
-            string furnace = Convert.ToString(row.FURNACE);
-            string date = Convert.ToString(row.EXCEPTION_DATE);
-            string hh = Convert.ToString(row.HH24);
-            string mm = Convert.ToString(row.MM);
-            string tapLen = Convert.ToString(row.TAPHOLE_LENGTH);
-            string clay = Convert.ToString(row.CLAY_PAUSED);
-            string type = Convert.ToString(row.TYPE);
-            string tapholeNo = Convert.ToString(row.TAPHOLE_NO);
+            var row = item as Newtonsoft.Json.Linq.JObject; // convert dynamic object to JObject
 
-            // Skip row if ID or Date is null
-            if (string.IsNullOrEmpty(idNo) || string.IsNullOrEmpty(date)) continue;
+            string idNo = row?["ID_NO"]?.ToString();
+            string tapholeno = row?["TAPHOLE_NO"]?.ToString();
+            string furnace = row?["FURNACE"]?.ToString();
+            string exceptiondate = row?["EXCEPTION_DATE"]?.ToString();
+            string hh24 = row?["HH24"]?.ToString() ?? "00";
+            string mm = row?["MM"]?.ToString() ?? "00";
+            string tapholelength = row?["TAPHOLE_LENGTH"]?.ToString();
+            string claypaused = row?["CLAY_PAUSED"]?.ToString();
+            string type = row?["TYPE"]?.ToString();
+
+            // skip if ID or Date is null
+            if (string.IsNullOrEmpty(idNo) || string.IsNullOrEmpty(exceptiondate))
+                continue;
 
             // Check if record exists
-            string chkSql = @"SELECT COUNT(1) FROM Test.T_CAST_EXCEPTION 
-                              WHERE ID_NO=:P_ID AND FUR_NAME=:P_FURNACE";
+            string chkSql = @"SELECT COUNT(1) 
+                              FROM Test.T_CAST_EXCEPTION 
+                              WHERE ID_NO = :P_ID AND FUR_NAME = :P_FURNACE";
+
             OracleCommand chkCmd = new OracleCommand(chkSql, con);
             chkCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-            chkCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+            chkCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace ?? "";
             int cnt = Convert.ToInt32(chkCmd.ExecuteScalar());
 
             if (cnt > 0)
@@ -44,15 +49,15 @@ public JsonResult Save_Exception_Cast(List<dynamic> data)
                       AND FUR_NAME = :P_FURNACE";
 
                 OracleCommand updCmd = new OracleCommand(updSql, con);
-                updCmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = date;
-                updCmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh;
+                updCmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = exceptiondate;
+                updCmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
                 updCmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
-                updCmd.Parameters.Add("P_TAPHOLELENGTH", OracleDbType.Varchar2).Value = tapLen;
-                updCmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = clay;
-                updCmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type;
-                updCmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeNo;
+                updCmd.Parameters.Add("P_TAPHOLELENGTH", OracleDbType.Varchar2).Value = tapholelength ?? "";
+                updCmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = claypaused ?? "";
+                updCmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type ?? "";
+                updCmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeno ?? "";
                 updCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-                updCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+                updCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace ?? "";
                 updCmd.ExecuteNonQuery();
             }
             else
@@ -66,15 +71,15 @@ public JsonResult Save_Exception_Cast(List<dynamic> data)
                      :P_FURNACE, :P_ID, :P_TAPHOLELENGTH, :P_CLAY, :P_TYPE, :P_TAPHOLENO, :P_HH, :P_MM)";
 
                 OracleCommand insCmd = new OracleCommand(insSql, con);
-                insCmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = date;
-                insCmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh;
+                insCmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = exceptiondate;
+                insCmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
                 insCmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
-                insCmd.Parameters.Add("P_TAPHOLELENGTH", OracleDbType.Varchar2).Value = tapLen;
-                insCmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = clay;
-                insCmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type;
-                insCmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeNo;
+                insCmd.Parameters.Add("P_TAPHOLELENGTH", OracleDbType.Varchar2).Value = tapholelength ?? "";
+                insCmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = claypaused ?? "";
+                insCmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type ?? "";
+                insCmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeno ?? "";
                 insCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-                insCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+                insCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace ?? "";
                 insCmd.ExecuteNonQuery();
             }
         }
