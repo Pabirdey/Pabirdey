@@ -1,19 +1,44 @@
-    <div class="table-responsive scrollable-table" style="max-height:282px; overflow-y:auto;">
-                                <table class="table table-bordered table-sm text-center align-middle" id="exception_cast">
-                                    <thead class="table-secondary sticky-top">
-                                        <tr>
-                                            <th style="width:150px;">ID No</th>
-                                            <th style="width:50px;">TAPHOLE No</th>
-                                            <th style="width:180px;">Date</th>
-                                            <th style="width:90px;">HH24</th>
-                                            <th style="width:90px;">MM</th>
-                                            <th>Taphole Length</th>
-                                            <th>Clay Paused</th>
-                                            <th style="width:240px;">Type</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- rows created by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
+ [HttpPost]
+        public JsonResult Save_Exception_Cast(List<dynamic> data)
+        {           
+
+            using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+            {
+                con.Open();
+
+                for (int i = 0; i < data.Count; i++)
+                {
+                    string idNo = Convert.ToString(data[i].ID_NO);
+                    string castDate = Convert.ToString(data[i].CAST_DATE);
+                    string hh24 = Convert.ToString(data[i].HH24);
+                    string mm = Convert.ToString(data[i].MM);                    
+                    if (string.IsNullOrEmpty(idNo) || string.IsNullOrEmpty(castDate))
+                        continue;                    
+                    string chkSql = "SELECT COUNT(*) FROM Test.T_CAST_EXCEPTION WHERE ID_NO = :ID_NO";
+                    OracleCommand chkCmd = new OracleCommand(chkSql, con);
+                    chkCmd.Parameters.Add(":ID_NO", idNo);
+                    int cnt = Convert.ToInt32(chkCmd.ExecuteScalar());
+                    if (cnt > 0)
+                    {                        
+                        string updSql = @"UPDATE Test.T_CAST_EXCEPTION  SET CAST_DATE =TO_DATE(:CAST_DATE || ' ' || :HH24 || ':' || :MM,'DD/MM/YYYY HH24:MI'),HH24=:HH24,MM=:MM  WHERE ID_NO = :ID_NO";
+                        OracleCommand updCmd = new OracleCommand(updSql, con);
+                        updCmd.Parameters.Add(":CAST_DATE", castDate);
+                        updCmd.Parameters.Add(":HH24", hh24);
+                        updCmd.Parameters.Add(":MM", mm);
+                        updCmd.Parameters.Add(":ID_NO", idNo);
+                        updCmd.ExecuteNonQuery();
+                    }
+                    else
+                    {                      
+                        string insSql = @"INSERT INTO Test.T_CAST_EXCEPTION(ID_NO, CAST_DATE, HH24, MM)VALUES(:ID_NO,TO_DATE(:CAST_DATE || ' ' || :HH24 || ':' || :MM,'DD/MM/YYYY HH24:MI'),:HH24,:MM)";                        OracleCommand insCmd = new OracleCommand(insSql, con);
+                        insCmd.Parameters.Add(":ID_NO", idNo);
+                        insCmd.Parameters.Add(":CAST_DATE", castDate);
+                        insCmd.Parameters.Add(":HH24", hh24);
+                        insCmd.Parameters.Add(":MM", mm);
+                        insCmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            return Json("Insert / Update completed successfully");
+        }
