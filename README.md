@@ -1,24 +1,32 @@
-document.addEventListener("click", function (e) {
+document.addEventListener("keydown", function (e) {
 
-    var row = e.target.closest("#exception_cast tbody tr");
-    if (!row) return;
+    if (e.key !== "ArrowDown") return;
+
+    var active = document.activeElement;
+    if (!active) return;
+
+    var currentRow = active.closest("#exception_cast tbody tr");
+    if (!currentRow) return;
 
     var tbody = document.querySelector("#exception_cast tbody");
     var rows = tbody.querySelectorAll("tr");
     var lastRow = rows[rows.length - 1];
 
-    // ✅ If clicked row is LAST ROW → add new row
-    if (row === lastRow) {
+    // ✅ If ArrowDown pressed in LAST ROW → add new row
+    if (currentRow === lastRow) {
 
         addRow();
 
-        // auto scroll to bottom
+        // scroll to bottom
         var wrapper = document.querySelector(".scrollable-table");
         if (wrapper) {
             wrapper.scrollTop = wrapper.scrollHeight;
         }
 
-        // focus first input of new row
+        // focus first input/select of new row
         tbody.lastElementChild.querySelector("input, select").focus();
+
+        // prevent default arrow behavior
+        e.preventDefault();
     }
 });
