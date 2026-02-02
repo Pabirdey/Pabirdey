@@ -1,67 +1,57 @@
-function SaveCastHouseData() {
-    debugger;
-    var rows = document.querySelectorAll("#TAP_Hot_Metal_Details tbody tr,#Driling_Slag_Details tbody tr,#Mudgun_Details tbody tr,#Other_Details tr");
-    var CastHouseMap = {};
-    rows.forEach(function (row) {
-        var inputs = row.querySelectorAll("input, select");
-        var castNo = "";
-        var rowData = {};
-        inputs.forEach(function (input) {
-            let val = input.value.trim();
-            rowData[input.name] = val === "" ? null : val;
-            if (input.name === "CAST_NO") {
-                castNo = val;
+[HttpPost]
+        public JsonResult Save_Exception_Cast(List<Dictionary<string, string>> data)
+        {
+            if (data == null || data.Count == 0)
+                return Json("No data received");
+
+            using (OracleConnection con =new OracleConnection(iMonitorWebUtils.msConRWString))
+            {
+                con.Open();
+                foreach (var row in data)
+                {
+                        string idNo          = row["ID_NO"];
+                        string furnace       = row["FURNACE"];
+                        string tapholeNo     = row["TAPHOLE_NO"];
+                        string exceptionDate = row["EXCEPTION_DATE"];
+                        string hh24          = row["HH24"] ?? "00";
+                        string mm            = row["MM"] ?? "00";
+                        string tapLength     = row["TAPHOLE_LENGTH"];
+                        string clayPaused    = row["CLAY_PAUSED"];
+                        string type          = row["TYPE"];            
+            if (string.IsNullOrWhiteSpace(idNo) && string.IsNullOrWhiteSpace(exceptionDate))
+            continue;            
+            OracleCommand chkCmd = new OracleCommand(@"SELECT COUNT(1) FROM Test.T_CAST_EXCEPTION WHERE ID_NO = :P_ID AND FUR_NAME = :P_FURNACE", con);
+            chkCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
+            chkCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+            int cnt = Convert.ToInt32(chkCmd.ExecuteScalar());
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = con;
+
+            if (cnt > 0)
+            {
+               
+                cmd.CommandText = @"UPDATE Test.T_CAST_EXCEPTION  SET DATE_TIME = TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,'DD/MM/YYYY HH24:MI'),TAPHOLE_LENGTH =:P_TAPLEN,CLAY_PUSHED=:P_CLAY,TYPE=:P_TYPE,TAPHOLE_NO=:P_TAPHOLENO  WHERE ID_NO = :P_ID  AND FUR_NAME = :P_FURNACE";
             }
-        });
-        if (!CastHouseMap[castNo]) {
-            CastHouseMap[castNo] = rowData;
-        } else {
-            Object.assign(CastHouseMap[castNo], rowData);
-        }
-    });
-    var CastHouse = Object.values(CastHouseMap);
-    var selectedDate = document.getElementById("tbFDatePick").value;
-    var selectedFurnace = document.getElementById("lstFur").value.trim();
-    console.log(CastHouse);
-    console.log(selectedDate);
-    console.log(selectedFurnace);
-    $.ajax({
-        url: '/CastHouse/SaveCastHouseData',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            data: CastHouse,
-            Fdate: selectedDate,
-            Fur: selectedFurnace
-        }),
-        success: function (response) {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    text: 'Data Saved Successfully!',
-                    showConfirmButton: true
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed!',
-                    text: response.message || 'Data Could not be Saved.Please try again....'
-                });
+            else
+            {
+              
+                cmd.CommandText = @"INSERT INTO Test.T_CAST_EXCEPTION(DATE_TIME, FUR_NAME, ID_NO,TAPHOLE_LENGTH, CLAY_PUSHED, TYPE, TAPHOLE_NO)
+                                VALUES(TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,'DD/MM/YYYY HH24:MI'),:P_FURNACE, :P_ID,:P_TAPLEN, :P_CLAY, :P_TYPE, :P_TAPHOLENO)";
             }
-        },
-        error: function () {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Something went wrong while saving.'
-            });
+
+           
+            cmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = exceptionDate;
+            cmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
+            cmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
+            cmd.Parameters.Add("P_TAPLEN", OracleDbType.Varchar2).Value = tapLength;
+            cmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = clayPaused;
+            cmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type;   
+            cmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeNo;
+            cmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
+            cmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
+            cmd.ExecuteNonQuery();
         }
-    });
+    }
+
+    return Json("Insert / Update completed successfully");
 }
- <label for="tbFDatePick" class="LabelControl" style="font-family:Allan,cursive;font-size:22px;">Date:&nbsp;</label>
-            <a id="tbFDatePick" class="btn btn-primary">
-                <i class="fa fa-calendar"></i>
-                <label id="currDate-value" style="font-size:12px;color:white"></label>
-            </a>
-            <input type="text" id="hiddenDate" style="position:absolute; opacity:0; height:0; width:0;" />
-            &nbsp;&nbsp;&nbsp;&nbsp;
