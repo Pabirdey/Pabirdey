@@ -1,112 +1,168 @@
-[HttpPost]
-public JsonResult Save_Exception_Cast(List<Dictionary<string, string>> data)
-{
-    if (data == null || data.Count == 0)
-        return Json("No data received");
+function Display_Mudgun_Details(date, furnace) {
+               $.ajax({
+                   url: '@Url.Action("Get_Display_Mudgun_Details","CastHouse")',
+                   type: 'GET',
+                   data: { Fdate: date, Fur: furnace },
+                   success: function (result) {
+                       let parsedData = JSON.parse(result);
+                       let tableBody = "";
+                       for (let i = 0; i < parsedData.length; i++) {
+                           tableBody += "<tr>";
+                           tableBody += `<tr name="CAST_NO" data-castno='${parsedData[i].CAST_NO}'>`;
+                           tableBody += `<td name="CAST_NO" class="freeze-col">${parsedData[i].CAST_NO}</td>`;
+                           tableBody += `<td>
+                                            <select name="CLOSURE_MODE" class ="form-select form-select-sm">
+                                                <option value="" ${parsedData[i].CLOSURE_MODE == "" ? 'selected' : ''}></option>
+                                                <option value="MUDGUN" ${parsedData[i].CLOSURE_MODE == "MUDGUN" ? 'selected' : ''}>MUDGUN</option>
+                                                <option value="NULL" ${parsedData[i].CLOSURE_MODE == "NULL" ? 'selected' : ''}>NULL</option>
+                                            </select>
+                                          </td>`;
+                           tableBody += `<td><input name="CLAY_QUANTITY" class="form-control form-control-sm" value="${parsedData[i].CLAY_QUANTITY}"></td>`;
+                           // Editable MG Clay input + dropdown + modal
+                           tableBody += `<td>
+                                            <div class="mgClayWrapper">
+                                                <input name="MG_CLAY_USED" type="text" class ="form-control form-control-sm mgClayInput" value="${parsedData[i].MG_CLAY_USED}">
+                                                <button type="button" class="btn btn-sm btn-secondary" onclick="showDropdown(this)">▼</button>
+                                                <div class="mgClayList">
+                                                    <div onclick="selectClay(this, ${i})">ACE</div>
+                                                    <div onclick="selectClay(this, ${i})">BRL</div>
+                                                    <div onclick="selectClay(this, ${i})">LRH</div>
+                                                    <div onclick="selectClay(this, ${i})">UBQ</div>
+                                                    <div onclick="selectClay(this, ${i})">CALDYRS</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(S) </div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(D) </div>
+                                                    <div onclick="selectClay(this, ${i})">CORUS</div>
+                                                    <div onclick="selectClay(this, ${i})">TRB</div>
+                                                    <div onclick="selectClay(this, ${i})">VISUVIUS</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA-TWH4</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA-CPH4</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(D) -TWH5</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(D) -TWH5K</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(D) TWH-5T</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA RWH-3</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA RWH-4</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(S) RW5F</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA RWH-5</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA RWH-6</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA CB1</div>
+                                                    <div onclick="selectClay(this, ${i})">RW5F</div>
+                                                    <div onclick="selectClay(this, ${i})">RG15</div>
+                                                    <div onclick="selectClay(this, ${i})">RG15K</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA(D) TWH-7</div>
+                                                    <div onclick="selectClay(this, ${i})">HARIMA CB2</div>
+                                                    <div onclick="selectClay(this, ${i})">TWH5(BELPAHAR) </div>
+                                                    <div onclick="selectClay(this, ${i})">CB2(BELPAHAR) </div>
+                                                    <div onclick="selectClay(this, ${i})">TWH 8(BELPAHAR) </div>
+                                                    <div onclick="selectClay(this, ${i})">TWH 8 K 1(BELPAHAR) </div>
+                                                    <div onclick="selectClay(this, ${i})">OTHERS</div>
+                                                </div>
+                                            </div>
+                                          </td>`;
 
-    using (OracleConnection con =
-           new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
+                           /* ******** LOT NO TEXTBOX + BUTTON HERE ******** */
+                           tableBody += `<td class="d-flex gap-0"><input name="LOT_NO" style="width:120px;"  value='${parsedData[i].LOT_NO}' />
+                                        <button type="button" class ="btn btn-primary btn-sm getLot" data-castno="${parsedData[i].LOT_NO}">::</button></td>`;
+                           tableBody += `<td><input name="NO_OF_BAGS" class='form-control form-control-sm' value='${parsedData[i].NO_OF_BAGS}'/></td>`;
+                           tableBody += `<td><input name="MUDGUN_HOLD_TIME" class='form-control form-control-sm' value='${parsedData[i].MUDGUN_HOLD_TIME}'/></td>`;
+                           tableBody += `<td>
+                                                <select name="MUDGUN_NOZZLE" class ='form-select form-control-sm'>
+                                                        <option ${!parsedData[i].MUDGUN_NOZZLE ? 'selected' : ''} value=""></option>
+                                                        <option ${parsedData[i].MUDGUN_NOZZLE === 'REPLACEMENT' ? 'selected' : ''}>REPLACEMENT</option>
+                                                        <option ${parsedData[i].MUDGUN_NOZZLE === 'WEILD' ? 'selected' : ''}>WEILD</option>
+                                                </select>
+                                        </td>`;
+                           tableBody += `<td><input name="MNOZZLE_BEF_CLOSING" class='form-control form-control-sm' value='${parsedData[i].MNOZZLE_BEF_CLOSING}'/></td>`;
+                           tableBody += `<td><input name="MNOZZLE_AFT_CLOSING" class='form-control form-control-sm' value='${parsedData[i].MNOZZLE_AFT_CLOSING}'/></td>`;
+                           tableBody += `<td><input name="INIT_PLUGIN_PRESSURE" class='form-control form-control-sm' value='${parsedData[i].INIT_PLUGIN_PRESSURE}'/></td>`;
+                           tableBody += `<td><input name="MAX_PLUGIN_PRESSURE" class='form-control form-control-sm' value='${parsedData[i].MAX_PLUGIN_PRESSURE}'/></td>`;
+                           tableBody += `<td><input name="FINAL_PLUGIN_PRESSURE" class='form-control form-control-sm' value='${parsedData[i].FINAL_PLUGIN_PRESSURE}'/></td>`;
+                           tableBody += `<td><input name="PRESS_ON_FORCE" class='form-control form-control-sm' value='${parsedData[i].PRESS_ON_FORCE}'/></td>`;
+                           tableBody += `<td>
+                                        <select name="CLAY_LEAKAGE" class ='form-select form-control-sm'>
+                                    <option ${!parsedData[i].CLAY_LEAKAGE ? 'selected' : ''} value=""></option>
+                                    <option ${parsedData[i].CLAY_LEAKAGE === 'YES' ? 'selected' : ''}>YES</option>
+                                    <option ${parsedData[i].CLAY_LEAKAGE === 'NO' ? 'selected' : ''}>NO</option>
+                                </select>
+                            </td>`;
 
-        using (OracleTransaction tran = con.BeginTransaction())
+                           tableBody += `<td>
+                                <select name="BACK_FIRE" class ='form-select form-control-sm'>
+                                    <option ${!parsedData[i].BACK_FIRE ? 'selected' : ''} value=""></option>
+                                    <option ${parsedData[i].BACK_FIRE === 'YES' ? 'selected' : ''}>YES</option>
+                                    <option ${parsedData[i].BACK_FIRE === 'NO' ? 'selected' : ''}>NO</option>
+                                </select>
+                            </td>`;
+
+                           tableBody += `</tr>`;
+                       }
+
+                       $("#Mudgun_Details tbody").html(tableBody);
+                   }
+               });
+           }
+           [HttpPost]
+        public JsonResult SaveCastHouseData(List<Dictionary<string, object>> data, string Fdate, string Fur)
         {
             try
             {
-                foreach (var row in data)
+                using (OracleConnection conn = new OracleConnection(iMonitorWebUtils.msConRWString))
                 {
-                    // 🔹 YOUR SAME FIELD MAPPING
-                    string idNo          = row["ID_NO"];
-                    string furnace       = row["FURNACE"];
-                    string tapholeNo     = row["TAPHOLE_NO"];
-                    string exceptionDate = row["EXCEPTION_DATE"];
-                    string hh24          = row["HH24"] ?? "00";
-                    string mm            = row["MM"] ?? "00";
-                    string tapLength     = row["TAPHOLE_LENGTH"];
-                    string clayPaused    = row["CLAY_PAUSED"];
-                    string type          = row["TYPE"];
+                    conn.Open();
 
-                    // 🔴 FIXED CONDITION
-                    if (string.IsNullOrWhiteSpace(idNo) ||
-                        string.IsNullOrWhiteSpace(exceptionDate))
-                        continue;
+                    string updateSql = @"
+                        UPDATE TEST.T_CAST_DETAILS SET
+                        CLOSURE_MODE=:CLOSURE_MODE,
+                        CLAY_QUANTITY=:CLAY_QUANTITY,
+                        MG_CLAY_USED=:MG_CLAY_USED,
+                        LOT_NO=:LOT_NO,
+                        NO_OF_BAGS=:NO_OF_BAGS,
+                        MUDGUN_HOLD_TIME=:MUDGUN_HOLD_TIME,
+                        MUDGUN_NOZZLE=:MUDGUN_NOZZLE,
+                        MNOZZLE_BEF_CLOSING=:MNOZZLE_BEF_CLOSING,
+                        MNOZZLE_AFT_CLOSING=:MNOZZLE_AFT_CLOSING,
+                        INIT_PLUGIN_PRESSURE=:INIT_PLUGIN_PRESSURE,
+                        MAX_PLUGIN_PRESSURE=:MAX_PLUGIN_PRESSURE,
+                        FINAL_PLUGIN_PRESSURE=:FINAL_PLUGIN_PRESSURE,
+                        PRESS_ON_FORCE=:PRESS_ON_FORCE,
+                        CLAY_LEAKAGE=:CLAY_LEAKAGE,
+                        BACK_FIRE=:BACK_FIRE  
+                         WHERE CAST_NO = :CAST_NO 
+                         AND TRUNC(DATE_TIME) = TO_DATE(:Fdate, 'DD-MM-YYYY') 
+                         AND FUR_NAME = :Fur";
 
-                    /* =======================
-                       CHECK RECORD EXISTS
-                       ======================= */
-                    OracleCommand chkCmd = new OracleCommand(
-                        @"SELECT COUNT(1)
-                          FROM Test.T_CAST_EXCEPTION
-                          WHERE ID_NO = :P_ID
-                          AND FUR_NAME = :P_FURNACE", con);
-
-                    chkCmd.Transaction = tran;
-                    chkCmd.BindByName = true;
-                    chkCmd.Parameters.Clear();
-                    chkCmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-                    chkCmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
-
-                    int cnt = Convert.ToInt32(chkCmd.ExecuteScalar());
-
-                    /* =======================
-                       INSERT OR UPDATE
-                       ======================= */
-                    OracleCommand cmd = new OracleCommand();
-                    cmd.Connection = con;
-                    cmd.Transaction = tran;
-                    cmd.BindByName = true;     // 🔥 MOST IMPORTANT FIX
-                    cmd.Parameters.Clear();
-
-                    if (cnt > 0)
+                    foreach (var row in data)
                     {
-                        // 🔄 UPDATE
-                        cmd.CommandText = @"
-UPDATE Test.T_CAST_EXCEPTION
-SET DATE_TIME = TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,
-                         'DD/MM/YYYY HH24:MI'),
-    TAPHOLE_LENGTH = :P_TAPLEN,
-    CLAY_PUSHED    = :P_CLAY,
-    TYPE           = :P_TYPE,
-    TAPHOLE_NO     = :P_TAPHOLENO
-WHERE ID_NO = :P_ID
-AND FUR_NAME = :P_FURNACE";
-                    }
-                    else
-                    {
-                        // ➕ INSERT
-                        cmd.CommandText = @"
-INSERT INTO Test.T_CAST_EXCEPTION
-(DATE_TIME, FUR_NAME, ID_NO,
- TAPHOLE_LENGTH, CLAY_PUSHED, TYPE, TAPHOLE_NO)
-VALUES
-(TO_DATE(:P_DATE || ' ' || :P_HH || ':' || :P_MM,
-         'DD/MM/YYYY HH24:MI'),
- :P_FURNACE, :P_ID,
- :P_TAPLEN, :P_CLAY, :P_TYPE, :P_TAPHOLENO)";
-                    }
+                        using (OracleCommand cmd = new OracleCommand(updateSql, conn))
+                        {
+                            cmd.Parameters.Add(":CLOSURE_MODE", row["CLOSURE_MODE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":CLAY_QUANTITY", row["CLAY_QUANTITY"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":MG_CLAY_USED", row["MG_CLAY_USED"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":LOT_NO", row["LOT_NO"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":NO_OF_BAGS", row["NO_OF_BAGS"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":MUDGUN_HOLD_TIME", row["MUDGUN_HOLD_TIME"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":MUDGUN_NOZZLE", row["MUDGUN_NOZZLE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":MNOZZLE_BEF_CLOSING", row["MNOZZLE_BEF_CLOSING"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":MNOZZLE_AFT_CLOSING", row["MNOZZLE_AFT_CLOSING"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":INIT_PLUGIN_PRESSURE", row["INIT_PLUGIN_PRESSURE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":MAX_PLUGIN_PRESSURE", row["MAX_PLUGIN_PRESSURE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":FINAL_PLUGIN_PRESSURE", row["FINAL_PLUGIN_PRESSURE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":PRESS_ON_FORCE", row["PRESS_ON_FORCE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":CLAY_LEAKAGE", row["CLAY_LEAKAGE"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":BACK_FIRE", row["BACK_FIRE"] ?? DBNull.Value);                          
+                            cmd.Parameters.Add(":CAST_NO", row["CAST_NO"] ?? DBNull.Value);
+                            cmd.Parameters.Add(":Fdate", Fdate);
+                            cmd.Parameters.Add(":Fur", Fur);
+                            cmd.ExecuteNonQuery();
 
-                    // 🔹 PARAMETERS (UNCHANGED ORDER, SAFE NOW)
-                    cmd.Parameters.Add("P_DATE", OracleDbType.Varchar2).Value = exceptionDate;
-                    cmd.Parameters.Add("P_HH", OracleDbType.Varchar2).Value = hh24;
-                    cmd.Parameters.Add("P_MM", OracleDbType.Varchar2).Value = mm;
-                    cmd.Parameters.Add("P_TAPLEN", OracleDbType.Varchar2).Value = tapLength;
-                    cmd.Parameters.Add("P_CLAY", OracleDbType.Varchar2).Value = clayPaused;
-                    cmd.Parameters.Add("P_TYPE", OracleDbType.Varchar2).Value = type;
-                    cmd.Parameters.Add("P_TAPHOLENO", OracleDbType.Varchar2).Value = tapholeNo;
-                    cmd.Parameters.Add("P_ID", OracleDbType.Varchar2).Value = idNo;
-                    cmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value = furnace;
 
-                    cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
 
-                tran.Commit();
-                return Json("Insert / Update completed successfully");
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                tran.Rollback();
-                return Json("Error: " + ex.Message);
+                return Json(new { success = false, message = ex.Message });
             }
         }
-    }
-}
