@@ -1,55 +1,36 @@
-function Display_Mudgun_Details(date, furnace) {
-    $.ajax({
-        url: '@Url.Action("Get_Display_Mudgun_Details","CastHouse")',
-        type: 'GET',
-        data: { Fdate: date, Fur: furnace },
-        success: function (result) {
+MERGE INTO imtg.T_JODA_IOPP_PROCESS_RAW t
+USING (
+    SELECT
+        DATE_TIME,
+        AVG(
+            DECODE(
+                TAG_NAME,
+                '07_WF001/TPH_PV',
+                TAG_VALUE
+            )
+        ) AS SCRUBBER_MASSFEED_RATE_1
+    FROM imtg.T_JODA_IOPP_PROCESS_PROC_RAW
+    WHERE DATE_TIME > vMAXDATE
+    GROUP BY DATE_TIME
+) s
+ON (
+    t.TIMESTAMP = s.DATE_TIME
+)
 
-            let parsedData = JSON.parse(result);
-            let tableBody = "";
+WHEN MATCHED THEN
+    UPDATE SET
+        t.SCRUBBER_MASSFEED_RATE_1 = s.SCRUBBER_MASSFEED_RATE_1
+    -- 🔴 UPDATE ONLY AFTER 5 MINUTES
+    WHERE SYSDATE - t.TIMESTAMP > (5 / (24*60))
 
-            for (let i = 0; i < parsedData.length; i++) {
+WHEN NOT MATCHED THEN
+    INSERT (
+        TIMESTAMP,
+        SCRUBBER_MASSFEED_RATE_1
+    )
+    VALUES (
+        s.DATE_TIME,
+        s.SCRUBBER_MASSFEED_RATE_1
+    );
 
-                tableBody += `
-                <tr data-castno="${parsedData[i].CAST_NO}">
-                    <td class="freeze-col">
-                        ${parsedData[i].CAST_NO}
-                        <input type="hidden" name="CAST_NO" value="${parsedData[i].CAST_NO}">
-                    </td>
-
-                    <td>
-                        <select name="CLOSURE_MODE" class="form-select form-select-sm">
-                            <option value=""></option>
-                            <option value="MUDGUN" ${parsedData[i].CLOSURE_MODE === "MUDGUN" ? "selected" : ""}>MUDGUN</option>
-                            <option value="NULL" ${parsedData[i].CLOSURE_MODE === "NULL" ? "selected" : ""}>NULL</option>
-                        </select>
-                    </td>
-
-                    <td><input name="CLAY_QUANTITY" class="form-control form-control-sm" value="${parsedData[i].CLAY_QUANTITY || ''}"></td>
-                    <td><input name="MG_CLAY_USED" class="form-control form-control-sm" value="${parsedData[i].MG_CLAY_USED || ''}"></td>
-                    <td><input name="LOT_NO" class="form-control form-control-sm" value="${parsedData[i].LOT_NO || ''}"></td>
-                    <td><input name="NO_OF_BAGS" class="form-control form-control-sm" value="${parsedData[i].NO_OF_BAGS || ''}"></td>
-                    <td><input name="MUDGUN_HOLD_TIME" class="form-control form-control-sm" value="${parsedData[i].MUDGUN_HOLD_TIME || ''}"></td>
-
-                    <td>
-                        <select name="CLAY_LEAKAGE" class="form-select form-select-sm">
-                            <option value=""></option>
-                            <option value="YES" ${parsedData[i].CLAY_LEAKAGE === "YES" ? "selected" : ""}>YES</option>
-                            <option value="NO" ${parsedData[i].CLAY_LEAKAGE === "NO" ? "selected" : ""}>NO</option>
-                        </select>
-                    </td>
-
-                    <td>
-                        <select name="BACK_FIRE" class="form-select form-select-sm">
-                            <option value=""></option>
-                            <option value="YES" ${parsedData[i].BACK_FIRE === "YES" ? "selected" : ""}>YES</option>
-                            <option value="NO" ${parsedData[i].BACK_FIRE === "NO" ? "selected" : ""}>NO</option>
-                        </select>
-                    </td>
-                </tr>`;
-            }
-
-            $("#Mudgun_Details tbody").html(tableBody);
-        }
-    });
-}
+COMMIT;
