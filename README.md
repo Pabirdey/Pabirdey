@@ -1,36 +1,12 @@
-MERGE INTO imtg.T_JODA_IOPP_PROCESS_RAW t
-USING (
-    SELECT
-        DATE_TIME,
-        AVG(
-            DECODE(
-                TAG_NAME,
-                '07_WF001/TPH_PV',
-                TAG_VALUE
-            )
-        ) AS SCRUBBER_MASSFEED_RATE_1
-    FROM imtg.T_JODA_IOPP_PROCESS_PROC_RAW
-    WHERE DATE_TIME > vMAXDATE
-    GROUP BY DATE_TIME
-) s
-ON (
-    t.TIMESTAMP = s.DATE_TIME
-)
-
-WHEN MATCHED THEN
-    UPDATE SET
-        t.SCRUBBER_MASSFEED_RATE_1 = s.SCRUBBER_MASSFEED_RATE_1
-    -- 🔴 UPDATE ONLY AFTER 5 MINUTES
-    WHERE SYSDATE - t.TIMESTAMP > (5 / (24*60))
-
-WHEN NOT MATCHED THEN
-    INSERT (
-        TIMESTAMP,
-        SCRUBBER_MASSFEED_RATE_1
-    )
-    VALUES (
-        s.DATE_TIME,
-        s.SCRUBBER_MASSFEED_RATE_1
-    );
-
-COMMIT;
+    v_days:=288*(to_number(to_date(to_char(Sysdate,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS')-to_date(to_char(vMAXDATE,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS')));
+     For v_count in 1..v_days
+    Loop
+        Insert into imtg.T_JODA_IOPP_PROCESS_RAW
+        (
+          Timestamp         
+          
+          )
+          values  (to_date(to_char(vMAXDATE,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS'));      
+           vMAXDATE :=((to_date(to_char(vMAXDATE,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS')+1/288));
+	 End loop;
+     commit;
