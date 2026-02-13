@@ -1,47 +1,38 @@
-[HttpGet]
-public JsonResult GetRawMaterialByFurnace(string furnace, string fdate)
-{
-    var list = new List<object>();
+function saveData() {
 
-    try
-    {
-        using (var conn = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            conn.Open();
+    var materials = [];
+    var rows = document.querySelectorAll("#myTable tbody tr");
 
-            using (var cmd = new OracleCommand("PROC_GET_BF_RAW_MATERIAL", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
+    for (var i = 0; i < rows.length; i++) {
 
-                cmd.Parameters.Add("p_furnace", OracleDbType.Varchar2).Value = furnace;
+        var tagId = rows[i].querySelector(".tagid").value;
+        var ton = rows[i].querySelector(".ton").value;
+        var kg = rows[i].querySelector(".kg").value;
 
-                cmd.Parameters.Add("p_date", OracleDbType.Date)
-                   .Value = DateTime.ParseExact(fdate, "dd/MM/yyyy",
-                           System.Globalization.CultureInfo.InvariantCulture);
+        materials.push({
+            TAG_ID: tagId,
+            VALUE_TON: ton,
+            VALUE_KG: kg
+        });
+    }
 
-                cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor)
-                   .Direction = ParameterDirection.Output;
+    var data = {
+        reportDate: document.getElementById("reportDate").value,
+        furnace: document.getElementById("furnace").value,
+        materials: materials
+    };
 
-                using (var dr = cmd.ExecuteReader())
-                {
-                    while (dr.Read())
-                    {
-                        list.Add(new
-                        {
-                            TAG_ID = dr["TAG_ID"] == DBNull.Value ? 0 : Convert.ToInt32(dr["TAG_ID"]),
-                            MATERIAL = dr["MATERIAL_NAME"].ToString(),
-                            VALUE_TON = dr["VALUE_TON"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["VALUE_TON"]),
-                            VALUE_KG = dr["VALUE_KG"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["VALUE_KG"])
-                        });
-                    }
-                }
-            }
+    $.ajax({
+        url: '/YourController/SaveRawMaterialData',
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function (res) {
+            alert(res.message);
+        },
+        error: function () {
+            alert("Error saving data");
         }
-
-        return Json(list, JsonRequestBehavior.AllowGet);
-    }
-    catch (Exception ex)
-    {
-        return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
-    }
+    });
 }
