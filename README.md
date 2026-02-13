@@ -158,4 +158,3 @@ function Display_Material(furnace, fDate) {
 }       
     </script>
 }
-gv
