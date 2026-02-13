@@ -1,225 +1,178 @@
-@section css {
-    <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap/dist/css/bootstrap.min.css")">
-    <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")">
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Furnace Material Report</title>
     <style>
-        .Main {
-            background-color: #ffffff;
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
 
-        .page-title {
-            font-weight: 700;
-            color: #2c3e50;
+        .top-section {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 20px;
         }
 
-        fieldset {
-            border: 2px solid #2c3e50;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        legend {
-            font-size: 14px;
+        label {
             font-weight: bold;
-            padding: 0 10px;
-            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
         }
 
-        #materialTable {
-            width: 60%;
-            background: white;
-            color: #000;
+        select, input[type="date"] {
+            padding: 6px;
+            width: 180px;
         }
 
-        #materialTable th {
-            background: #2c3e50;
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #2f3e4d;
             color: white;
-            text-align: center;
-            font-family: Courier New;
-            font-size: 18px;
+            padding: 10px;
+            text-align: left;
         }
 
-        #materialTable td {
-            border: 1px solid #000;
-            font-family: Courier New, monospace;
-            font-weight: bold;
-            font-size: 16px;
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
         }
 
-        .medium-textbox {
-            width: 100px;
-            text-align: right;
-            font-weight: bold;
-        }
-
-        /* ⭐ SPACE BEFORE TYPES COLUMN */
-        #materialTable th:last-child,
-        #materialTable td:last-child {
-            padding-left: 50px;
-        }
-
-        .btn-custom {
-            padding: 10px 40px;
-            font-size: 15px;
-            border-radius: 8px;
+        .types-section {
+            margin-top: 15px;
         }
     </style>
-}
+</head>
+<body>
 
-<div class="Main">
-    <div class="container">
+    <h2>Furnace Material Report</h2>
 
-        <h2 class="text-center page-title mb-4">Raw Material Consumption</h2>
-
-        <div class="row">
-
-            <!-- DATE FIELDSET -->
-            <div class="col-md-2">
-                <fieldset>
-                    <legend>Date Selection</legend>
-                    <label>Date</label><br />
-                    <a id="date-daily" class="btn btn-primary">
-                        <span id="currDate-value"></span>
-                    </a>
-                </fieldset>
-            </div>
-
-            <!-- FURNACE FIELDSET -->
-            <div class="col-md-2">
-                <fieldset>
-                    <legend>Furnace Selection</legend>
-                    <label>Furnace</label>
-                    <select class="form-control" id="ddlFurnace">
-                        <option value="C">C</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                    </select>
-                </fieldset>
-            </div>
-
+    <!-- Top Section -->
+    <div class="top-section">
+        <div>
+            <label>Date</label>
+            <input type="date" id="reportDate">
         </div>
 
-        <!-- TABLE -->
-        <table id="materialTable" class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>Material</th>
-                    <th>Value (Tons)</th>
-                    <th>Value (Kgs)</th>
-                    <th>Types</th>
-                </tr>
-            </thead>
-            <tbody id="materialBody">
-            </tbody>
-        </table>
-
-        <!-- BUTTONS -->
-        <div class="mt-4">
-            <button class="btn btn-success btn-custom" onclick="SaveRawMaterialData()">Save</button>
-            <button class="btn btn-secondary btn-custom" onclick="history.back()">Back</button>
+        <div>
+            <label>Furnace</label>
+            <select id="furnaceSelect">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C" selected>C</option>
+            </select>
         </div>
 
+        <div>
+            <label>Types</label>
+            <select id="typeSelect" onchange="loadData()">
+                <option value="">-- Select Type --</option>
+                <option value="IPC">IPC</option>
+                <option value="RPC">RPC</option>
+                <option value="CURRAGH">CURRAGH</option>
+            </select>
+        </div>
     </div>
-</div>
 
-@section scripts {
-
-<script src="@Url.Content("~/bower_components/jquery/dist/jquery.min.js")"></script>
-<script src="@Url.Content("~/bower_components/bootstrap/dist/js/bootstrap.min.js")"></script>
-<script src="@Url.Content("~/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")"></script>
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Value (Tons)</th>
+                <th>Value (Kgs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Coal</td>
+                <td id="coalTons">0</td>
+                <td id="coalKgs">0</td>
+            </tr>
+            <tr>
+                <td>Nut Coke</td>
+                <td id="nutTons">0</td>
+                <td id="nutKgs">0</td>
+            </tr>
+            <tr>
+                <td>Noa Ore / LRP</td>
+                <td id="oreTons">0</td>
+                <td id="oreKgs">0</td>
+            </tr>
+            <tr>
+                <td>Sinter</td>
+                <td id="sinterTons">0</td>
+                <td id="sinterKgs">0</td>
+            </tr>
+            <tr>
+                <td>Quartz</td>
+                <td id="quartzTons">0</td>
+                <td id="quartzKgs">0</td>
+            </tr>
+        </tbody>
+    </table>
 
 <script>
-
-$(document).ready(function () {
-
-    var selectedDate = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
-
-    $('#currDate-value').text(selectedDate);
-
-    $('#date-daily').datepicker({
-        format: "dd/mm/yyyy",
-        autoclose: true,
-        todayHighlight: true
-    }).datepicker("setDate", selectedDate);
-
-    $('#date-daily').on('changeDate', function () {
-        selectedDate = $('#date-daily').datepicker('getFormattedDate');
-        $('#currDate-value').text(selectedDate);
-        Display_Material($('#ddlFurnace').val(), selectedDate);
-    });
-
-    $('#ddlFurnace').change(function () {
-        Display_Material($(this).val(), selectedDate);
-    });
-
-    Display_Material($('#ddlFurnace').val(), selectedDate);
-});
-
-
-function Display_Material(furnace, fDate) {
-
-    $.ajax({
-        url: '@Url.Action("GetRawMaterialByFurnace","HML")',
-        type: 'GET',
-        data: { furnace: furnace, fdate: fDate },
-
-        success: function (data) {
-
-            var tbody = $("#materialBody");
-            tbody.empty();
-
-            for (var i = 0; i < data.length; i++) {
-
-                tbody.append("<tr>" +
-                    "<td class='material'>" + data[i].MATERIAL + "</td>" +
-                    "<td><input type='number' step='0.001' class='ton form-control medium-textbox' value='" + (data[i].VALUE_TON || 0) + "'></td>" +
-                    "<td><input type='number' step='0.01' class='kg form-control medium-textbox' value='" + (data[i].VALUE_KG || 0) + "'></td>" +
-                    "<td>" + (data[i].TYPES || '') + "</td>" +
-                    "</tr>");
-            }
-        }
-    });
-}
-
-
-function SaveRawMaterialData() {
-
-    var dataList = [];
-    var selectedDate = $('#currDate-value').text();
-    var furnace = $('#ddlFurnace').val();
-
-    $("#materialBody tr").each(function () {
-
-        var material = $(this).find('.material').text();
-        var ton = $(this).find('.ton').val();
-        var kg = $(this).find('.kg').val();
-        var types = $(this).find('td:last-child').text();
-
-        dataList.push({
-            FDATE: selectedDate,
-            FURNACE: furnace,
-            MATERIAL: material,
-            VALUE_TON: ton,
-            VALUE_KG: kg,
-            TYPES: types
-        });
-    });
-
-    $.ajax({
-        url: '@Url.Action("SaveRawMaterial","HML")',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(dataList),
-
-        success: function () {
-            alert("Data Saved Successfully!");
+    // Sample Data (You can replace with API data)
+    const materialData = {
+        IPC: {
+            coal: 327.49,
+            nut: 120.87,
+            ore: 0,
+            sinter: 1590.73,
+            quartz: 51.74
         },
-        error: function () {
-            alert("Error while saving data.");
+        RPC: {
+            coal: 210.10,
+            nut: 95.50,
+            ore: 50.00,
+            sinter: 1300.25,
+            quartz: 40.12
+        },
+        CURRAGH: {
+            coal: 400.00,
+            nut: 150.00,
+            ore: 20.00,
+            sinter: 1700.00,
+            quartz: 60.00
         }
-    });
-}
+    };
 
+    function loadData() {
+        const selectedType = document.getElementById("typeSelect").value;
+
+        if (!materialData[selectedType]) {
+            clearTable();
+            return;
+        }
+
+        const data = materialData[selectedType];
+
+        updateRow("coal", data.coal);
+        updateRow("nut", data.nut);
+        updateRow("ore", data.ore);
+        updateRow("sinter", data.sinter);
+        updateRow("quartz", data.quartz);
+    }
+
+    function updateRow(material, tons) {
+        document.getElementById(material + "Tons").innerText = tons.toFixed(2);
+        document.getElementById(material + "Kgs").innerText = (tons * 1000).toFixed(2);
+    }
+
+    function clearTable() {
+        const ids = ["coal", "nut", "ore", "sinter", "quartz"];
+        ids.forEach(id => {
+            document.getElementById(id + "Tons").innerText = "0";
+            document.getElementById(id + "Kgs").innerText = "0";
+        });
+    }
 </script>
-}
+
+</body>
+</html>
