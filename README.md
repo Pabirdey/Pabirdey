@@ -1,199 +1,60 @@
-@section css {
-    <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap/dist/css/bootstrap.min.css")">
-    <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")">
-    <style>
-        body {
-            background-color: #f4f6f9;
-        }
+[HttpPost]
+public JsonResult SaveAllData(List<Dictionary<string, object>> data)
+{
+    string connectionString = "YOUR_CONNECTION_STRING";
 
-        .Main {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-        }
+    using (OracleConnection con = new OracleConnection(connectionString))
+    {
+        con.Open();
 
-        .page-title {
-            font-weight: 700;
-            color: #2c3e50;
-        }
+        using (OracleTransaction trans = con.BeginTransaction())
+        {
+            try
+            {
+                foreach (var row in data)
+                {
+                    string reportDate = row["REPORT_DATE"].ToString();
+                    string furnace = row["FURNACE"].ToString();
+                    int tagId = Convert.ToInt32(row["TAG_ID"]);
+                    decimal ton = Convert.ToDecimal(row["VALUE_TON"]);
+                    decimal kg = Convert.ToDecimal(row["VALUE_KG"]);
 
-        fieldset {
-            border: 2px solid #2c3e50;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
+                    using (OracleCommand cmd = new OracleCommand(@"
+                        MERGE INTO T_RAW_MATERIAL t
+                        USING (SELECT :TAG_ID TAG_ID FROM dual) s
+                        ON (t.TAG_ID = s.TAG_ID
+                            AND t.REPORT_DATE = TO_DATE(:REPORT_DATE,'YYYY-MM-DD')
+                            AND t.FURNACE = :FURNACE)
+                        WHEN MATCHED THEN
+                            UPDATE SET 
+                                t.VALUE_TON = :VALUE_TON,
+                                t.VALUE_KG = :VALUE_KG
+                        WHEN NOT MATCHED THEN
+                            INSERT (TAG_ID, REPORT_DATE, FURNACE, VALUE_TON, VALUE_KG)
+                            VALUES (:TAG_ID, TO_DATE(:REPORT_DATE,'YYYY-MM-DD'),
+                                    :FURNACE, :VALUE_TON, :VALUE_KG)
+                    ", con))
+                    {
+                        cmd.Transaction = trans;
 
-        legend {
-            font-size: 14px;
-            font-weight: bold;
-            padding: 0 10px;
-            color: #2c3e50;
-        }
+                        cmd.Parameters.Add(":TAG_ID", OracleDbType.Int32).Value = tagId;
+                        cmd.Parameters.Add(":REPORT_DATE", OracleDbType.Varchar2).Value = reportDate;
+                        cmd.Parameters.Add(":FURNACE", OracleDbType.Varchar2).Value = furnace;
+                        cmd.Parameters.Add(":VALUE_TON", OracleDbType.Decimal).Value = ton;
+                        cmd.Parameters.Add(":VALUE_KG", OracleDbType.Decimal).Value = kg;
 
-        /* ===== FLEXBOX FOR TABLES ===== */
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
-        .Consumption {
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            margin-top: 20px;
+                trans.Commit();  // ✅ All rows success
+                return Json(new { message = "All Data Saved Successfully" });
+            }
+            catch (Exception ex)
+            {
+                trans.Rollback(); // ❌ If any error, rollback everything
+                return Json(new { message = "Error: " + ex.Message });
+            }
         }
-
-        #materialTable {
-            flex: 2;
-            min-width: 40px;
-            background: white;
-        }
-
-        #types {
-            flex: 1;
-            min-width: 250px;
-            background: white;
-        }
-
-        #materialTable th {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            font-family: Courier New;
-            font-size: 16px;
-        }
-
-        #materialTable td {
-            border: 1px solid #000;
-            font-family: Courier New, monospace;
-            font-weight: bold;
-            font-size: 15px;
-        }
-
-        #types th {
-            background: #34495e;
-            color: white;
-            text-align: center;
-        }
-
-        .medium-textbox {
-            width: 100px;
-            text-align: right;
-            font-weight: bold;
-        }
-
-        .btn-custom {
-            padding: 10px 40px;
-            font-size: 15px;
-            border-radius: 8px;
-        }
-        .types tr{
-            display:none;
-        }
-    </style>
+    }
 }
-<div class="Main">
-    <div class="container">
-        <h2 class="text-center page-title mb-4">Raw Material Consumption</h2>
-        <div class="row">
-            <!-- DATE -->
-            <div class="col-md-3">
-                <fieldset>
-                    <legend>Date Selection</legend>
-                    <label>Date</label><br />
-                    <a id="date-daily" class="btn btn-primary">
-                        <span id="currDate-value"></span>
-                    </a>
-                </fieldset>
-            </div>
-            <!-- FURNACE -->
-            <div class="col-md-3">
-                <fieldset>
-                    <legend>Furnace Selection</legend>
-                    <label>Furnace</label>
-                    <select class="form-select" id="ddlFurnace">
-                        <option value="C">C</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                    </select>
-                </fieldset>
-            </div>
-        </div>
-        <!-- FLEX TABLE SECTION -->
-        <div class="Consumption">
-            <!-- MATERIAL TABLE -->
-            <table id="materialTable" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Material</th>
-                        <th>Value (Tons)</th>
-                        <th>Value (Kgs)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <!-- TYPES TABLE -->
-            <table id="types" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Types</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <select id="ddlCoal" class="form-select">
-                                <option value=""></option>
-                                <option value="IPC">IPC</option>
-                                <option value="RPC">RPC</option>
-                                <option value="Curragh(N)+Aunthra">Curragh(N)+Aunthra</option>
-                                <option value="West Bokaro">West Bokaro</option>
-                                <option value="Jellinbah">Jellinbah</option>
-                                <option value="Foxleigh">Foxleigh</option>
-                            </select>
-                        </td>                        
-                    </tr>
-                    <tr>
-                        <td>
-                            <select id="ddlIO" class="form-select">
-                                <option value=""></option>
-                                <option value="BF Sized Banspani">BF Sized Banspani</option>
-                                <option value="BF Sized Joda">BF Sized Joda</option>
-                                <option value="BF Sized Khondbond">BF Sized Khondbond</option>
-                                <option value="BF Sized Noamundi">BF Sized Noamundi</option>
-                                <option value="LD Sized Noamundi">LD Sized Noamundi</option>                                
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <select id="ddlPyro" class="form-select">
-                                <option value=""></option>
-                                <option value="Sukinda">Sukinda</option>
-                                <option value="Local">Local</option>                                
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <select id="ddlLimestone" class="form-select">
-                                <option value=""></option>
-                                <option value="Gotan">Gotan</option>
-                                <option value="SP Grade">SP Grade</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                           <label style="font-family:Courier New, Courier, monospace;font-weight:bold;font-size:15px;"><strong>Theoretical Production</strong></label><br />
-                            <input type="text" />
-                        </td>
-                    </tr>
-                </tbody>                
-            </table>
-        </div>
-        <!-- BUTTONS -->
-        <div class="text-center mt-4">
-            <button class="btn btn-primary btn-custom" onclick="SaveBFRawMaterialCons()">Save</button>
-            <button class="btn btn-secondary btn-custom">Back</button>
-        </div>
-    </div>
-</div>
