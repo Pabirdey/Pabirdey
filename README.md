@@ -1,81 +1,88 @@
 @section css {
     <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap/dist/css/bootstrap.min.css")">
     <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")">
+
     <style>
         body {
-            background-color: #f4f6f9;
+            background-color: #eef2f7;
         }
 
         .Main {
             background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .page-title {
             font-weight: 700;
-            color: #2c3e50;
+            color: #1f2d3d;
+            letter-spacing: 1px;
         }
 
         fieldset {
-            border: 2px solid #2c3e50;
+            border: 1px solid #dcdcdc;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            background: #fafafa;
         }
 
         legend {
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 600;
             padding: 0 10px;
-            color: #2c3e50;
         }
 
-        /* ===== FLEXBOX FOR TABLES ===== */
-
+        /* FLEX LAYOUT */
         .Consumption {
             display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            margin-top: 20px;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        /* LEFT TABLE */
+        #materialTableContainer {
+            flex: 2;
+            min-width: 550px;
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
         }
 
         #materialTable {
-            flex: 2;
-            min-width: 50px;
-            background: white;
+            width: 100%;
         }
 
+        /* RIGHT TABLE */
         #types {
             flex: 1;
-            min-width: 250px;
-            background: white;
+            min-width: 280px;
         }
 
-        #materialTable th {
-            background: #2c3e50;
+        /* HEADER STICKY */
+        #materialTable thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(90deg, #1f4e79, #2c3e50);
             color: white;
             text-align: center;
-            font-family: Courier New;
-            font-size: 16px;
-        }
-
-        #materialTable td {
-            border: 1px solid #000;
-            font-family: Courier New, monospace;
-            font-weight: bold;
-            font-size: 15px;
+            z-index: 2;
         }
 
         #types th {
-            background: #34495e;
+            background: linear-gradient(90deg, #34495e, #2c3e50);
             color: white;
             text-align: center;
         }
 
+        #materialTable td {
+            font-family: Courier New, monospace;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
         .medium-textbox {
-            width: 100px;
+            width: 110px;
             text-align: right;
             font-weight: bold;
         }
@@ -85,115 +92,38 @@
             font-size: 15px;
             border-radius: 8px;
         }
-        .types tr{
-            display:none;
+
+        #materialTable tbody tr:hover {
+            background-color: #f1f7ff;
+        }
+
+        /* LOADER */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.7);
+            z-index: 9999;
+            text-align: center;
+            padding-top: 300px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .Consumption {
+                flex-direction: column;
+            }
+
+            #materialTableContainer,
+            #types {
+                width: 100%;
+                min-width: 100%;
+            }
         }
     </style>
 }
-<div class="Main">
-    <div class="container">
-        <h2 class="text-center page-title mb-4">Raw Material Consumption</h2>
-        <div class="row">
-            <!-- DATE -->
-            <div class="col-md-3">
-                <fieldset>
-                    <legend>Date Selection</legend>
-                    <label>Date</label><br />
-                    <a id="date-daily" class="btn btn-primary">
-                        <span id="currDate-value"></span>
-                    </a>
-                </fieldset>
-            </div>
-            <!-- FURNACE -->
-            <div class="col-md-3">
-                <fieldset>
-                    <legend>Furnace Selection</legend>
-                    <label>Furnace</label>
-                    <select class="form-select" id="ddlFurnace">
-                        <option value="C">C</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                    </select>
-                </fieldset>
-            </div>
-        </div>
-        <!-- FLEX TABLE SECTION -->
-        <div class="Consumption">
-            <!-- MATERIAL TABLE -->
-            <table id="materialTable" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Material</th>
-                        <th>Value (Tons)</th>
-                        <th>Value (Kgs)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <!-- TYPES TABLE -->
-            <table id="types" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Types</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <select id="ddlCoal" class="form-select">
-                                <option value=""></option>
-                                <option value="IPC">IPC</option>
-                                <option value="RPC">RPC</option>
-                                <option value="Curragh(N)+Aunthra">Curragh(N)+Aunthra</option>
-                                <option value="West Bokaro">West Bokaro</option>
-                                <option value="Jellinbah">Jellinbah</option>
-                                <option value="Foxleigh">Foxleigh</option>
-                            </select>
-                        </td>                        
-                    </tr>
-                    <tr>
-                        <td>
-                            <select id="ddlIO" class="form-select">
-                                <option value=""></option>
-                                <option value="BF Sized Banspani">BF Sized Banspani</option>
-                                <option value="BF Sized Joda">BF Sized Joda</option>
-                                <option value="BF Sized Khondbond">BF Sized Khondbond</option>
-                                <option value="BF Sized Noamundi">BF Sized Noamundi</option>
-                                <option value="LD Sized Noamundi">LD Sized Noamundi</option>                                
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <select id="ddlPyro" class="form-select">
-                                <option value=""></option>
-                                <option value="Sukinda">Sukinda</option>
-                                <option value="Local">Local</option>                                
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <select id="ddlLimestone" class="form-select">
-                                <option value=""></option>
-                                <option value="Gotan">Gotan</option>
-                                <option value="SP Grade">SP Grade</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                           <label style="font-family:Courier New, Courier, monospace;font-weight:bold;font-size:15px;"><strong>Theoretical Production</strong></label><br />
-                            <input type="text" />
-                        </td>
-                    </tr>
-                </tbody>                
-            </table>
-        </div>
-        <!-- BUTTONS -->
-        <div class="text-center mt-4">
-            <button class="btn btn-primary btn-custom" onclick="SaveBFRawMaterialCons()">Save</button>
-            <button class="btn btn-secondary btn-custom">Back</button>
-        </div>
-    </div>
-</div>
