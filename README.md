@@ -1,47 +1,39 @@
-function SaveBFRawMaterialCons() {            
+$("#ddlFurnace").on("change", function () {
 
-    var materials = [];
-    var furnace = document.getElementById("ddlFurnace").value;
-    var rows = document.querySelectorAll("#materialTable tbody tr");
-
-    for (var i = 0; i < rows.length; i++) {
-
-        var tagId = rows[i].getAttribute("data-tagid");
-        var ton = parseFloat(rows[i].querySelector(".ton-input").value) || 0;
-        var materialName = rows[i].querySelector("td").innerText.trim(); // WEB_COLUMN
-
-        var finalValue;
-
-        // ✅ Condition: Furnace F AND Pellet → DO NOT multiply
-        if (furnace === "F" && materialName === "Pellet") {
-            finalValue = ton;
-        } 
-        else {
-            finalValue = ton * 1000;
-        }
-
-        materials.push({
-            TAG_ID: tagId,
-            VALUE_TON: finalValue
-        });
-    }
-
-    var data = {
-        FDate: lsSelectedFDate,
-        furnace: furnace,
-        materials: materials
-    };
+    var furnace = $(this).val();
 
     $.ajax({
-        url: '/HML/SaveBFRawMaterialData',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function (res) {
-            alert(res.message);
+        url: "/YourController/GetConsumptionData",
+        type: "POST",
+        data: { furnace: furnace },
+        success: function (data) {
+
+            for (var i = 0; i < data.length; i++) {
+
+                var item = data[i];
+
+                if (item.TYPE_NAME === "COAL") {
+                    $("#ddlCoal").val(item.DISPLAY_VALUE);
+                }
+
+                if (item.TYPE_NAME === "IOC") {
+                    $("#ddlIOC").val(item.DISPLAY_VALUE);
+                }
+
+                if (item.TYPE_NAME === "PYROX") {
+                    $("#ddlPyrox").val(item.DISPLAY_VALUE);
+                }
+
+                if (item.TYPE_NAME === "LS") {
+                    $("#ddlLS").val(item.DISPLAY_VALUE);
+                }
+
+                $("#txtTheoretical").val(item.THEORETICAL_PROD);
+            }
         },
         error: function () {
-            alert("Error saving data");
+            alert("Error loading data");
         }
     });
-}
+
+});
