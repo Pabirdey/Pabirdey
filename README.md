@@ -1,34 +1,46 @@
-$("#ddlFurnace").on("change", function () {
+<table id="tagTable" border="1">
+    <thead>
+        <tr>
+            <th>Sl No</th>
+            <th>Material</th>
+            <th>Tag Type</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+$("#ddlFurnace").change(function () {
 
     var furnace = $(this).val();
 
     $.ajax({
-        url: "/YourController/GetConsumptionData",
+        url: "/YourController/GetTagData",
         type: "POST",
         data: { furnace: furnace },
         success: function (data) {
 
+            var tbody = $("#tagTable tbody");
+            tbody.empty();
+
             for (var i = 0; i < data.length; i++) {
 
-                var item = data[i];
+                var selectedY = data[i].REQUIRED === "Y" ? "selected" : "";
+                var selectedN = data[i].REQUIRED === "N" ? "selected" : "";
 
-                if (item.TYPE_NAME === "COAL") {
-                    $("#ddlCoal").val(item.DISPLAY_VALUE);
-                }
+                var row = "<tr>" +
+                    "<td>" + data[i].WEB_SL_NO + "</td>" +
+                    "<td>" + data[i].WEB_COLUMN + "</td>" +
+                    "<td>" + data[i].TAG_TYPE + "</td>" +
+                    "<td>" +
+                    "<select>" +
+                    "<option value='Y' " + selectedY + ">Y</option>" +
+                    "<option value='N' " + selectedN + ">N</option>" +
+                    "</select>" +
+                    "</td>" +
+                    "</tr>";
 
-                if (item.TYPE_NAME === "IOC") {
-                    $("#ddlIOC").val(item.DISPLAY_VALUE);
-                }
-
-                if (item.TYPE_NAME === "PYROX") {
-                    $("#ddlPyrox").val(item.DISPLAY_VALUE);
-                }
-
-                if (item.TYPE_NAME === "LS") {
-                    $("#ddlLS").val(item.DISPLAY_VALUE);
-                }
-
-                $("#txtTheoretical").val(item.THEORETICAL_PROD);
+                tbody.append(row);
             }
         },
         error: function () {
