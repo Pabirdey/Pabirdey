@@ -1,50 +1,70 @@
-[HttpPost]
-public JsonResult GetTagData(string furnace)
-{
-    List<Dictionary<string, object>> dataList =
-        new List<Dictionary<string, object>>();
 
-    using (OracleConnection con =
-        new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
-
-        string query = @"
-            SELECT a.WEB_SL_NO,
-                   a.FUR_NAME,
-                   b.TAG_NAME AS HISTORIAN_TAG_NAME,
-                   a.WEB_COLUMN,
-                   b.TAG_TYPE,
-                   a.REQUIRED
-            FROM imtg.T_ATOF_BIN_DETAILS a,
-                 imtg.T_ATOF_PRODUCTION_TAG_MASTER b
-            WHERE a.TAG_ID = b.TAG_ID
-              AND a.FUR_NAME = :FURNACE
-              AND a.WEB_SL_NO IS NOT NULL
-              AND a.WEB_COLUMN IS NOT NULL
-            ORDER BY a.WEB_SL_NO";
-
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        {
-            cmd.Parameters.Add("FURNACE", furnace);
-
-            using (OracleDataReader dr = cmd.ExecuteReader())
-            {
-                while (dr.Read())
-                {
-                    Dictionary<string, object> row =
-                        new Dictionary<string, object>();
-
-                    row["WEB_SL_NO"] = dr["WEB_SL_NO"].ToString();
-                    row["WEB_COLUMN"] = dr["WEB_COLUMN"].ToString();
-                    row["TAG_TYPE"] = dr["TAG_TYPE"].ToString();
-                    row["REQUIRED"] = dr["REQUIRED"].ToString();
-
-                    dataList.Add(row);
-                }
-            }
-        }
-    }
-
-    return Json(dataList, JsonRequestBehavior.AllowGet);
+@{
+    Layout = null;
 }
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BF_ATOF_Bin_Details</title>
+</head>
+<body>
+    <div>
+        <div>
+            <select id="ddlFurnace">
+                <option value="C">C</option>                
+                <option value="E">E</option>
+                <option value="F">F</option>                
+            </select>
+        </div>
+        <table id="tblBinDetails" border="1">
+            <thead>
+                <tr>
+                    <th>WEB SL NO</th>
+                    <th>FUR NAME</th>
+                    <th>iHISTORIAN TAG NAME</th>
+                    <th>WEB COLUMN</th>
+                    <th>TAG TYPE</th>
+                    <th>REQUIRED</th>                    
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table> 
+    </div>
+    <script>
+    $("#ddlFurnace").change(function () {
+        var furnace = $(this).val();
+        $.ajax({
+            url: "/HML/GetATOFBinDetails",
+            type: "POST",
+            data: { furnace: furnace },
+            success: function (data) {
+                var tbody = $("#tblBinDetails tbody");
+                tbody.empty();
+                for (var i = 0; i < data.length; i++) {
+                    var selectedY = data[i].REQUIRED === "Y" ? "selected" : "";
+                    var selectedN = data[i].REQUIRED === "N" ? "selected" : "";
+                    var row = "<tr>" +
+                        "<td>" + data[i].WEB_SL_NO + "</td>" + "<td>" + data[i].FUR_NAME +
+                        "</td>" + "<td>" + data[i].TAG_NAME + "</td>" + "<td>" + data[i].WEB_COLUMN +
+                        "</td>" + "<td>" + data[i].TAG_TYPE + "</td>" + "<td>" + data[i].REQUIRED +
+                        "</td>" + "<td>" + data[i].TAG_TYPE + "</td>" + "<td>" +
+                        "<select>" + "<option value='Y' " + selectedY + ">Y</option>" +
+                        "<option value='N' " + selectedN + ">N</option>" +
+                        "</select>" +
+                        "</td>" +
+                        "</tr>";
+                    tbody.append(row);
+                }
+            },
+            error: function () {
+                alert("Error loading data");
+            }
+        });
+
+    });
+    </script>
+</body>
+</html>
