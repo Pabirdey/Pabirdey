@@ -1,51 +1,50 @@
-<table id="tagTable" border="1">
-    <thead>
-        <tr>
-            <th>Sl No</th>
-            <th>Material</th>
-            <th>Tag Type</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+[HttpPost]
+public JsonResult GetTagData(string furnace)
+{
+    List<Dictionary<string, object>> dataList =
+        new List<Dictionary<string, object>>();
 
-$("#ddlFurnace").change(function () {
+    using (OracleConnection con =
+        new OracleConnection(iMonitorWebUtils.msConRWString))
+    {
+        con.Open();
 
-    var furnace = $(this).val();
+        string query = @"
+            SELECT a.WEB_SL_NO,
+                   a.FUR_NAME,
+                   b.TAG_NAME AS HISTORIAN_TAG_NAME,
+                   a.WEB_COLUMN,
+                   b.TAG_TYPE,
+                   a.REQUIRED
+            FROM imtg.T_ATOF_BIN_DETAILS a,
+                 imtg.T_ATOF_PRODUCTION_TAG_MASTER b
+            WHERE a.TAG_ID = b.TAG_ID
+              AND a.FUR_NAME = :FURNACE
+              AND a.WEB_SL_NO IS NOT NULL
+              AND a.WEB_COLUMN IS NOT NULL
+            ORDER BY a.WEB_SL_NO";
 
-    $.ajax({
-        url: "/YourController/GetTagData",
-        type: "POST",
-        data: { furnace: furnace },
-        success: function (data) {
+        using (OracleCommand cmd = new OracleCommand(query, con))
+        {
+            cmd.Parameters.Add("FURNACE", furnace);
 
-            var tbody = $("#tagTable tbody");
-            tbody.empty();
+            using (OracleDataReader dr = cmd.ExecuteReader())
+            {
+                while (dr.Read())
+                {
+                    Dictionary<string, object> row =
+                        new Dictionary<string, object>();
 
-            for (var i = 0; i < data.length; i++) {
+                    row["WEB_SL_NO"] = dr["WEB_SL_NO"].ToString();
+                    row["WEB_COLUMN"] = dr["WEB_COLUMN"].ToString();
+                    row["TAG_TYPE"] = dr["TAG_TYPE"].ToString();
+                    row["REQUIRED"] = dr["REQUIRED"].ToString();
 
-                var selectedY = data[i].REQUIRED === "Y" ? "selected" : "";
-                var selectedN = data[i].REQUIRED === "N" ? "selected" : "";
-
-                var row = "<tr>" +
-                    "<td>" + data[i].WEB_SL_NO + "</td>" +
-                    "<td>" + data[i].WEB_COLUMN + "</td>" +
-                    "<td>" + data[i].TAG_TYPE + "</td>" +
-                    "<td>" +
-                    "<select>" +
-                    "<option value='Y' " + selectedY + ">Y</option>" +
-                    "<option value='N' " + selectedN + ">N</option>" +
-                    "</select>" +
-                    "</td>" +
-                    "</tr>";
-
-                tbody.append(row);
+                    dataList.Add(row);
+                }
             }
-        },
-        error: function () {
-            alert("Error loading data");
         }
-    });
+    }
 
-});
+    return Json(dataList, JsonRequestBehavior.AllowGet);
+}
