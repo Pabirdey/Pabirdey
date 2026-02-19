@@ -1,238 +1,102 @@
-<style>
-    .datepicker-days thead th {
-        color: #000 !important;
-        background-color: #f8f9fa !important;
-        font-weight: bold;
-    }
-
-    .datepicker {
-        z-index: 1055 !important;
-    }
-
-    body {
-        background-color: #f4f6f9;
-    }
-
-    .Main {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 10px;
-    }
-
-    .Main-Heading {
-        font-family: Allan, cursive;
-        font-weight: bold;
-        font-size: 6vh;
-        text-align: center;
-        padding: 20px;
-        color: rgb(57,57,57);
-        margin: 20px 0;
-    }
-
-    .Consumption {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
-
-    #materialTable {
-        flex: 0 0 550px;
-        max-width: 550px;
-        background: white;
-        font-family: Courier New;
-    }
-
-    #types {
-        flex: 0 0 310px;
-        max-width: 310px;
-        background: white;
-        border: 1px solid;
-    }
-
-    #materialTable th {
-        background: #8d15aa;
-        color: white;
-        text-align: center;
-    }
-
-    #materialTable td {
-        border: 1px solid #000;
-        font-weight: bold;
-    }
-
-    #types th {
-        background: #8d15aa;
-        color: white;
-        text-align: center;
-    }
-
-    #types .btn {
-        min-width: 90px;
-        font-weight: bold;
-        font-family: Courier New;
-    }
-
-    .medium-textbox {
-        width: 100px;
-        text-align: right;
-        font-weight: bold;
-    }
-</style>
-
-
-<div class="Main">
-    <div class="container">
-
-        <h2 class="Main-Heading">Raw Material Consumption</h2>
-
-        <!-- FLEX SECTION -->
-        <div class="Consumption">
-
-            <!-- MATERIAL TABLE -->
-            <table id="materialTable" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Material</th>
-                        <th>Value (Tons)</th>
-                        <th>Value (Kgs)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Coke</td>
-                        <td><input type="text" class="medium-textbox" /></td>
-                        <td><input type="text" class="medium-textbox" /></td>
-                    </tr>
-                </tbody>
-            </table>
-
-
-            <!-- TYPES TABLE -->
-            <table id="types" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Types</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    <!-- Coal -->
-                    <tr>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <select id="ddlCoal" class="form-select">
-                                    <option value=""></option>
-                                    <option>IPC</option>
-                                    <option>RPC</option>
-                                    <option>Curragh(N)+Aunthra</option>
-                                    <option>West Bokaro</option>
-                                    <option>Jellinbah</option>
-                                    <option>Foxleigh</option>
+<div class="modal fade" id="mgClayOtherModal" tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center">Bin Details Master</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- BODY -->
+                <div class="modal-body">
+                    <div class="title-box">Weightage of Clay</div>
+                    <div class="clay-box">
+                        <!-- Clay 1 (DROPDOWN) -->
+                        <div class="row align-items-center mb-3">
+                            <div class="col-2 clay-label">Clay1</div>
+                            <div class="col-7">
+                                <select class="form-select clay-input" id="MG_CLAY1">
+                                    <option value="">-- Select Clay1 --</option>
+                                    <option>ACE</option>                                   
                                 </select>
-                                <span style="font-weight:bold;">(Coal)</span>
                             </div>
-                        </td>
-                    </tr>
-
-                    <!-- I/O -->
-                    <tr>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <select id="ddlIO" class="form-select">
-                                    <option value=""></option>
-                                    <option>BF Sized Banspani</option>
-                                    <option>BF Sized Joda</option>
-                                    <option>BF Sized Khondbond</option>
-                                    <option>BF Sized Noamundi</option>
-                                    <option>LD Sized Noamundi</option>
+                            <div class="col-3">
+                                <select class="form-select clay-input" id="P1">
+                                    <option value="">%</option>
+                                    <option>5</option>                                   
                                 </select>
-                                <span style="font-weight:bold;">(I/O)</span>
                             </div>
-                        </td>
-                    </tr>
-
-                    <!-- Pyrox -->
-                    <tr>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <select id="ddlPyro" class="form-select">
-                                    <option value=""></option>
-                                    <option>Sukinda</option>
-                                    <option>Local</option>
+                        </div>
+                        <!-- Clay 2 -->
+                        <div class="row align-items-center mb-3">
+                            <div class="col-2 clay-label">Clay2</div>
+                            <div class="col-7">
+                                <select class="form-select clay-input" id="MG_CLAY2">
+                                    <option value="">-- Select Clay2 --</option>
+                                    <option>ACE</option>                                   
                                 </select>
-                                <span style="font-weight:bold;">(Pyrox)</span>
                             </div>
-                        </td>
-                    </tr>
-
-                    <!-- Limestone -->
-                    <tr>
-                        <td>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <select id="ddlLimestone" class="form-select">
-                                    <option value=""></option>
-                                    <option>Gotan</option>
-                                    <option>SP Grade</option>
+                            <div class="col-3">
+                                <select class="form-select clay-input" id="P2">
+                                    <option value="">%</option>
+                                    <option>5</option>                                   
                                 </select>
-                                <span style="font-weight:bold;">(L/S)</span>
                             </div>
-                        </td>
-                    </tr>
-
-                    <!-- Theoretical Production -->
-                    <tr>
-                        <td>
-                            <label style="font-weight:bold;font-size:16px;">
-                                Theoretical Production
-                            </label><br />
-                            <input type="text" class="form-control" />
-                        </td>
-                    </tr>
-
-                    <!-- BUTTONS ROW -->
-                    <tr>
-                        <td style="text-align:center;padding-top:15px;">
-                            <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-                                <button class="btn btn-success"
-                                        onclick="SaveBFRawMaterialCons()">
-                                    Save
-                                </button>
-
-                                <button class="btn btn-warning"
-                                        onclick="goToBinDetails()">
-                                    Bin Details
-                                </button>
-
-                                <button class="btn btn-primary"
-                                        onclick="goBack()">
-                                    Back
-                                </button>
+                        </div>
+                        <!-- Clay 3 -->
+                        <div class="row align-items-center">
+                            <div class="col-2 clay-label">Clay3</div>
+                            <div class="col-7">
+                                <select class="form-select clay-input" id="MG_CLAY3">
+                                    <option value="">-- Select Clay3 --</option>
+                                    <option>ACE</option>                                   
+                                </select>
                             </div>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-
+                            <div class="col-3">
+                                <select class="form-select clay-input" id="P3">
+                                    <option value="">%</option>
+                                    <option>5</option>                                   
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- FOOTER -->
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-save" onclick="checkClay()">Save</button>
+                    <button class="btn btn-exit" data-bs-dismiss="modal">Exit</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
+     function goToBinDetails() {
+            var Bin_Required = [];
+            var furnace = document.getElementById("ddlFurnace").value;
+            var rows = document.querySelectorAll("#tblBinDetails tbody tr");
+            for (var i = 0; i < rows.length; i++) {
+                var Web_Id = rows[i].getAttribute("data-tagid");
+                var Required = rows[i].querySelector("td").innerText.trim();
+                Bin_Required.push({
+                    Web_Id: Web_Id,
+                    Required: Required
+                });
+            }
+            var data = {
+                furnace: furnace,
+                SL_NO: Web_Id,
+                Bin_Required: Bin_Required
+            };
 
-<script>
-    function SaveBFRawMaterialCons() {
-        alert("Data Saved Successfully!");
-        // Yaha AJAX call laga sakte ho
-    }
-
-    function goToBinDetails() {
-        // MVC Navigation example
-        window.location.href = '/YourController/BinDetails';
-    }
-
-    function goBack() {
-        window.history.back();
-    }
-</script>
+            $.ajax({
+                url: '/HML/SaveATOFBinRequired',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    alert(res.message);
+                },
+                error: function () {
+                    alert("Error saving data");
+                }
+            });
+        }
