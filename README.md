@@ -1,50 +1,31 @@
-<script>
+public JsonResult GetTagValue(string tagId)
+{
+    string value = "";
+    string timestamp = "";
 
-$(document).ready(function () {
+    string constr = ConfigurationManager.ConnectionStrings["OracleDb"].ConnectionString;
 
-    // Call function when dropdown changes
-    $("#ddlFurnaceModal").change(function () {
-        var furnace = $(this).val();
-        loadFurnaceData(furnace);
-    });
+    using (OracleConnection con = new OracleConnection(constr))
+    {
+        con.Open();
 
-});
+        string query = @"SELECT TIMESTAMP, VALUE 
+                         FROM t_furnaces_proc_hm_prod 
+                         WHERE TIMESTAMP = TO_DATE('24-FEB-2026','DD-MON-YYYY') 
+                         AND TAG_ID = :tagId";
 
+        using (OracleCommand cmd = new OracleCommand(query, con))
+        {
+            cmd.Parameters.Add("tagId", tagId);
 
-// ✅ Separate reusable function
-function loadFurnaceData(furnace) {
-
-    $.ajax({
-        url: '/YourController/GetFurnaceData',
-        type: 'GET',
-        data: { furNo: furnace },
-        success: function (data) {
-
-            if (data != null) {
-                $("#txtCoalType").val(data.COAL_TYPE || "");
-                $("#txtIOType").val(data.IO_TYPE || "");
-                $("#txtPyroType").val(data.PYROXINITE_TYPE || "");
-                $("#txtLimeType").val(data.LIMESTONE_TYPE || "");
+            OracleDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                timestamp = dr["TIMESTAMP"].ToString();
+                value = dr["VALUE"].ToString();
             }
-            else {
-                clearFurnaceFields();
-            }
-        },
-        error: function (xhr, status, error) {
-            console.log(error);
         }
-    });
+    }
 
+    return Json(new { timestamp = timestamp, value = value }, JsonRequestBehavior.AllowGet);
 }
-
-
-// ✅ Optional clear function (clean practice)
-function clearFurnaceFields() {
-    $("#txtCoalType").val("");
-    $("#txtIOType").val("");
-    $("#txtPyroType").val("");
-    $("#txtLimeType").val("");
-}
-
-</script>
-
