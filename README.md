@@ -1,31 +1,20 @@
-public JsonResult GetTagValue(string tagId)
-{
-    string value = "";
-    string timestamp = "";
-
-    string constr = ConfigurationManager.ConnectionStrings["OracleDb"].ConnectionString;
-
-    using (OracleConnection con = new OracleConnection(constr))
-    {
-        con.Open();
-
-        string query = @"SELECT TIMESTAMP, VALUE 
-                         FROM t_furnaces_proc_hm_prod 
-                         WHERE TIMESTAMP = TO_DATE('24-FEB-2026','DD-MON-YYYY') 
-                         AND TAG_ID = :tagId";
-
-        using (OracleCommand cmd = new OracleCommand(query, con))
+public JsonResult GetTheoreticalProd(string FDate)
         {
-            cmd.Parameters.Add("tagId", tagId);
-
-            OracleDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
+            string value = "";                       
+            using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
             {
-                timestamp = dr["TIMESTAMP"].ToString();
-                value = dr["VALUE"].ToString();
+                con.Open();
+                string query = @"SELECT VALUE  FROM imtg.T_FURNACES_PROC_HM_PROD  WHERE TIMESTAMP = TO_DATE(':FDate','DD/MM/YYYY') AND TAG_ID =10426";
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.Parameters.Add("FDate", FDate);
+                    OracleDataReader dr = cmd.ExecuteReader();
+                    if (dr.Read())
+                    {                      
+                        value = dr["VALUE"].ToString();
+                    }
+                }
             }
-        }
-    }
 
-    return Json(new { timestamp = timestamp, value = value }, JsonRequestBehavior.AllowGet);
-}
+            return Json(new {value = value }, JsonRequestBehavior.AllowGet);
+        }
