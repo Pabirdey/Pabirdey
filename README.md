@@ -1,39 +1,36 @@
-public JsonResult GetFurnaceData(string furNo)
-{
-    string conStr = ConfigurationManager.ConnectionStrings["OracleDB"].ConnectionString;
+<script>
+$(document).ready(function () {
 
-    using (OracleConnection con = new OracleConnection(conStr))
-    {
-        con.Open();
+    $("#ddlFurnaceModal").change(function () {
 
-        string query = @"SELECT COAL_TYPE, IO_TYPE, PYROXINITE_TYPE, LIMESTONE_TYPE
-                         FROM DEMO.T_BF_PRODUCTION_TEST
-                         WHERE TIMESTAMP = (
-                            SELECT MAX(TIMESTAMP)
-                            FROM DEMO.T_BF_PRODUCTION_TEST
-                            WHERE FUR_NO = :furNo
-                            AND IO_TYPE IS NOT NULL)
-                         AND FUR_NO = :furNo";
+        var furnace = $(this).val();
 
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        {
-            cmd.Parameters.Add("furNo", furNo);
+        $.ajax({
+            url: '/YourController/GetFurnaceData',
+            type: 'GET',
+            data: { furNo: furnace },
+            success: function (data) {
 
-            using (OracleDataReader dr = cmd.ExecuteReader())
-            {
-                if (dr.Read())
-                {
-                    return Json(new
-                    {
-                        COAL_TYPE = dr["COAL_TYPE"].ToString(),
-                        IO_TYPE = dr["IO_TYPE"].ToString(),
-                        PYROXINITE_TYPE = dr["PYROXINITE_TYPE"].ToString(),
-                        LIMESTONE_TYPE = dr["LIMESTONE_TYPE"].ToString()
-                    }, JsonRequestBehavior.AllowGet);
+                if (data != null) {
+                    $("#txtCoalType").val(data.COAL_TYPE || "");
+                    $("#txtIOType").val(data.IO_TYPE || "");
+                    $("#txtPyroType").val(data.PYROXINITE_TYPE || "");
+                    $("#txtLimeType").val(data.LIMESTONE_TYPE || "");
                 }
-            }
-        }
-    }
+                else {
+                    $("#txtCoalType").val("");
+                    $("#txtIOType").val("");
+                    $("#txtPyroType").val("");
+                    $("#txtLimeType").val("");
+                }
 
-    return Json(null, JsonRequestBehavior.AllowGet);
-}
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+    });
+
+});
+</script>
