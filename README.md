@@ -1,34 +1,28 @@
-   public JsonResult GetTheoreticalProd(string FDate)
-        {
-            string value = "";                       
+  public JsonResult GetFurnaceWiseTypeData(string furnace, string FDate)
+        {           
             using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
             {
                 con.Open();
-                string query = @"SELECT VALUE  FROM imtg.T_FURNACES_PROC_HM_PROD  WHERE TRUNC(TIMESTAMP) =:FDate AND TAG_ID =10426";
+                string query = @"SELECT COAL_TYPE,IO_TYPE,PYROXINITE_TYPE,LIMESTONE_TYPE FROM DEMO.T_BF_PRODUCTION_TEST WHERE TIMESTAMP =(SELECT MAX(TIMESTAMP) FROM DEMO.T_BF_PRODUCTION_TEST WHERE FUR_NO =:furnace AND TIMESTAMP<=to_date(:FDate,'DD/MM/YYYY') AND IO_TYPE IS NOT NULL) AND FUR_NO = :furnace";
                 using (OracleCommand cmd = new OracleCommand(query, con))
                 {
-                    cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value= FDate;
-                    OracleDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                    {                      
-                        value = dr["VALUE"].ToString();
+                    cmd.Parameters.Add("furnace", furnace);
+                    cmd.Parameters.Add("FDate", FDate);
+                    using (OracleDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            return Json(new
+                            {
+                                COAL_TYPE = dr["COAL_TYPE"].ToString(),
+                                IO_TYPE = dr["IO_TYPE"].ToString(),
+                                PYROXINITE_TYPE = dr["PYROXINITE_TYPE"].ToString(),
+                                LIMESTONE_TYPE = dr["LIMESTONE_TYPE"].ToString()
+                            }, JsonRequestBehavior.AllowGet);
+                        }
                     }
                 }
             }
 
-            return Json(new {value = value }, JsonRequestBehavior.AllowGet);
-        }
-          function Display_Theoretical_Prod(fDate) {
-            debugger;
-            $.ajax({
-                url: '/HML/GetTheoreticalProd',
-                type: 'GET',
-                data: {fdate: fDate },
-                success: function (response) {
-                    $("#txtTheoretical").val(response.value);
-                },
-                error: function (error) {
-                    console.log(error);
-                }                
-            });
+            return Json(null, JsonRequestBehavior.AllowGet);
         }
