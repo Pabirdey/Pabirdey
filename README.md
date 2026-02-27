@@ -9,17 +9,15 @@
 
 <body class="bg-light">
 
-<div class="container-fluid py-4">
-
+<div class="container py-4">
     <div class="card shadow-lg rounded-4">
         <div class="card-body">
-
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="d-flex align-items-center gap-3">
                     <h4 class="fw-bold mb-0">Production</h4>
                     <label class="fw-semibold">Date</label>
-                    <input type="date" class="form-control" style="width:200px" value="2026-02-26">
+                    <input type="date" class="form-control" style="width:150px" value="2026-02-26">
                 </div>
 
                 <button class="btn btn-primary">Refresh Balance</button>
@@ -35,8 +33,8 @@
                             <th>Furnace</th>
                             <th>On Date</th>
                             <th>To Date</th>
-                            <th>Plan On Date</th>
-                            <th>Plan To Date</th>
+                            <th>On Date</th>
+                            <th>To Date</th>
                             <th>Balance</th>
                         </tr>
                     </thead>
@@ -114,7 +112,7 @@
                         </tr>
 
                         <!-- Summary Rows -->
-                        <tr class="table-secondary fw-bold">
+                        <tr class="table-secondary">
                             <td></td>
                             <td>A-F</td>
                             <td>7429.41</td>
