@@ -5,16 +5,24 @@
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .page-wrapper {
+            max-width: 900px;   /* Small professional width */
+            margin: auto;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
 
-<div class="container py-4">
+<div class="container py-4 page-wrapper">
     <div class="card shadow-lg rounded-4">
         <div class="card-body">
+
             <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center gap-3">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
                     <h4 class="fw-bold mb-0">Production</h4>
                     <label class="fw-semibold">Date</label>
                     <input type="date" class="form-control" style="width:150px" value="2026-02-26">
@@ -40,13 +48,12 @@
                     </thead>
 
                     <tbody>
-                        <!-- Furnace Rows -->
                         <tr>
                             <td>26-Feb-2026</td>
                             <td>C</td>
                             <td>2094.49</td>
                             <td>50700.21</td>
-                            <td><input type="text" class="form-control text-center" value="2100"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="2100"></td>
                             <td>50500</td>
                             <td class="fw-bold text-success">200.21</td>
                         </tr>
@@ -56,7 +63,7 @@
                             <td>D</td>
                             <td>-</td>
                             <td>-</td>
-                            <td><input type="text" class="form-control text-center"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center"></td>
                             <td>-</td>
                             <td>-</td>
                         </tr>
@@ -66,7 +73,7 @@
                             <td>E</td>
                             <td>1227.7</td>
                             <td>29949.52</td>
-                            <td><input type="text" class="form-control text-center" value="1200"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="1200"></td>
                             <td>30200</td>
                             <td class="fw-bold text-danger">-250.48</td>
                         </tr>
@@ -76,7 +83,7 @@
                             <td>F</td>
                             <td>4107.22</td>
                             <td>105014.29</td>
-                            <td><input type="text" class="form-control text-center" value="4100"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="4100"></td>
                             <td>105900</td>
                             <td class="fw-bold text-danger">-885.71</td>
                         </tr>
@@ -86,7 +93,7 @@
                             <td>G</td>
                             <td>2609.38</td>
                             <td>148145.01</td>
-                            <td><input type="text" class="form-control text-center" value="2700"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="2700"></td>
                             <td>148200</td>
                             <td class="fw-bold text-danger">-54.99</td>
                         </tr>
@@ -96,7 +103,7 @@
                             <td>H</td>
                             <td>8677.83</td>
                             <td>216254.89</td>
-                            <td><input type="text" class="form-control text-center" value="8750"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="8750"></td>
                             <td>216800</td>
                             <td class="fw-bold text-danger">-545.11</td>
                         </tr>
@@ -106,13 +113,13 @@
                             <td>I</td>
                             <td>9195.35</td>
                             <td>214289.53</td>
-                            <td><input type="text" class="form-control text-center" value="9100"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="9100"></td>
                             <td>214900</td>
                             <td class="fw-bold text-danger">-610.47</td>
                         </tr>
 
-                        <!-- Summary Rows -->
-                        <tr class="table-secondary">
+                        <!-- Summary -->
+                        <tr class="table-secondary fw-bold">
                             <td></td>
                             <td>A-F</td>
                             <td>7429.41</td>
@@ -182,8 +189,8 @@
                             <td></td>
                             <td>985.66</td>
                             <td></td>
-                            <td><input type="text" class="form-control text-center" value="35.35"></td>
-                            <td><input type="text" class="form-control text-center"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center" value="35.35"></td>
+                            <td><input type="text" class="form-control form-control-sm text-center"></td>
                         </tr>
 
                         <tr>
@@ -227,21 +234,20 @@
 
             <!-- Buttons -->
             <div class="text-end mt-3">
-                <button class="btn btn-success">Calculate Now</button>
+                <button class="btn btn-success btn-sm">Calculate Now</button>
             </div>
 
-            <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
-                <button class="btn btn-outline-primary">Save</button>
-                <button class="btn btn-outline-secondary">Back</button>
-                <button class="btn btn-outline-info">Raw Mat Cons</button>
-                <button class="btn btn-outline-warning">Prod Details</button>
-                <button class="btn btn-outline-dark">HM Distribution</button>
-                <button class="btn btn-outline-danger">Delay Details</button>
+            <div class="d-flex justify-content-center gap-2 flex-wrap mt-4">
+                <button class="btn btn-outline-primary btn-sm">Save</button>
+                <button class="btn btn-outline-secondary btn-sm">Back</button>
+                <button class="btn btn-outline-info btn-sm">Raw Mat Cons</button>
+                <button class="btn btn-outline-warning btn-sm">Prod Details</button>
+                <button class="btn btn-outline-dark btn-sm">HM Distribution</button>
+                <button class="btn btn-outline-danger btn-sm">Delay Details</button>
             </div>
 
         </div>
     </div>
-
 </div>
 
 </body>
