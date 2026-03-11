@@ -1,5 +1,31 @@
- <div class="mb-2">
-                                    <button type="button" class="btnSaveCastHouse" onclick="SaveCastHouseData()">Save</button>
-                                    <button type="button" class="btnHMLogistics" onclick="gotoHMLPage()">HML</button>
-                                    @Html.ActionLink("HML Ladle", "HML_Ladle_Details", "HML", new { bf = @urlBF }, new { @class = "btn btn-custom" })
-                                </div>     
+CREATE OR REPLACE TRIGGER TRG_PILE_RAWMAT_LOG
+AFTER INSERT OR UPDATE OR DELETE
+ON T_PILE_RAWMAT_QUANTITY_NEW
+FOR EACH ROW
+BEGIN
+
+    IF INSERTING THEN
+    
+        INSERT INTO T_PILE_RAWMAT_LOG
+        (PILE_NO, PREP_START_DATE, PREP_END_DATE, CONS_ST_DATE, SOURCE, ACTION_TYPE, ACTION_DATE)
+        VALUES
+        (:NEW.PILE_NO, :NEW.PREP_START_DATE, :NEW.PREP_END_DATE, :NEW.CONS_ST_DATE, :NEW.SOURCE, 'INSERT', SYSDATE);
+
+    ELSIF UPDATING THEN
+    
+        INSERT INTO T_PILE_RAWMAT_LOG
+        (PILE_NO, PREP_START_DATE, PREP_END_DATE, CONS_ST_DATE, SOURCE, ACTION_TYPE, ACTION_DATE)
+        VALUES
+        (:NEW.PILE_NO, :NEW.PREP_START_DATE, :NEW.PREP_END_DATE, :NEW.CONS_ST_DATE, :NEW.SOURCE, 'UPDATE', SYSDATE);
+
+    ELSIF DELETING THEN
+    
+        INSERT INTO T_PILE_RAWMAT_LOG
+        (PILE_NO, PREP_START_DATE, PREP_END_DATE, CONS_ST_DATE, SOURCE, ACTION_TYPE, ACTION_DATE)
+        VALUES
+        (:OLD.PILE_NO, :OLD.PREP_START_DATE, :OLD.PREP_END_DATE, :OLD.CONS_ST_DATE, :OLD.SOURCE, 'DELETE', SYSDATE);
+
+    END IF;
+
+END;
+/
