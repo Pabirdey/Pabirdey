@@ -1,32 +1,76 @@
-  For k in(SELECT TIMESTAMP,FURNACE,ACTUAL,REPORTED,BALANCE From Demo.T_BF_PRODUCTION_TRACKING Where TIMESTAMP=vDATE AND FURNACE in ('C','E','F') Order by FURNACE)
-    Loop
-        Begin
-            Select COUNT(*) into vCount From demo.T_BF_PRODUCTION_BALANCE Where TIMESTAMP=k.TIMESTAMP AND FUR_NAME=K.FURNACE;
-             IF vCount=0 Then      
-                    Insert into demo.T_BF_PRODUCTION_BALANCE(TIMESTAMP,FUR_NAME,ACTUAL_ONDT,REPORTED_ONDT,BALANCE)
-                    VALUES(K.TIMESTAMP,K.FURNACE,K.ACTUAL,K.REPORTED,K.BALANCE);                         
-             Else
-                Update Demo.T_BF_PRODUCTION_BALANCE SET
-                    ACTUAL_ONDT=k.ACTUAL,
-                    REPORTED_ONDT=k.REPORTED,
-                    BALANCE=k.BALANCE
-                WHERE TIMESTAMP=K.TIMESTAMP AND FUR_NAME=K.FURNACE;                
-            End If;   
-        Exception
-        When Others Then null;        
-        End;        
-    End Loop;
-    COMMIT;   
-    
-  FOR k in (SELECT TIMESTAMP,FURNACE,decode(sum(ACTUAL),0,Null,sum(ACTUAL))ACTUAL_TODT,decode(sum(REPORTED),0,Null,sum(REPORTED))REPORTED_TODT From Demo.T_BF_PRODUCTION_TRACKING Where TIMESTAMP>=V_TODT AND TIMESTAMP<=vDATE  AND FURNACE in ('C','E','F') GROUP BY FURNACE,TIMESTAMP Order by FURNACE)
-  LOOP
-        BEGIN
-            UPDATE demo.T_BF_PRODUCTION_BALANCE SET
-                            ACTUAL_TODT=k.ACTUAL_TODT,
-                            REPORTED_TODT=k.REPORTED_TODT
-            WHERE TIMESTAMP=k.TIMESTAMP AND FUR_NAME=K.FURNACE;                    
-        EXCEPTION
-        WHEN OTHERS THEN NULL;
-        END;
-  END LOOP;
-COMMIT;
+@model iMonitor_Web.Models.BF_Production
+@{
+    Layout = null;
+}@*Created BY:- Pabir Kumar Dey
+    Created Date:-25-march-2026
+    Requested By:-Gaurav Sir.*@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BF Production</title>
+    <!-- Bootstrap 5 -->    
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/css/all.min.css" rel="stylesheet" />
+    <style>
+        .page-wrapper {
+            max-width: 900px; 
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="container py-4 page-wrapper">                           
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h4 class="fw-bold mb-0" style="font-family:Allan,cursive;">Production</h4>
+                        <label class="fw-semibold">Date</label>
+                        <input type="date" class="form-control" style="width:150px" value="2026-02-26">
+                    </div>
+                </div>
+                <!-- ===================== MAIN TABLE ===================== -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center align-middle" style="font-family:'Courier New', Courier, monospace;">
+                        <thead>
+                            <tr>
+                                <th>Date Time</th>
+                                <th>Furnace</th>
+                                <th>On Date</th>
+                                <th>To Date</th>
+                                <th>On Date</th>
+                                <th>To Date</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- ===================== ACTUAL BREAKUP ===================== -->
+                <h5 class="mt-4 mb-3 fw-bold border-bottom pb-2" style="font-family:Allan,cursive;">Actual Breakup</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center align-middle" style="font-family:'Courier New', Courier, monospace;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>LD1 Tons</th>
+                                <th>LD2 Tons</th>
+                                <th>LD3 Tons</th>
+                                <th>MRD TP Tons</th>
+                                <th>No of TP</th>
+                                <th>No of Slag Ladle</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- Buttons -->
+                <div class="text-center mt-3">
+                    <button class="btn btn-success btn-sm">Save</button>
+                    <button class="btn btn-info btn-sm">Back</button>
+                    <button class="btn btn-primary btn-sm">Raw Mat Cons</button>
+                    <button class="btn btn-success btn-sm">Calculate Now</button>
+                </div>                   
+        
+    </div>
+</body>
+</html>
