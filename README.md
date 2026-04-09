@@ -1,3 +1,22 @@
+@model iMonitor_Web.Models.BF_Production
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BF Production</title>
+    <!-- Bootstrap 5 -->    
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/css/all.min.css" rel="stylesheet" />
+    <style>
+        .page-wrapper {
+            max-width: 900px; 
+            margin: auto;
+        }
+    </style>
+</head>
 <body class="bg-white">
     <div class="container py-4 page-wrapper">                           
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -39,12 +58,12 @@
                             <td><input class="form-control" type="text" readonly value="@Model.EBF_Balance" name="EBF_Balance" id="EBF_Balance" /></td>  
                         </tr>                        
                         <tr>                            
-                            <td><input class="form-control" type="text" readonly value="@Model.EBF_Furnace" name="FBF_Furnace" id="FBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.EBF_ActOnDate" name="FBF_ActOnDate" id="FBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.EBF_ActToDate" name="FBF_ActToDate" id="FBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.EBF_ReportOnDate" name="FBF_ReportOnDate" id="FBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.EBF_ReportToDate" name="FBF_ReportToDate" id="FBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.EBF_Balance" name="FBF_Balance" id="FBF_Balance" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.FBF_Furnace" name="FBF_Furnace" id="FBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.FBF_ActOnDate" name="FBF_ActOnDate" id="FBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.FBF_ActToDate" name="FBF_ActToDate" id="FBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.FBF_ReportOnDate" name="FBF_ReportOnDate" id="FBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.FBF_ReportToDate" name="FBF_ReportToDate" id="FBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.FBF_Balance" name="FBF_Balance" id="FBF_Balance" /></td>
                         </tr>
                         <tr>
                             <td><input class="form-control" type="text" readonly value="@Model.GBF_Furnace" name="GBF_Furnace" id="GBF_Furnace" /></td>
@@ -99,59 +118,7 @@
                 <button class="btn btn-primary btn-sm">Raw Mat Cons</button>
                 <button class="btn btn-success btn-sm">Calculate Now</button>
             </div>
-
-
+            </form>
+</div>
 </body>
-
-
-
- public class BF_Production
-    {
-        public string DateTime { get; set; }
-        public string CBF_Furnace { get; set; }
-        public string CBF_ActOnDate { get; set; }
-        public string CBF_ActToDate { get; set; }
-        public string CBF_ReportOnDate { get; set; }
-        public string CBF_ReportToDate { get; set; }
-        public string CBF_Balance { get; set; }
-
-        public string EBF_Furnace { get; set; }
-        public string EBF_ActOnDate { get; set; }
-        public string EBF_ActToDate { get; set; }
-        public string EBF_ReportOnDate { get; set; }
-        public string EBF_ReportToDate { get; set; }
-        public string EBF_Balance { get; set; }
-
-        public string FBF_Furnace { get; set; }
-        public string FBF_ActOnDate { get; set; }
-        public string FBF_ActToDate { get; set; }
-        public string FBF_ReportOnDate { get; set; }
-        public string FBF_ReportToDate { get; set; }
-        public string FBF_Balance { get; set; }
-
-        public string GBF_Furnace { get; set; }
-        public string GBF_ActOnDate { get; set; }
-        public string GBF_ActToDate { get; set; }
-        public string GBF_ReportOnDate { get; set; }
-        public string GBF_ReportToDate { get; set; }
-        public string GBF_Balance { get; set; }
-
-        public string HBF_Furnace { get; set; }
-        public string HBF_ActOnDate { get; set; }
-        public string HBF_ActToDate { get; set; }
-        public string HBF_ReportOnDate { get; set; }
-        public string HBF_ReportToDate { get; set; }
-        public string HBF_Balance { get; set; }
-
-        public string IBF_Furnace { get; set; }
-        public string IBF_ActOnDate { get; set; }
-        public string IBF_ActToDate { get; set; }
-        public string IBF_ReportOnDate { get; set; }
-        public string IBF_ReportToDate { get; set; }
-        public string IBF_Balance { get; set; }
-
-
-
-
-
-    }
+</html>
