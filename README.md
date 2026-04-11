@@ -1,16 +1,71 @@
- function calculateAF_ActOnDate() {
-            debugger;
-            var n1 = parseFloat(document.getElementById("CBF_ActOnDate").value) || 0;
-            var n2 = parseFloat(document.getElementById("EBF_ActOnDate").value) || 0;
-            var n3 = parseFloat(document.getElementById("FBF_ActOnDate").value) || 0;
-            var n4 = parseFloat(document.getElementById("GBF_ActOnDate").value) || 0;
-            var n5 = parseFloat(document.getElementById("HBF_ActOnDate").value) || 0;
-            var n6 = parseFloat(document.getElementById("IBF_ActOnDate").value) || 0;
-            var CtoFBF_ActOnDate = n1 + n2 + n3 + n4 + n5 + n6;
-            document.getElementById("CtoFBF_ActOnDate").value = CtoFBF_ActOnDate;
+@model iMonitor_Web.Models.BF_Production
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BF Production</title>
+    <!-- Bootstrap 5 -->    
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="~/css/all.min.css" rel="stylesheet" />
+    <style>
+        .page-wrapper {
+            max-width: 900px; 
+            margin: auto;
+        }   
+    
+    .table-bordered td {
+        padding: 4px !important;
+        vertical-align: middle;
+    }
+    
+    .table-bordered .form-control {
+        height: 28px;     
+        padding: 2px 5px; 
+        font-size: 0.85rem;
+        border-radius: 2px;
+    }
+     .datepicker-days thead th {
+            color: #000 !important;
+            background-color: #f8f9fa !important;
+            font-weight: bold;
         }
 
-         <tbody>
+        .datepicker {
+            z-index: 1055 !important;
+        }
+</style>    
+</head>
+<body class="bg-white">
+    <div class="container py-4 page-wrapper">                           
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h4 class="fw-bold mb-0" style="font-family:Allan,cursive;">Production</h4>                        
+                        <label for="tbFDatePick" class="LabelControl" style="font-family:Allan,cursive;font-size:18px;">Date:&nbsp;</label>
+                        <a id="tbFDatePick" class="btn btn-primary">
+                            <label id="currDate-value" style="font-size:12px;color:white"></label>
+                        </a>
+                        <input type="text" id="hiddenDate" style="position:absolute; opacity:0; height:0; width:0;" />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
+                </div>
+                <!-- ===================== MAIN TABLE ===================== -->
+        <form method="post">
+            <div class="table-responsive" style="font-family:'Courier New', Courier, monospace;font-weight:bold;font-size:15px;">
+                <table class="table table-bordered text-center" style="border:2px solid black;">
+                    <thead style="border:2px solid black;">
+                        <tr>
+                            <th>Furnace</th>
+                            <th>Actual On Date</th>
+                            <th>Actual To Date</th>
+                            <th>Reported On Date</th>
+                            <th>Reported To Date</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         <tr>
                             <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="CBF_Furnace" id="CBF_Furnace" /></td>
                             <td><input class="form-control" type="text" value="@Model.ACT_ONDT" onkeyup="calculateAF_ActOnDate()" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
@@ -69,3 +124,180 @@
                         </tr>
                        
                     </tbody>
+                </table>
+              </div>
+
+                <!-- ===================== ACTUAL BREAKUP ===================== -->
+                <h5 class="mt-4 mb-3 fw-bold border-bottom pb-2" style="font-family:Allan,cursive;">Actual Breakup</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center align-middle" style="font-family:'Courier New', Courier, monospace;font-weight:bold;border:2px solid black;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>LD1 Tons</th>
+                                <th>LD2 Tons</th>
+                                <th>LD3 Tons</th>
+                                <th>MRD TP Tons</th>                                
+                            </tr>
+                        </thead>
+                        <tbody style="font-family:Courier New, Courier, monospace;">
+                            <tr>
+                                <td><label>On Date</label></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="CBF_Furnace" id="CBF_Furnace" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT"  name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                                <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>                               
+                                
+                            </tr>
+                            <tr>
+                                <td><label>To Date A-F</label></td>                                
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                                <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>                                
+                            </tr>
+                            <tr>
+                                <td><label>To Date A-G</label></td>                                
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                                <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>                                
+                            </tr>
+                            <tr>
+                                <td><label>To Date A-H</label></td>                                
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                                <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>                                
+                            </tr>
+                            <tr>
+                                <td><label>To Date A-I</label></td>                                
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                                <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                                <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Buttons -->
+                <div class="text-center mt-3">
+                    <button class="btn btn-success btn-sm">Save</button>
+                    <button class="btn btn-info btn-sm">Back</button>
+                    <button class="btn btn-primary btn-sm">Raw Mat Cons</button>
+                    <button class="btn btn-success btn-sm">Calculate Now</button>
+                </div>
+</form>
+</div>
+<script src="~/js/Jquey3.6.0.min.js"></script>
+<script src="~/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/bootstrap-datepicker.min.js"></script>
+<script>
+    let lsSelectedFDate;
+    let IsSelectedFur;
+    $(document).ready(function () {
+        lsSelectedFDate = '@DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
+        $('#currDate-value').text(lsSelectedFDate);
+        $('#hiddenDate').datepicker({
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true
+        }).datepicker('setDate', lsSelectedFDate);
+        $('#tbFDatePick').on('click', function (e) {
+            e.preventDefault();
+            $('#hiddenDate').datepicker('show');
+        });
+        $('#hiddenDate').on('changeDate', function (e) {
+            lsSelectedFDate = e.format('dd/mm/yyyy');
+            $('#currDate-value').text(lsSelectedFDate);
+            Display_CTOFBFReportData(lsSelectedFDate);
+        });
+        Display_CTOFBFReportData(lsSelectedFDate);
+        calculateAF_ActOnDate();
+
+      
+       
+    });
+
+    function Display_CTOFBFReportData(fDate) {
+        $.ajax({
+            url: '@Url.Action("GetCTOFBFReportDataByFurnace", "HML")',
+            type: 'GET',
+            data: { fDate: fDate },
+            success: function (data) {            
+                if (data.message) {
+                    alert(data.message);
+                    return;
+                }
+
+                data.forEach(function (item) {
+                    if (item.FURNACE === "C") {                        
+                        $("#CBF_Furnace").val(item.FURNACE);
+                        $("#CBF_ActOnDate").val(item.ACT_ONDT);
+                        $("#CBF_ActToDate").val(item.ACT_TODT);
+                        $("#CBF_ReportOnDate").val(item.REPORT_ONDT);
+                        $("#CBF_ReportToDate").val(item.REPORT_TODT);
+                        $("#CBF_Balance").val(item.BALANCE);
+                    }
+
+                    if (item.FURNACE === "E") {
+                        $("#EBF_Furnace").val(item.FURNACE);
+                        $("#EBF_ActOnDate").val(item.ACT_ONDT);
+                        $("#EBF_ActToDate").val(item.ACT_TODT);
+                        $("#EBF_ReportOnDate").val(item.REPORT_ONDT);
+                        $("#EBF_ReportToDate").val(item.REPORT_TODT);
+                        $("#EBF_Balance").val(item.BALANCE);
+                    }
+
+                    if (item.FURNACE === "F") {
+                        $("#FBF_Furnace").val(item.FURNACE);
+                        $("#FBF_ActOnDate").val(item.ACT_ONDT);
+                        $("#FBF_ActToDate").val(item.ACT_TODT);
+                        $("#FBF_ReportOnDate").val(item.REPORT_ONDT);
+                        $("#FBF_ReportToDate").val(item.REPORT_TODT);
+                        $("#FBF_Balance").val(item.BALANCE);
+                    }
+                    if (item.FURNACE === "G") {
+                        $("#GBF_Furnace").val(item.FURNACE);
+                        $("#GBF_ActOnDate").val(item.ACT_ONDT);
+                        $("#GBF_ActToDate").val(item.ACT_TODT);
+                        $("#GBF_ReportOnDate").val(item.REPORT_ONDT);
+                        $("#GBF_ReportToDate").val(item.REPORT_TODT);
+                        $("#GBF_Balance").val(item.BALANCE);
+                    }
+                    if (item.FURNACE === "H") {
+                        $("#HBF_Furnace").val(item.FURNACE);
+                        $("#HBF_ActOnDate").val(item.ACT_ONDT);
+                        $("#HBF_ActToDate").val(item.ACT_TODT);
+                        $("#HBF_ReportOnDate").val(item.REPORT_ONDT);
+                        $("#HBF_ReportToDate").val(item.REPORT_TODT);
+                        $("#HBF_Balance").val(item.BALANCE);
+                    }
+                    if (item.FURNACE === "I") {
+                        $("#IBF_Furnace").val(item.FURNACE);
+                        $("#IBF_ActOnDate").val(item.ACT_ONDT);
+                        $("#IBF_ActToDate").val(item.ACT_TODT);
+                        $("#IBF_ReportOnDate").val(item.REPORT_ONDT);
+                        $("#IBF_ReportToDate").val(item.REPORT_TODT);
+                        $("#IBF_Balance").val(item.BALANCE);
+                    }
+
+                });
+            }
+        });
+
+    }
+    function calculateAF_ActOnDate() {
+        debugger;
+        var n1 = parseFloat(document.getElementById("CBF_ActOnDate").value) || 0;
+        var n2 = parseFloat(document.getElementById("EBF_ActOnDate").value) || 0;
+        var n3 = parseFloat(document.getElementById("FBF_ActOnDate").value) || 0;
+        var n4 = parseFloat(document.getElementById("GBF_ActOnDate").value) || 0;
+        var n5 = parseFloat(document.getElementById("HBF_ActOnDate").value) || 0;
+        var n6 = parseFloat(document.getElementById("IBF_ActOnDate").value) || 0;
+        var CtoFBF_ActOnDate = n1 + n2 + n3 + n4 + n5 + n6;
+        document.getElementById("CtoFBF_ActOnDate").value = CtoFBF_ActOnDate;
+    }
+</script>
+</body>
+</html>
