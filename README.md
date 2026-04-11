@@ -1,59 +1,94 @@
-else
-{
-    string sqlquery = @"
-    SELECT 
-        TRUNC(a.TIMESTAMP, 'MON') AS MONTH_START,
-        a.TIMESTAMP,
-        a.FUR_NAME FURNACE,
-        NVL(SUM(a.NET_WT),0) AS ACT_ONDT,
+  <tbody>
+                        <tr>
+                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="CBF_Furnace" id="CBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="CtoF_ActaulOnDt()" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" name="CBF_Balance" id="CBF_Balance" /></td>
+                        </tr>
+                        <tr>
+                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="EBF_Furnace" id="EBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="CtoF_ActaulOnDt()" name="EBF_ActOnDate" id="EBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="EBF_ActToDate" id="EBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="EBF_ReportOnDate" id="EBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="EBF_ReportToDate" id="EBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" name="EBF_Balance" id="EBF_Balance" /></td>
+                        </tr>
+                        <tr>
+                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="FBF_Furnace" id="FBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="CtoF_ActaulOnDt()" name="FBF_ActOnDate" id="FBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="FBF_ActToDate" id="FBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="FBF_ReportOnDate" id="FBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="FBF_ReportToDate" id="FBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" name="FBF_Balance" id="FBF_Balance" /></td>
+                        </tr>
+                        <tr>
+                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="GBF_Furnace" id="GBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="CtoF_ActaulOnDt()" name="GBF_ActOnDate" id="GBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="GBF_ActToDate" id="GBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="GBF_ReportOnDate" id="GBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="GBF_ReportToDate" id="GBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" name="GBF_Balance" id="GBF_Balance" /></td>
+                        </tr>
+                        <tr>
+                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="HBF_Furnace" id="HBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="CtoF_ActaulOnDt()" name="HBF_ActOnDate" id="HBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="HBF_ActToDate" id="HBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="HBF_ReportOnDate" id="HBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="HBF_ReportToDate" id="HBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" name="HBF_Balance" id="HBF_Balance" /></td>
+                        </tr>
+                        <tr>
+                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="IBF_Furnace" id="IBF_Furnace" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="CtoF_ActaulOnDt()" name="IBF_ActOnDate" id="IBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" name="IBF_ActToDate" id="IBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" name="IBF_ReportOnDate" id="IBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" name="IBF_ReportToDate" id="IBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" name="IBF_Balance" id="IBF_Balance" /></td>
+                        </tr>
+                        <tr>                           
+                            <td>A-F</td>
+                            <td><input class="form-control" type="text" readonly  name="CtoFBF_ActOnDate" id="CtoFBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CtoFBF_ActToDate" id="CtoFBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CtoFBF_ReportOnDate" id="CtoFBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CtoFBF_ReportToDate" id="CtoFBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CtoFBF_Balance" id="CtoFBF_Balance" /></td>
+                        </tr>
+                        <tr>                            
+                            <td>A-G</td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly name="CBF_Balance" id="CBF_Balance" /></td>
+                        </tr>
+                        <tr>                            
+                            <td>A-H</td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_Balance" id="CBF_Balance" /></td>
+                        </tr>
+                        <tr>                           
+                            <td>A-I</td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ActToDate" id="CBF_ActToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>
+                            <td><input class="form-control" type="text" readonly  name="CBF_Balance" id="CBF_Balance" /></td>
+                        </tr>
+                    </tbody>
 
-        (SELECT NVL(SUM(b.ACTUAL),0) 
-         FROM DEMO.T_BF_PRODUCTION_BALANCE b 
-         WHERE b.FURNACE = a.FUR_NAME  
-         AND b.TIMESTAMP >= TRUNC(a.TIMESTAMP, 'MON') 
-         AND b.TIMESTAMP < a.TIMESTAMP) AS ACT_TODT_PREV,
-
-        (SELECT NVL(SUM(b.REPORTED),0) 
-         FROM DEMO.T_BF_PRODUCTION_BALANCE b 
-         WHERE b.FURNACE = a.FUR_NAME 
-         AND b.TIMESTAMP >= TRUNC(a.TIMESTAMP, 'MON') 
-         AND b.TIMESTAMP < a.TIMESTAMP) AS REPORT_TODT_PREV
-
-    FROM DEMO.T_LADLE_DETAILS a 
-    WHERE a.LADLE_FLEND_TIME >= TO_DATE(:FDate,'DD/MM/YYYY')+6/24 
-    AND a.LADLE_FLEND_TIME < TO_DATE(:FDate,'DD/MM/YYYY')+1+6/24 
-    AND a.DESTINATION <> 'R' 
-    GROUP BY a.FUR_NAME, a.TIMESTAMP 
-    ORDER BY a.FUR_NAME";
-
-    using (OracleCommand cmd = new OracleCommand(sqlquery, con))
-    {
-        cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
-
-        using (var dr = cmd.ExecuteReader())
-        {
-            while (dr.Read())
-            {
-                BF_Production row = new BF_Production();
-
-                // 🔹 Basic values
-                row.FURNACE = dr["FURNACE"].ToString();
-                row.ACT_ONDT = dr["ACT_ONDT"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ACT_ONDT"]);
-
-                decimal actPrev = dr["ACT_TODT_PREV"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ACT_TODT_PREV"]);
-                decimal repPrev = dr["REPORT_TODT_PREV"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["REPORT_TODT_PREV"]);
-
-                // 🔹 Input from textbox
-                decimal repOnDtVal = repOnDt ?? 0;
-
-                row.REPORT_ONDT = repOnDtVal;
-
-                // 🔥 FINAL CALCULATION (CORRECT)
-                row.ACTUAL_TD = actPrev + row.ACT_ONDT;
-                row.REPORT_TODT = repPrev + repOnDtVal;
-
-                list.Add(row);
-            }
+                     function CtoF_ActaulOnDt() {
+            debugger;
+            var n1 = parseFloat(document.getElementById("CBF_ActOnDate").value) || 0;
+            var n2 = parseFloat(document.getElementById("EBF_ActOnDate").value) || 0;
+            var n3 = parseFloat(document.getElementById("FBF_ActOnDate").value) || 0;
+            var n4 = parseFloat(document.getElementById("GBF_ActOnDate").value) || 0;
+            var n5 = parseFloat(document.getElementById("HBF_ActOnDate").value) || 0;
+            var n6 = parseFloat(document.getElementById("IBF_ActOnDate").value) || 0;
+            var Tot_CtoFActOnDt = n1 + n2 + n3 + n4 + n5 +n6;
+            document.getElementById("CtoFBF_ActOnDate").value = Tot_CtoFActOnDt;
         }
-    }
-}
