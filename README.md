@@ -18,3 +18,12 @@ function calculateAF_ActOnDate() {
 
     document.getElementById("CtoFBF_ActOnDate").value = total;
 }
+let val1 = parseFloat(document.getElementById('box1').value) || 0;
+    let val2 = parseFloat(document.getElementById('box2').value) || 0;
+    let val3 = parseFloat(document.getElementById('box3').value) || 0;
+
+    // Sum the values
+    let sum = val1 + val2 + val3;
+
+    // Display in the fourth text box
+    document.getElementById('total').value = sum;
