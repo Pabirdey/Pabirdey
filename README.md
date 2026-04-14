@@ -1,3 +1,16 @@
+  <div class="container py-4 page-wrapper">                           
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h4 class="fw-bold mb-0" style="font-family:Allan,cursive;">Production</h4>                        
+                        <label for="tbFDatePick" class="LabelControl" style="font-family:Allan,cursive;font-size:18px;">Date:&nbsp;</label>
+                        <a id="tbFDatePick" class="btn btn-primary">
+                            <label id="currDate-value" style="font-size:12px;color:white"></label>
+                        </a>
+                        <input type="text" id="hiddenDate" style="position:absolute; opacity:0; height:0; width:0;" />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
+                </div>
+                <!-- ===================== MAIN TABLE ===================== -->
         <form method="post">
             <div class="table-responsive" style="font-family:'Courier New', Courier, monospace;font-weight:bold;font-size:15px;">
                 <table class="table table-bordered text-center" style="border:2px solid black;">
@@ -157,3 +170,4 @@
                     <button class="btn btn-success btn-sm">Calc_ Now</button>
                 </div>
 </form>
+</div>
