@@ -1,26 +1,13 @@
-SELECT 
-    TRUNC(a.timestamp,'MON') AS month_start,
-    a.furnace,
-    a.actual   AS act_ondt,
-    a.reported AS report_ondt,
-    a.balance,
-
-    (
-        SELECT SUM(b.actual)
-        FROM demo.t_bf_production_balance b
-        WHERE b.furnace = a.furnace
-          AND b.timestamp >= TRUNC(a.timestamp,'MON')
-          AND b.timestamp <= a.timestamp
-    ) AS act_todt,
-
-    (
-        SELECT SUM(b.reported)
-        FROM demo.t_bf_production_balance b
-        WHERE b.furnace = a.furnace
-          AND b.timestamp >= TRUNC(a.timestamp,'MON')
-          AND b.timestamp <= a.timestamp
-    ) AS report_todt
-
-FROM demo.t_bf_production_balance a
-WHERE a.timestamp = TO_DATE('11-APR-2026','DD-MON-YYYY')   -- ✅ FIX
-ORDER BY a.furnace;
+Select Case When PLANT='A-F' Then 'A-F' 
+            When PLANT in('G','A-F') Then 'A-G'
+            When  PLANT in ('A-F','G','H') Then 'A-H'
+            When  Plant in ('A-F','G','H','I') Then 'A-I' 
+            Else NUll End Plant,SUM(LD1_TONS_ACTUAL) LD1_TONS_ACT
+            From DEMO.T_LADLE WHERE DATE_TIME>='01-APR-2026' AND DATE_TIME<='13-APR-2026'
+            Group by 
+            Case When PLANT='A-F' Then 'A-F' 
+            When PLANT in ('G','A-F') Then 'A-G'
+            When  PLANT in ('A-F','G','H') Then 'A-H'
+            When  Plant in ('A-F','G','H','I') Then 'A-I'
+            Else NUll End
+            Order by Plant
