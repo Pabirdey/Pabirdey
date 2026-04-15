@@ -1,157 +1,76 @@
-<div class="container py-4 page-wrapper">
+public JsonResult GetPlantData(string date)
+{
+    var list = new List<object>();
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <h4 class="fw-bold" style="font-family:Allan,cursive;">Production</h4>
-    </div>
+    string[] plants = { "C", "E", "F", "G", "H", "I" }; // adjust if needed
 
-    <form method="post">
+    using (OracleConnection con = new OracleConnection("YOUR_CONNECTION_STRING"))
+    {
+        con.Open();
 
-        <!-- ================= ROW START ================= -->
-        <div class="row">
+        foreach (var plant in plants)
+        {
+            // ================= COUNT CHECK =================
+            string countQuery = @"
+                SELECT COUNT(*)
+                FROM DEMO.T_LADLE
+                WHERE TRUNC(DATE_TIME) = TO_DATE(:pDate,'DD-MON-YYYY')
+                AND PLANT = :pPlant";
 
-            <!-- ================= LEFT TABLE ================= -->
-            <div class="col-md-6">
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center" style="font-family:'Courier New';font-weight:bold;border:2px solid black;">
-                        
-                        <thead>
-                            <tr>
-                                <th>Furnace</th>
-                                <th>Actual On Date</th>
-                                <th>Actual To Date</th>
-                                <th>Reported On Date</th>
-                                <th>Reported To Date</th>
-                                <th>Balance</th>
-                            </tr>
-                        </thead>
+            int count = 0;
 
-                        <tbody>
+            using (OracleCommand cmd = new OracleCommand(countQuery, con))
+            {
+                cmd.Parameters.Add("pDate", date);
+                cmd.Parameters.Add("pPlant", plant);
 
-                            <!-- Furnace Rows -->
-                            <tr>
-                                <td>CBF</td>
-                                <td><input class="form-control" id="CBF_ActOnDate" oninput="calculateAll()" /></td>
-                                <td><input class="form-control" id="CBF_ActToDate" readonly /></td>
-                                <td><input class="form-control" id="CBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="CBF_ReportToDate" readonly /></td>
-                                <td><input class="form-control" id="CBF_Balance" readonly /></td>
-                            </tr>
+                count = Convert.ToInt32(cmd.ExecuteScalar());
+            }
 
-                            <tr>
-                                <td>EBF</td>
-                                <td><input class="form-control" id="EBF_ActOnDate" oninput="calculateAll()" /></td>
-                                <td><input class="form-control" id="EBF_ActToDate" readonly /></td>
-                                <td><input class="form-control" id="EBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="EBF_ReportToDate" readonly /></td>
-                                <td><input class="form-control" id="EBF_Balance" readonly /></td>
-                            </tr>
+            // ================= IF NO DATA =================
+            if (count == 0)
+            {
+                string dataQuery = @"
+                    SELECT DATE_TIME, PLANT,
+                           LD1_TONS, LD2_TONS, LD3_TONS, MRDTP_TONS,
+                           NOOFTP,
+                           LD1_TONS_ACTUAL, LD2_TONS_ACTUAL,
+                           LD3_TONS_ACTUAL, MRDTP_TONS_ACTUAL
+                    FROM DEMO.T_LADLE
+                    WHERE TRUNC(DATE_TIME) = TO_DATE(:pDate,'DD-MON-YYYY')
+                    AND PLANT = :pPlant";
 
-                            <tr>
-                                <td>FBF</td>
-                                <td><input class="form-control" id="FBF_ActOnDate" oninput="calculateAll()" /></td>
-                                <td><input class="form-control" id="FBF_ActToDate" readonly /></td>
-                                <td><input class="form-control" id="FBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="FBF_ReportToDate" readonly /></td>
-                                <td><input class="form-control" id="FBF_Balance" readonly /></td>
-                            </tr>
+                using (OracleCommand cmd = new OracleCommand(dataQuery, con))
+                {
+                    cmd.Parameters.Add("pDate", date);
+                    cmd.Parameters.Add("pPlant", plant);
 
-                            <tr>
-                                <td>GBF</td>
-                                <td><input class="form-control" id="GBF_ActOnDate" oninput="calculateAll()" /></td>
-                                <td><input class="form-control" id="GBF_ActToDate" readonly /></td>
-                                <td><input class="form-control" id="GBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="GBF_ReportToDate" readonly /></td>
-                                <td><input class="form-control" id="GBF_Balance" readonly /></td>
-                            </tr>
+                    using (OracleDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            list.Add(new
+                            {
+                                PLANT = dr["PLANT"].ToString(),
+                                DATE_TIME = dr["DATE_TIME"].ToString(),
 
-                            <tr>
-                                <td>HBF</td>
-                                <td><input class="form-control" id="HBF_ActOnDate" oninput="calculateAll()" /></td>
-                                <td><input class="form-control" id="HBF_ActToDate" readonly /></td>
-                                <td><input class="form-control" id="HBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="HBF_ReportToDate" readonly /></td>
-                                <td><input class="form-control" id="HBF_Balance" readonly /></td>
-                            </tr>
+                                LD1 = dr["LD1_TONS"],
+                                LD2 = dr["LD2_TONS"],
+                                LD3 = dr["LD3_TONS"],
+                                MRDTP = dr["MRDTP_TONS"],
+                                NOOFTP = dr["NOOFTP"],
 
-                            <tr>
-                                <td>IBF</td>
-                                <td><input class="form-control" id="IBF_ActOnDate" oninput="calculateAll()" /></td>
-                                <td><input class="form-control" id="IBF_ActToDate" readonly /></td>
-                                <td><input class="form-control" id="IBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="IBF_ReportToDate" readonly /></td>
-                                <td><input class="form-control" id="IBF_Balance" readonly /></td>
-                            </tr>
+                                LD1_ACT = dr["LD1_TONS_ACTUAL"],
+                                LD2_ACT = dr["LD2_TONS_ACTUAL"],
+                                LD3_ACT = dr["LD3_TONS_ACTUAL"],
+                                MRDTP_ACT = dr["MRDTP_TONS_ACTUAL"]
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-                            <!-- Cumulative -->
-                            <tr><td>A-F</td><td><input id="CtoFBF_ActOnDate" class="form-control" readonly /></td></tr>
-                            <tr><td>A-G</td><td><input id="CtoGBF_ActOnDate" class="form-control" readonly /></td></tr>
-                            <tr><td>A-H</td><td><input id="CtoHBF_ActOnDate" class="form-control" readonly /></td></tr>
-                            <tr><td>A-I</td><td><input id="CtoIBF_ActOnDate" class="form-control" readonly /></td></tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ================= RIGHT TABLE ================= -->
-            <div class="col-md-6">
-
-                <h5 class="mb-2 fw-bold">Actual Breakup</h5>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center" style="font-family:'Courier New';font-weight:bold;border:2px solid black;">
-                        
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>LD1</th>
-                                <th>LD2</th>
-                                <th>LD3</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-                                <td>A-F</td>
-                                <td><input id="A_F_ACT_LD1_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_F_ACT_LD2_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_F_ACT_LD3_TONS" class="form-control" readonly /></td>
-                            </tr>
-
-                            <tr>
-                                <td>A-G</td>
-                                <td><input id="A_G_ACT_LD1_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_G_ACT_LD2_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_G_ACT_LD3_TONS" class="form-control" readonly /></td>
-                            </tr>
-
-                            <tr>
-                                <td>A-H</td>
-                                <td><input id="A_H_ACT_LD1_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_H_ACT_LD2_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_H_ACT_LD3_TONS" class="form-control" readonly /></td>
-                            </tr>
-
-                            <tr>
-                                <td>A-I</td>
-                                <td><input id="A_I_ACT_LD1_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_I_ACT_LD2_TONS" class="form-control" readonly /></td>
-                                <td><input id="A_I_ACT_LD3_TONS" class="form-control" readonly /></td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-        <!-- ================= ROW END ================= -->
-
-        <div class="text-center mt-3">
-            <button type="button" class="btn btn-success" onclick="calculateAll()">Calc Now</button>
-        </div>
-
-    </form>
-</div>
+    return Json(list, JsonRequestBehavior.AllowGet);
+}
