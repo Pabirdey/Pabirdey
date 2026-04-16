@@ -1,76 +1,170 @@
-public JsonResult GetPlantData(string date)
-{
-    var list = new List<object>();
+<div class="container py-4">
 
-    string[] plants = { "C", "E", "F", "G", "H", "I" }; // adjust if needed
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold" style="font-family:Allan,cursive;">Production</h4>
 
-    using (OracleConnection con = new OracleConnection("YOUR_CONNECTION_STRING"))
-    {
-        con.Open();
+        <div>
+            <label>Date:</label>
+            <input type="text" id="hiddenDate" />
+        </div>
+    </div>
 
-        foreach (var plant in plants)
-        {
-            // ================= COUNT CHECK =================
-            string countQuery = @"
-                SELECT COUNT(*)
-                FROM DEMO.T_LADLE
-                WHERE TRUNC(DATE_TIME) = TO_DATE(:pDate,'DD-MON-YYYY')
-                AND PLANT = :pPlant";
+    <form method="post">
 
-            int count = 0;
+        <div class="row">
 
-            using (OracleCommand cmd = new OracleCommand(countQuery, con))
-            {
-                cmd.Parameters.Add("pDate", date);
-                cmd.Parameters.Add("pPlant", plant);
+            <!-- ================= LEFT TABLE ================= -->
+            <div class="col-md-7">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center"
+                           style="border:2px solid black;font-family:'Courier New';font-weight:bold;">
 
-                count = Convert.ToInt32(cmd.ExecuteScalar());
-            }
+                        <thead>
+                            <tr>
+                                <th>Furnace</th>
+                                <th>Actual On Date</th>
+                                <th>Actual To Date</th>
+                                <th>Reported On Date</th>
+                                <th>Reported To Date</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
 
-            // ================= IF NO DATA =================
-            if (count == 0)
-            {
-                string dataQuery = @"
-                    SELECT DATE_TIME, PLANT,
-                           LD1_TONS, LD2_TONS, LD3_TONS, MRDTP_TONS,
-                           NOOFTP,
-                           LD1_TONS_ACTUAL, LD2_TONS_ACTUAL,
-                           LD3_TONS_ACTUAL, MRDTP_TONS_ACTUAL
-                    FROM DEMO.T_LADLE
-                    WHERE TRUNC(DATE_TIME) = TO_DATE(:pDate,'DD-MON-YYYY')
-                    AND PLANT = :pPlant";
+                        <tbody>
 
-                using (OracleCommand cmd = new OracleCommand(dataQuery, con))
-                {
-                    cmd.Parameters.Add("pDate", date);
-                    cmd.Parameters.Add("pPlant", plant);
+                            <tr>
+                                <td>CBF</td>
+                                <td><input class="form-control" id="CBF_ActOnDate" /></td>
+                                <td><input class="form-control" id="CBF_ActToDate" /></td>
+                                <td><input class="form-control" id="CBF_ReportOnDate" /></td>
+                                <td><input class="form-control" id="CBF_ReportToDate" /></td>
+                                <td><input class="form-control" id="CBF_Balance" /></td>
+                            </tr>
 
-                    using (OracleDataReader dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            list.Add(new
-                            {
-                                PLANT = dr["PLANT"].ToString(),
-                                DATE_TIME = dr["DATE_TIME"].ToString(),
+                            <tr>
+                                <td>EBF</td>
+                                <td><input class="form-control" id="EBF_ActOnDate" /></td>
+                                <td><input class="form-control" id="EBF_ActToDate" /></td>
+                                <td><input class="form-control" id="EBF_ReportOnDate" /></td>
+                                <td><input class="form-control" id="EBF_ReportToDate" /></td>
+                                <td><input class="form-control" id="EBF_Balance" /></td>
+                            </tr>
 
-                                LD1 = dr["LD1_TONS"],
-                                LD2 = dr["LD2_TONS"],
-                                LD3 = dr["LD3_TONS"],
-                                MRDTP = dr["MRDTP_TONS"],
-                                NOOFTP = dr["NOOFTP"],
+                            <tr>
+                                <td>FBF</td>
+                                <td><input class="form-control" id="FBF_ActOnDate" /></td>
+                                <td><input class="form-control" id="FBF_ActToDate" /></td>
+                                <td><input class="form-control" id="FBF_ReportOnDate" /></td>
+                                <td><input class="form-control" id="FBF_ReportToDate" /></td>
+                                <td><input class="form-control" id="FBF_Balance" /></td>
+                            </tr>
 
-                                LD1_ACT = dr["LD1_TONS_ACTUAL"],
-                                LD2_ACT = dr["LD2_TONS_ACTUAL"],
-                                LD3_ACT = dr["LD3_TONS_ACTUAL"],
-                                MRDTP_ACT = dr["MRDTP_TONS_ACTUAL"]
-                            });
-                        }
-                    }
-                }
-            }
-        }
-    }
+                            <tr>
+                                <td>GBF</td>
+                                <td><input class="form-control" id="GBF_ActOnDate" /></td>
+                                <td><input class="form-control" id="GBF_ActToDate" /></td>
+                                <td><input class="form-control" id="GBF_ReportOnDate" /></td>
+                                <td><input class="form-control" id="GBF_ReportToDate" /></td>
+                                <td><input class="form-control" id="GBF_Balance" /></td>
+                            </tr>
 
-    return Json(list, JsonRequestBehavior.AllowGet);
-}
+                            <tr>
+                                <td>HBF</td>
+                                <td><input class="form-control" id="HBF_ActOnDate" /></td>
+                                <td><input class="form-control" id="HBF_ActToDate" /></td>
+                                <td><input class="form-control" id="HBF_ReportOnDate" /></td>
+                                <td><input class="form-control" id="HBF_ReportToDate" /></td>
+                                <td><input class="form-control" id="HBF_Balance" /></td>
+                            </tr>
+
+                            <tr>
+                                <td>IBF</td>
+                                <td><input class="form-control" id="IBF_ActOnDate" /></td>
+                                <td><input class="form-control" id="IBF_ActToDate" /></td>
+                                <td><input class="form-control" id="IBF_ReportOnDate" /></td>
+                                <td><input class="form-control" id="IBF_ReportToDate" /></td>
+                                <td><input class="form-control" id="IBF_Balance" /></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= RIGHT TABLE ================= -->
+            <div class="col-md-5">
+
+                <h5 class="fw-bold mb-2" style="font-family:Allan,cursive;">Actual Breakup</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center"
+                           style="border:2px solid black;font-family:'Courier New';font-weight:bold;">
+
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>LD1</th>
+                                <th>LD2</th>
+                                <th>LD3</th>
+                                <th>MRDTP</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <td>On Date</td>
+                                <td><input class="form-control" id="A_F_LD1_TONS" /></td>
+                                <td><input class="form-control" id="A_F_LD2_TONS" /></td>
+                                <td><input class="form-control" id="A_F_LD3_TONS" /></td>
+                                <td><input class="form-control" id="A_F_MRD_TP_TONS" /></td>
+                            </tr>
+
+                            <tr>
+                                <td>To Date A-F</td>
+                                <td><input class="form-control" id="A_F_ACT_LD1_TONS" /></td>
+                                <td><input class="form-control" id="A_F_ACT_LD2_TONS" /></td>
+                                <td><input class="form-control" id="A_F_ACT_LD3_TONS" /></td>
+                                <td><input class="form-control" id="A_F_ACT_MRD_TP_TONS" /></td>
+                            </tr>
+
+                            <tr>
+                                <td>To Date A-G</td>
+                                <td><input class="form-control" id="A_G_ACT_LD1_TONS" /></td>
+                                <td><input class="form-control" id="A_G_ACT_LD2_TONS" /></td>
+                                <td><input class="form-control" id="A_G_ACT_LD3_TONS" /></td>
+                                <td><input class="form-control" id="A_G_ACT_MRD_TP_TONS" /></td>
+                            </tr>
+
+                            <tr>
+                                <td>To Date A-H</td>
+                                <td><input class="form-control" id="A_H_ACT_LD1_TONS" /></td>
+                                <td><input class="form-control" id="A_H_ACT_LD2_TONS" /></td>
+                                <td><input class="form-control" id="A_H_ACT_LD3_TONS" /></td>
+                                <td><input class="form-control" id="A_H_ACT_MRD_TP_TONS" /></td>
+                            </tr>
+
+                            <tr>
+                                <td>To Date A-I</td>
+                                <td><input class="form-control" id="A_I_ACT_LD1_TONS" /></td>
+                                <td><input class="form-control" id="A_I_ACT_LD2_TONS" /></td>
+                                <td><input class="form-control" id="A_I_ACT_LD3_TONS" /></td>
+                                <td><input class="form-control" id="A_I_ACT_MRD_TP_TONS" /></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="text-center mt-3">
+            <button type="button" onclick="saveAllData()" class="btn btn-success">Save</button>
+        </div>
+
+    </form>
+</div>
