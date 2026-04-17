@@ -1,170 +1,64 @@
-<div class="container py-4">
+	V_TEMP:=0;
+		select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE ='G';    
+ 		
+ 		:CTL_BLK.TXT_TIMESTAMP_G:=:ctl_blk.ctl_date_time_prod;
+			:CTL_BLK.TXT_FURNACE_G:='G';
+			:CTL_BLK.TXT_ACTUAL_G:=NULL;
+			:CTL_BLK.TXT_RPT_G:=NULL;
+			:CTL_BLK.TXT_BAL_G:=NULL;
+			:CTL_BLK.DISPLAY_ACT_G:=NULL;
+			:CTL_BLK.DISPLAY_RPT_G:=NULL;
+			:CTL_BLK.DISPLAY_BAL_G:=NULL;
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold" style="font-family:Allan,cursive;">Production</h4>
+ 			IF V_TEMP>0 THEN 			
 
-        <div>
-            <label>Date:</label>
-            <input type="text" id="hiddenDate" />
-        </div>
-    </div>
+ 				SELECT ACTUAL,REPORTED,BALANCE INTO :CTL_BLK.TXT_ACTUAL_G ,:CTL_BLK.TXT_RPT_G,:CTL_BLK.TXT_BAL_G
+      		FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			WHERE TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
+      
+      					 --#####
+      			     SELECT sum(ACTUAL),sum(REPORTED) into :CTL_BLK.TXT_ACTUAL_G_TD ,:CTL_BLK.TXT_RPT_G_TD
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<=:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
+      			     --#####	
+       	SELECT BALANCE INTO :Global.vBalance FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			WHERE TIMESTAMP=(:CTL_BLK.TXT_TIMESTAMP_G)-1 AND FURNACE='G';	 
+ 			ELSE					
 
-    <form method="post">
-
-        <div class="row">
-
-            <!-- ================= LEFT TABLE ================= -->
-            <div class="col-md-7">
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center"
-                           style="border:2px solid black;font-family:'Courier New';font-weight:bold;">
-
-                        <thead>
-                            <tr>
-                                <th>Furnace</th>
-                                <th>Actual On Date</th>
-                                <th>Actual To Date</th>
-                                <th>Reported On Date</th>
-                                <th>Reported To Date</th>
-                                <th>Balance</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-                                <td>CBF</td>
-                                <td><input class="form-control" id="CBF_ActOnDate" /></td>
-                                <td><input class="form-control" id="CBF_ActToDate" /></td>
-                                <td><input class="form-control" id="CBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="CBF_ReportToDate" /></td>
-                                <td><input class="form-control" id="CBF_Balance" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>EBF</td>
-                                <td><input class="form-control" id="EBF_ActOnDate" /></td>
-                                <td><input class="form-control" id="EBF_ActToDate" /></td>
-                                <td><input class="form-control" id="EBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="EBF_ReportToDate" /></td>
-                                <td><input class="form-control" id="EBF_Balance" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>FBF</td>
-                                <td><input class="form-control" id="FBF_ActOnDate" /></td>
-                                <td><input class="form-control" id="FBF_ActToDate" /></td>
-                                <td><input class="form-control" id="FBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="FBF_ReportToDate" /></td>
-                                <td><input class="form-control" id="FBF_Balance" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>GBF</td>
-                                <td><input class="form-control" id="GBF_ActOnDate" /></td>
-                                <td><input class="form-control" id="GBF_ActToDate" /></td>
-                                <td><input class="form-control" id="GBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="GBF_ReportToDate" /></td>
-                                <td><input class="form-control" id="GBF_Balance" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>HBF</td>
-                                <td><input class="form-control" id="HBF_ActOnDate" /></td>
-                                <td><input class="form-control" id="HBF_ActToDate" /></td>
-                                <td><input class="form-control" id="HBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="HBF_ReportToDate" /></td>
-                                <td><input class="form-control" id="HBF_Balance" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>IBF</td>
-                                <td><input class="form-control" id="IBF_ActOnDate" /></td>
-                                <td><input class="form-control" id="IBF_ActToDate" /></td>
-                                <td><input class="form-control" id="IBF_ReportOnDate" /></td>
-                                <td><input class="form-control" id="IBF_ReportToDate" /></td>
-                                <td><input class="form-control" id="IBF_Balance" /></td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ================= RIGHT TABLE ================= -->
-            <div class="col-md-5">
-
-                <h5 class="fw-bold mb-2" style="font-family:Allan,cursive;">Actual Breakup</h5>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center"
-                           style="border:2px solid black;font-family:'Courier New';font-weight:bold;">
-
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>LD1</th>
-                                <th>LD2</th>
-                                <th>LD3</th>
-                                <th>MRDTP</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-                                <td>On Date</td>
-                                <td><input class="form-control" id="A_F_LD1_TONS" /></td>
-                                <td><input class="form-control" id="A_F_LD2_TONS" /></td>
-                                <td><input class="form-control" id="A_F_LD3_TONS" /></td>
-                                <td><input class="form-control" id="A_F_MRD_TP_TONS" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>To Date A-F</td>
-                                <td><input class="form-control" id="A_F_ACT_LD1_TONS" /></td>
-                                <td><input class="form-control" id="A_F_ACT_LD2_TONS" /></td>
-                                <td><input class="form-control" id="A_F_ACT_LD3_TONS" /></td>
-                                <td><input class="form-control" id="A_F_ACT_MRD_TP_TONS" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>To Date A-G</td>
-                                <td><input class="form-control" id="A_G_ACT_LD1_TONS" /></td>
-                                <td><input class="form-control" id="A_G_ACT_LD2_TONS" /></td>
-                                <td><input class="form-control" id="A_G_ACT_LD3_TONS" /></td>
-                                <td><input class="form-control" id="A_G_ACT_MRD_TP_TONS" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>To Date A-H</td>
-                                <td><input class="form-control" id="A_H_ACT_LD1_TONS" /></td>
-                                <td><input class="form-control" id="A_H_ACT_LD2_TONS" /></td>
-                                <td><input class="form-control" id="A_H_ACT_LD3_TONS" /></td>
-                                <td><input class="form-control" id="A_H_ACT_MRD_TP_TONS" /></td>
-                            </tr>
-
-                            <tr>
-                                <td>To Date A-I</td>
-                                <td><input class="form-control" id="A_I_ACT_LD1_TONS" /></td>
-                                <td><input class="form-control" id="A_I_ACT_LD2_TONS" /></td>
-                                <td><input class="form-control" id="A_I_ACT_LD3_TONS" /></td>
-                                <td><input class="form-control" id="A_I_ACT_MRD_TP_TONS" /></td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- BUTTONS -->
-        <div class="text-center mt-3">
-            <button type="button" onclick="saveAllData()" class="btn btn-success">Save</button>
-        </div>
-
-    </form>
-</div>
+				Select SUM(NET_WT) into :CTL_BLK.TXT_ACTUAL_G  from  demo.t_ladle_details where
+ 						LADLE_FLEND_TIME>=:CTL_BLK.TXT_TIMESTAMP_G+6/24 and LADLE_FLEND_TIME<:CTL_BLK.TXT_TIMESTAMP_G+1+6/24 
+							and DESTINATION<>'R' and fur_name='G';
+			
+				SELECT SUM(NVL(ACTUAL,0))-sum(NVL(REPORTED,0)) INTO :CTL_BLK.TXT_BAL_G
+					FROM DEMO.T_BF_PRODUCTION_TRACKING 
+						WHERE TIMESTAMP>=TRUNC(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G'; 			
+			
+		  	:CTL_BLK.TXT_RPT_G:=nvl(:CTL_BLK.TXT_ACTUAL_G,0)+nvl(:CTL_BLK.TXT_BAL_G,0);	
+		  	:Global.vBalance:=:CTL_BLK.TXT_BAL_G;
+				:CTL_BLK.TXT_BAL_G:=NVL(:CTL_BLK.TXT_ACTUAL_G,0)-NVL(:CTL_BLK.TXT_RPT_G,0)+NVL(:Global.vBalance,0);	
+				
+			         	--#####
+								 vActual_TD:=0;
+								 vReported_TD:=0;
+      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
+      			     :CTL_BLK.TXT_ACTUAL_G_TD:=nvl(vActual_TD,0)+ nvl(:CTL_BLK.TXT_ACTUAL_G ,0);
+      			     	:CTL_BLK.TXT_RPT_G_TD:=nvl(vReported_TD,0)+ nvl(:CTL_BLK.TXT_RPT_G ,0);      			     
+      			     --#####	   		  			
+ 			END IF;
+ 	
+		:CTL_BLK.DISPLAY_ACT_G:=nvl(:BLK_CONTROL.DISPLAY_ACTUAL,0)+nvl(:CTL_BLK.TXT_ACTUAL_G,0);
+		:CTL_BLK.DISPLAY_RPT_G:=nvl(:BLK_CONTROL.DISPLAY_REPORTED,0)+nvl(:CTL_BLK.TXT_RPT_G,0);
+		:CTL_BLK.DISPLAY_BAL_G:=nvl(:BLK_CONTROL.DISPLAY_BALANCE,0)+nvl(:CTL_BLK.TXT_BAL_G,0);
+							
+		--#####
+		:CTL_BLK.DISPLAY_ACT_G_TD:=nvl(:BLK_CONTROL.DISPLAY_ACTUAL_TD,0)+nvl(:CTL_BLK.TXT_ACTUAL_G_TD,0);
+		:CTL_BLK.DISPLAY_RPT_G_TD:=nvl(:BLK_CONTROL.DISPLAY_REPORTED_TD,0)+nvl(:CTL_BLK.TXT_RPT_G_TD,0);     			    
+		--#####
+		
+									If :CTL_BLK.TXT_ACTUAL_G_TD=0 Then
+      			     		:CTL_BLK.TXT_ACTUAL_G_TD:=Null;
+      			     	End If;   
+      			     	If :CTL_BLK.TXT_RPT_G_TD=0 Then
+      			     		 :CTL_BLK.TXT_RPT_G_TD:=Null;
+      			     	End If; 
+		
