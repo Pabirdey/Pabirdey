@@ -1,102 +1,144 @@
 public JsonResult GetATOIBFLDReportData(string fDate)
+{
+    List<BF_Production> list = new List<BF_Production>();
+    string[] furnaces = { "A-F", "G", "H", "I" };
+
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
         {
-            List<BF_Production> list = new List<BF_Production>();
-            string[] furnaces = { "A-F", "G", "H", "I" };
-            try
+            con.Open();
+
+            foreach (var furnace in furnaces)
             {
-                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+                BF_Production row = new BF_Production();
+
+                decimal LD1_TONS = 0, LD2_TONS = 0, LD3_TONS = 0;
+                decimal MRDTP_TONS = 0, NOOFTP = 0;
+
+                try
                 {
-                    con.Open();
+                    // 🔹 Handle A-F group
+                    string plantCondition = furnace == "A-F"
+                        ? "IN ('C','D','E','F')"
+                        : "= :FURNACE";
 
-                    foreach (var furnace in furnaces)
+                    // =========================
+                    // 🔴 CHECK DATA IN T_LADLE
+                    // =========================
+                    string countQuery = $@"
+                        SELECT COUNT(*) 
+                        FROM DEMO.T_LADLE 
+                        WHERE DATE_TIME = TO_DATE(:FDate,'DD/MM/YYYY') 
+                        AND PLANT {plantCondition}";
+
+                    int count = 0;
+
+                    using (OracleCommand cmd = new OracleCommand(countQuery, con))
                     {
-                        BF_Production row = new BF_Production();
+                        cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
 
-                        decimal LD1_TONS = 0, LD2_TONS = 0, LD3_TONS = 0;
-                        decimal MRDTP_TONS = 0;
+                        if (furnace != "A-F")
+                            cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = furnace;
 
-                        try
+                        count = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+
+                    // =========================
+                    // 🔴 IF DATA EXISTS
+                    // =========================
+                    if (count > 0)
+                    {
+                        string sql = $@"
+                            SELECT 
+                                NVL(SUM(LD1_TONS),0),
+                                NVL(SUM(LD2_TONS),0),
+                                NVL(SUM(LD3_TONS),0),
+                                NVL(SUM(MRDTP_TONS),0),
+                                NVL(SUM(NOOFTP),0)
+                            FROM DEMO.T_LADLE
+                            WHERE DATE_TIME = TO_DATE(:FDate,'DD/MM/YYYY')
+                            AND PLANT {plantCondition}";
+
+                        using (OracleCommand cmd = new OracleCommand(sql, con))
                         {
-                            string countQuery = @"SELECT COUNT(*) FROM DEMO.T_LADLE WHERE TIMESTAMP = TO_DATE(:FDate,'DD/MM/YYYY') AND FURNACE = :FURNACE";
-                            int count = 0;
-                            using (OracleCommand cmd = new OracleCommand(countQuery, con))
-                            {
-                                cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
+                            cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
+
+                            if (furnace != "A-F")
                                 cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = furnace;
 
-                                count = Convert.ToInt32(cmd.ExecuteScalar());
-                            }
-                            if (count > 0)
+                            using (var dr = cmd.ExecuteReader())
                             {
-                                string Sql1 = @"DATE_TIME,LD1_TONS,LD2_TONS,LD3_TONS,MRDTP_TONS,NOOFTP,LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,LD3_TONS_ACTUAL,MRDTP_TONS_ACTUAL WHERE DATE_TIME = TO_DATE(:FDate,'DD/MM/YYYY') AND PLANT = :FURNACE";
-                                using (OracleCommand cmd = new OracleCommand(Sql1, con))
+                                if (dr.Read())
                                 {
-                                    cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
-                                    cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = furnace;
-
-                                    using (var dr = cmd.ExecuteReader())
-                                    {
-                                        if (dr.Read())
-                                        {
-                                            LD1_TONS = dr["LD1_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1_TONS"]);
-                                            LD2_TONS = dr["LD2_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2_TONS"]);
-                                            LD3_TONS = dr["LD3_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3_TONS"]);
-                                            MRDTP_TONS = dr["MRDTP_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRDTP_TONS"]);                                           
-                                        }
-                                    }
+                                    LD1_TONS = dr.IsDBNull(0) ? 0 : dr.GetDecimal(0);
+                                    LD2_TONS = dr.IsDBNull(1) ? 0 : dr.GetDecimal(1);
+                                    LD3_TONS = dr.IsDBNull(2) ? 0 : dr.GetDecimal(2);
+                                    MRDTP_TONS = dr.IsDBNull(3) ? 0 : dr.GetDecimal(3);
+                                    NOOFTP = dr.IsDBNull(4) ? 0 : dr.GetDecimal(4);
                                 }
-                            }
-                            else
-                            {
-                                string Sql1 = @"SELECT NVL(SUM(CASE WHEN DESTINATION='LD1' THEN NET_WT END),0) AS LD1_TONS,NVL(SUM(CASE WHEN DESTINATION = 'LD2' THEN NET_WT END),0) AS LD2_TONS,
-                                                NVL(SUM(CASE WHEN DESTINATION='LD3' THEN NET_WT END),0) AS LD3_TONS,
-                                                NVL(SUM(CASE WHEN DESTINATION='MRD' AND TRP_NO <= 50 THEN NET_WT END),0) AS MRDTP_TONS,
-                                                NVL(SUM(CASE WHEN TRP_NO <= 50 AND RET_FLAG = 'N' THEN FILL_STATUS END),0) AS NOOFTP
-                                                FROM DEMO.T_LADLE_DETAILS WHERE LADLE_FLEND_TIME >= TO_DATE(:FDate,'DD/MM/YYYY')+ 6/24
-                                                AND LADLE_FLEND_TIME <TO_DATE(:FDate,'DD/MM/YYYY')+1+6/24 AND FUR_NAME IN ('C','D','E','F')";
-
-                                using (OracleCommand cmd = new OracleCommand(Sql1, con))
-                                {
-                                    cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
-                                    cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = furnace;
-                                }
-
-                                
-                               
-
-                               
                             }
                         }
-                        catch (Exception ex)
+                    }
+                    // =========================
+                    // 🔴 ELSE (CALCULATE FROM DETAILS)
+                    // =========================
+                    else
+                    {
+                        string sql = $@"
+                            SELECT 
+                                NVL(SUM(CASE WHEN DESTINATION='LD1' THEN NET_WT END),0),
+                                NVL(SUM(CASE WHEN DESTINATION='LD2' THEN NET_WT END),0),
+                                NVL(SUM(CASE WHEN DESTINATION='LD3' THEN NET_WT END),0),
+                                NVL(SUM(CASE WHEN DESTINATION='MRD' AND TRP_NO <= 50 THEN NET_WT END),0),
+                                NVL(SUM(CASE WHEN TRP_NO <= 50 AND RET_FLAG = 'N' THEN FILL_STATUS END),0)
+                            FROM DEMO.T_LADLE_DETAILS
+                            WHERE LADLE_FLEND_TIME >= TO_DATE(:FDate,'DD/MM/YYYY') + 6/24
+                            AND LADLE_FLEND_TIME < TO_DATE(:FDate,'DD/MM/YYYY') + 1 + 6/24
+                            AND FUR_NAME {plantCondition}";
+
+                        using (OracleCommand cmd = new OracleCommand(sql, con))
                         {
-                            row.FURNACE = furnace;
-                            row.ACT_ONDT = 0;
-                            row.REPORT_ONDT = 0;
-                            row.BALANCE = 0;
-                            row.ACT_TODT = null;
-                            row.REPORT_TODT = null;
-                            System.Diagnostics.Debug.WriteLine("Error for Furnace " + furnace + ": " + ex.Message);
-                            list.Add(row);
-                            continue;
+                            cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
+
+                            if (furnace != "A-F")
+                                cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = furnace;
+
+                            using (var dr = cmd.ExecuteReader())
+                            {
+                                if (dr.Read())
+                                {
+                                    LD1_TONS = dr.IsDBNull(0) ? 0 : dr.GetDecimal(0);
+                                    LD2_TONS = dr.IsDBNull(1) ? 0 : dr.GetDecimal(1);
+                                    LD3_TONS = dr.IsDBNull(2) ? 0 : dr.GetDecimal(2);
+                                    MRDTP_TONS = dr.IsDBNull(3) ? 0 : dr.GetDecimal(3);
+                                    NOOFTP = dr.IsDBNull(4) ? 0 : dr.GetDecimal(4);
+                                }
+                            }
                         }
-                        row.FURNACE = furnace;
-                        row.ACT_ONDT = ACTUAL;
-                        row.REPORT_ONDT = REPORTED;
-                        row.BALANCE = BALANCE;
-                        row.ACT_TODT = ACTUAL_TD == 0 ? (decimal?)null : ACTUAL_TD;
-                        row.REPORT_TODT = REPORTED_TD == 0 ? (decimal?)null : REPORTED_TD;
-                        list.Add(row);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                return Json(new
+                catch (Exception ex)
                 {
-                    success = false,
-                    message = ex.Message
-                }, JsonRequestBehavior.AllowGet);
-            }
+                    System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+                }
 
-            return Json(list, JsonRequestBehavior.AllowGet);
+                // 🔹 ASSIGN TO OBJECT
+                row.FURNACE = furnace;
+                row.LD1_TONS = LD1_TONS;
+                row.LD2_TONS = LD2_TONS;
+                row.LD3_TONS = LD3_TONS;
+                row.MRDTP_TONS = MRDTP_TONS;
+                row.NOOFTP = NOOFTP;
+
+                list.Add(row);
+            }
         }
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+    }
+
+    return Json(list, JsonRequestBehavior.AllowGet);
+}
