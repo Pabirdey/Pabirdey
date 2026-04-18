@@ -1,97 +1,37 @@
-public JsonResult GetATOIBFLDReportData(string fDate)
-{
-    List<BF_Production> list = new List<BF_Production>();
 
-    try
-    {
-        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
-
-            BF_Production row = new BF_Production();
-
-            decimal LD1_TONS = 0, LD2_TONS = 0, LD3_TONS = 0;
-            decimal MRDTP_TONS = 0, NOOFTP = 0;
-
-            try
-            {
-                string sql = @"
-                SELECT 
-                    NVL(SUM(LD1),0),
-                    NVL(SUM(LD2),0),
-                    NVL(SUM(LD3),0),
-                    NVL(SUM(MRD),0),
-                    NVL(SUM(NOOFTP),0)
-                FROM
-                (
-                    -- 🔴 FROM T_LADLE (if exists)
-                    SELECT 
-                        LD1_TONS AS LD1,
-                        LD2_TONS AS LD2,
-                        LD3_TONS AS LD3,
-                        MRDTP_TONS AS MRD,
-                        NOOFTP
-                    FROM DEMO.T_LADLE
-                    WHERE DATE_TIME = TO_DATE(:FDate,'DD/MM/YYYY')
-                    AND PLANT IN ('C','D','E','F')
-
-                    UNION ALL
-
-                    -- 🔴 FROM DETAILS (only when no data in T_LADLE)
-                    SELECT 
-                        NVL(SUM(CASE WHEN DESTINATION='LD1' THEN NET_WT END),0),
-                        NVL(SUM(CASE WHEN DESTINATION='LD2' THEN NET_WT END),0),
-                        NVL(SUM(CASE WHEN DESTINATION='LD3' THEN NET_WT END),0),
-                        NVL(SUM(CASE WHEN DESTINATION='MRD' AND TRP_NO<=50 THEN NET_WT END),0),
-                        NVL(SUM(CASE WHEN TRP_NO<=50 AND RET_FLAG='N' THEN FILL_STATUS END),0)
-                    FROM DEMO.T_LADLE_DETAILS
-                    WHERE LADLE_FLEND_TIME >= TO_DATE(:FDate,'DD/MM/YYYY') + 6/24
-                    AND LADLE_FLEND_TIME < TO_DATE(:FDate,'DD/MM/YYYY') + 1 + 6/24
-                    AND FUR_NAME IN ('C','D','E','F')
-                    AND NOT EXISTS
-                    (
-                        SELECT 1 FROM DEMO.T_LADLE
-                        WHERE DATE_TIME = TO_DATE(:FDate,'DD/MM/YYYY')
-                        AND PLANT IN ('C','D','E','F')
-                    )
-                )";
-
-                using (OracleCommand cmd = new OracleCommand(sql, con))
-                {
-                    cmd.Parameters.Add("FDate", OracleDbType.Varchar2).Value = fDate;
-
-                    using (var dr = cmd.ExecuteReader())
-                    {
-                        if (dr.Read())
-                        {
-                            LD1_TONS = dr.IsDBNull(0) ? 0 : dr.GetDecimal(0);
-                            LD2_TONS = dr.IsDBNull(1) ? 0 : dr.GetDecimal(1);
-                            LD3_TONS = dr.IsDBNull(2) ? 0 : dr.GetDecimal(2);
-                            MRDTP_TONS = dr.IsDBNull(3) ? 0 : dr.GetDecimal(3);
-                            NOOFTP = dr.IsDBNull(4) ? 0 : dr.GetDecimal(4);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
-            }
-
-            row.FURNACE = "A-F";
-            row.LD1_TONS = LD1_TONS;
-            row.LD2_TONS = LD2_TONS;
-            row.LD3_TONS = LD3_TONS;
-            row.MRDTP_TONS = MRDTP_TONS;
-            row.NOOFTP = NOOFTP;
-
-            list.Add(row);
-        }
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-    }
-
-    return Json(list, JsonRequestBehavior.AllowGet);
-}
+                    
+                    			--Modified on 15-Jan-2009
+                    select DATE_TIME,LD1_TONS,LD2_TONS,LD3_TONS,MRDTP_TONS,NOOFTP,LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,LD3_TONS_ACTUAL,MRDTP_TONS_ACTUAL
+		                into :BLK_CONTROL.DATE_TIME,:BLK_CONTROL.LD1_TONS,:BLK_CONTROL.LD2_TONS,:BLK_CONTROL.LD3_TONS,:BLK_CONTROL.MRDTP_TONS,:BLK_CONTROL.NOOFTP,
+		                     :BLK_CONTROL.LD1_TONS_ACTUAL,:BLK_CONTROL.LD2_TONS_ACTUAL,:BLK_CONTROL.LD3_TONS_ACTUAL,:BLK_CONTROL.MRDTP_TONS_ACTUAL		                      
+		                FROM demo.t_ladle where date_time=:ctl_blk.ctl_date_time_prod and Plant='A-F';
+		                -------------------
+                    
+                    
+                    SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD1_TONS from  demo.t_ladle_details where
+		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24					
+					 AND DESTINATION='LD1' and fur_name IN ('C','D','E','F');	
+					:BLK_CONTROL.LD1_TONS_ACTUAL:=:BLK_CONTROL.LD1_TONS;
+					
+					SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD2_TONS from  demo.t_ladle_details where
+		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24			
+						AND DESTINATION='LD2' and fur_name IN ('C','D','E','F');	
+					:BLK_CONTROL.LD2_TONS_ACTUAL:=:BLK_CONTROL.LD2_TONS;					
+			
+						
+			SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD3_TONS from  demo.t_ladle_details where
+		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
+						-- AND DESTINATION='LD2' and fur_name<>'G';
+						AND DESTINATION='LD3' and fur_name IN ('C','D','E','F');	
+					:BLK_CONTROL.LD3_TONS_ACTUAL:=:BLK_CONTROL.LD3_TONS;
+			
+						SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.MRDTP_TONS from  demo.t_ladle_details where
+		 			  LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
+					--	AND DESTINATION='MRD' AND TRP_NO<=50 and fur_name<>'G';		
+					AND DESTINATION='MRD' AND TRP_NO<=50 and fur_name IN ('C','D','E','F');			
+				  	:BLK_CONTROL.MRDTP_TONS_ACTUAL:=:BLK_CONTROL.MRDTP_TONS;
+									
+		     	SELECT NVL(SUM(FILL_STATUS),0) INTO :BLK_CONTROL.NOOFTP from  demo.t_ladle_details where
+		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
+					--	AND  TRP_NO<=50 and fur_name<>'G' and ret_flag='N';
+							AND  TRP_NO<=50 and fur_name IN ('C','D','E','F') and ret_flag='N';
