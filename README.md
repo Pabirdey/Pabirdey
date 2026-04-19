@@ -1,50 +1,23 @@
-function SaveBFData() {
+  string query = @"MERGE INTO imtg.T_FURNACES_PROC_HM_PROD t
+                                    USING (SELECT :TAG_ID TAG_ID FROM dual) s
+                                    ON (t.TAG_ID = s.TAG_ID AND t.TIMESTAMP = TO_DATE(:FDate,'DD/MM/YYYY'))
+                                    WHEN MATCHED THEN
+                                    UPDATE SET 
+                                    t.VALUE = :VALUE_TON                                    
+                                    WHEN NOT MATCHED THEN
+                                    INSERT (TAG_ID,TIMESTAMP,VALUE)
+                                    VALUES (:TAG_ID,TO_DATE(:FDate,'DD/MM/YYYY'),:VALUE_TON)";
 
-    debugger;
-
-    var date = $("#txtDate").val();
-
-    if (!date) {
-        alert("Please select date");
-        return;
-    }
-
-    var furnaces = ["C", "E", "F"];
-    var modelList = [];
-
-    furnaces.forEach(function (f) {
-
-        var model = {
-            FURNACE: f,
-
-            // 🔥 DATE ADDED HERE
-            DATE_TIME: date,
-
-            ACT_ONDT: Number($("#" + f + "_ActOnDate").val()) || 0,
-            REPORT_ONDT: Number($("#" + f + "_ReportOnDate").val()) || 0,
-            BALANCE: Number($("#" + f + "_Balance").val()) || 0
-        };
-
-        modelList.push(model);
-    });
-
-    $.ajax({
-        url: '/HML/SaveBFProdData',
-        type: 'POST',
-        data: JSON.stringify(modelList),
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-
-        success: function (res) {
-            if (res.success) {
-                alert("Saved Successfully");
-            } else {
-                alert("Error: " + res.message);
-            }
-        },
-
-        error: function () {
-            alert("Server error");
-        }
-    });
-}
+                        foreach (var row in materials)
+                        {
+                            int tagId = Convert.ToInt32(row["TAG_ID"]);
+                            decimal ton = Convert.ToDecimal(row["VALUE_TON"]);
+                            using (OracleCommand cmd = new OracleCommand(query, con))
+                            {
+                                cmd.Transaction = trans;
+                                cmd.BindByName = true;
+                                cmd.Parameters.Add(":TAG_ID", OracleDbType.Int32).Value = tagId;
+                                cmd.Parameters.Add(":FDate", OracleDbType.Varchar2).Value = FDate;
+                                cmd.Parameters.Add(":VALUE_TON", OracleDbType.Decimal).Value = ton;
+                                cmd.ExecuteNonQuery();
+                            }
