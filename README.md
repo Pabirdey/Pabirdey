@@ -1,43 +1,43 @@
-function saveCBFData() {
+[HttpPost]
+public JsonResult SaveCBFBulk(List<BF_Production> modelList)
+{
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            con.Open();
 
-    var furnaces = ["C", "E", "F"];   // 👉 add more if needed
+            foreach (var model in modelList)
+            {
+                string query = @"
+                MERGE INTO DEMO.T_BF_PRODUCTION_TRACKING t
+                USING (SELECT :FURNACE AS FURNACE FROM dual) s
+                ON (t.FURNACE = s.FURNACE)
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        ACTUAL = :ACT,
+                        REPORTED = :RPT,
+                        BALANCE = :BAL
+                WHEN NOT MATCHED THEN
+                    INSERT (FURNACE, ACTUAL, REPORTED, BALANCE)
+                    VALUES (:FURNACE, :ACT, :RPT, :BAL)";
 
-    var modelList = [];
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.Parameters.Add("FURNACE", model.FURNACE_C);
+                    cmd.Parameters.Add("ACT", model.ACT_ONDT);
+                    cmd.Parameters.Add("RPT", model.REPORT_ONDT);
+                    cmd.Parameters.Add("BAL", model.BALANCE);
 
-    furnaces.forEach(function (f) {
-
-        var model = {
-            FURNACE_C: f,
-
-            ACT_ONDT: Number($("#" + f + "_ActOnDate").val()) || 0,
-            ACT_TODT: Number($("#" + f + "_ActToDate").val()) || 0,
-
-            REPORT_ONDT: Number($("#" + f + "_ReportOnDate").val()) || 0,
-            REPORT_TODT: Number($("#" + f + "_ReportToDate").val()) || 0,
-
-            BALANCE: Number($("#" + f + "_Balance").val()) || 0
-        };
-
-        modelList.push(model);
-    });
-
-    $.ajax({
-        url: '/Home/SaveCBFBulk',   // 👈 bulk API
-        type: 'POST',
-        data: JSON.stringify(modelList),
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-
-        success: function (res) {
-            if (res.success) {
-                alert("Saved Successfully");
-            } else {
-                alert("Error: " + res.message);
+                    cmd.ExecuteNonQuery();
+                }
             }
-        },
-
-        error: function () {
-            alert("Server error");
         }
-    });
+
+        return Json(new { success = true });
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = ex.Message });
+    }
 }
