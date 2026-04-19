@@ -1,4 +1,8 @@
-  ------------For C Furnace
+	select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE IN('C','D','E','F');
+	 
+		IF V_TEMP>0 THEN		
+	
+      			     ------------For C Furnace
 		            :BLK_CONTROL.DATE_TIME_PROD_C:=:ctl_blk.ctl_date_time_prod;
 		            :BLK_CONTROL.FURNACE_C:='C';
 		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_C,:BLK_CONTROL.REPORTED_C,:BLK_CONTROL.BALANCE_C
@@ -46,29 +50,6 @@
       			   
       			     :BLK_CONTROL.DISPLAY_BALANCE:=nvl(:BLK_CONTROL.BALANCE_C,0)+nvl(:BLK_CONTROL.BALANCE_D,0)+nvl(:BLK_CONTROL.BALANCE_E,0)+nvl(:BLK_CONTROL.BALANCE_F,0);
       			     --##### For A-F Actual Todate/Reported
-      			   
-      			     :BLK_CONTROL.DISPLAY_ACTUAL_TD:=nvl(:BLK_CONTROL.ACTUAL_C_TD,0)+nvl(:BLK_CONTROL.ACTUAL_D_TD,0)+nvl(:BLK_CONTROL.ACTUAL_E_TD,0)+nvl(:BLK_CONTROL.ACTUAL_F_TD,0);
-      			     :BLK_CONTROL.DISPLAY_REPORTED_TD:=nvl(:BLK_CONTROL.REPORTED_C_TD,0)+nvl(:BLK_CONTROL.REPORTED_D_TD,0)+nvl(:BLK_CONTROL.REPORTED_E_TD,0)+nvl(:BLK_CONTROL.REPORTED_F_TD,0);
-      			     --#####
-					 	
-							select sum(NET_WT) into :BLK_CONTROL.ACTUAL_C  from  demo.t_ladle_details where
- 						   LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME_PROD_C+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME_PROD_C+1+6/24 
-							and DESTINATION<>'R' and fur_name='C';
-								
-								 --#####
-								 vActual_TD:=0;
-								 vReported_TD:=0;
-      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<:ctl_blk.ctl_date_time_prod AND FURNACE='C';
-      			     :BLK_CONTROL.ACTUAL_C_TD:=nvl(vActual_TD,0)+ nvl(:BLK_CONTROL.ACTUAL_C ,0);
-      			     :BLK_CONTROL.REPORTED_C_TD:=nvl(vReported_TD,0)+ nvl(:BLK_CONTROL.REPORTED_C ,0);
-      			     If :BLK_CONTROL.ACTUAL_C_TD=0 Then
-      			     	  :BLK_CONTROL.ACTUAL_C_TD:=Null;
-      			     End If; 
-      			     If :BLK_CONTROL.REPORTED_C_TD=0 Then
-      			     	  :BLK_CONTROL.REPORTED_C_TD:=Null;
-      			     End If;        			     
-      			     --#####
 							
 				
 			    
