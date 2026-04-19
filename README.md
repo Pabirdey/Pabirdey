@@ -1,6 +1,34 @@
-<td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="CBF_Furnace" id="CBF_Furnace" /></td>
-                                    <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AF_ActOnDate()" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
-                                    <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AF_ActToDate()" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
-                                    <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AF_ReportOnDate(); Calc_CBF_ReportOnDate();" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
-                                    <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AF_ReportToDate(); Calc_CBF_ReportOnDate();" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>
-                                    <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AF_Balance()" name="CBF_Balance" id="CBF_Balance" /></td>
+function saveCBFData() {
+
+    var model = {
+        FURNACE_C: $("#CBF_Furnace").val(),
+
+        ACT_ONDT: Number($("#CBF_ActOnDate").val()) || 0,
+        ACT_TODT: Number($("#CBF_ActToDate").val()) || 0,
+
+        REPORT_ONDT: Number($("#CBF_ReportOnDate").val()) || 0,
+        REPORT_TODT: Number($("#CBF_ReportToDate").val()) || 0,
+
+        BALANCE: Number($("#CBF_Balance").val()) || 0
+    };
+
+    $.ajax({
+        url: '/Home/SaveCBFData',
+        type: 'POST',
+        data: JSON.stringify(model),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+
+        success: function (res) {
+            if (res.success) {
+                alert("Saved Successfully");
+            } else {
+                alert("Error: " + res.message);
+            }
+        },
+
+        error: function () {
+            alert("Server error");
+        }
+    });
+}
