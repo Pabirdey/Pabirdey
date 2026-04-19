@@ -8,58 +8,37 @@ public JsonResult GetATOFBFLDReportData(string fDate)
         {
             con.Open();
 
-            // ================= COUNT =================
-            int v_temp = 0;
+            bool recordExists = false;
 
-            string countQuery = @"SELECT COUNT(*) 
+            // ================= CHECK EXISTS =================
+            string countQuery = @"SELECT 1 
                                   FROM demo.t_ladle 
                                   WHERE DATE_TIME = TO_DATE(:pDate,'DD/MM/YYYY') 
                                   AND PLANT = 'A-F'";
 
             using (OracleCommand cmd = new OracleCommand(countQuery, con))
             {
-                cmd.Parameters.Add("pDate", fDate);
-                v_temp = Convert.ToInt32(cmd.ExecuteScalar());
+                cmd.BindByName = true;
+                cmd.Parameters.Add("pDate", OracleDbType.Varchar2).Value = fDate;
+
+                var result = cmd.ExecuteScalar();
+                recordExists = (result != null);
             }
 
-            // ================= IF DATA EXISTS =================
-            if (v_temp > 0)
+            string query = "";
+
+            if (recordExists)
             {
-                string query = @"SELECT 
-                                    DATE_TIME,
-                                    LD1_TONS,LD2_TONS,LD3_TONS,
-                                    MRDTP_TONS,NOOFTP,
-                                    LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,
-                                    LD3_TONS_ACTUAL,MRDTP_TONS_ACTUAL
-                                 FROM demo.t_ladle 
-                                 WHERE DATE_TIME = TO_DATE(:pDate,'DD/MM/YYYY') 
-                                 AND PLANT = 'A-F'";
-
-                using (OracleCommand cmd = new OracleCommand(query, con))
-                {
-                    cmd.Parameters.Add("pDate", fDate);
-
-                    using (var dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            BF_Production row = new BF_Production();
-
-                            row.LD1_TONS = dr["LD1_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1_TONS"]);
-                            row.LD2_TONS = dr["LD2_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2_TONS"]);
-                            row.LD3_TONS = dr["LD3_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3_TONS"]);
-                            row.MRDTP_TONS = dr["MRDTP_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRDTP_TONS"]);
-                            row.NOOFTP = dr["NOOFTP"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NOOFTP"]);
-
-                            list.Add(row);
-                        }
-                    }
-                }
+                query = @"SELECT 
+                            LD1_TONS,LD2_TONS,LD3_TONS,
+                            MRDTP_TONS,NOOFTP
+                          FROM demo.t_ladle 
+                          WHERE DATE_TIME = TO_DATE(:pDate,'DD/MM/YYYY') 
+                          AND PLANT = 'A-F'";
             }
-            // ================= ELSE (CALCULATE) =================
             else
             {
-                string sqlquery = @"SELECT 
+                query = @"SELECT 
                         NVL(SUM(CASE WHEN DESTINATION = 'LD1' THEN NET_WT END), 0) AS LD1_TONS,
                         NVL(SUM(CASE WHEN DESTINATION = 'LD2' THEN NET_WT END), 0) AS LD2_TONS,
                         NVL(SUM(CASE WHEN DESTINATION = 'LD3' THEN NET_WT END), 0) AS LD3_TONS,
@@ -69,25 +48,26 @@ public JsonResult GetATOFBFLDReportData(string fDate)
                     WHERE LADLE_FLEND_TIME >= TO_DATE(:pDate,'DD/MM/YYYY') + 6/24
                       AND LADLE_FLEND_TIME <  TO_DATE(:pDate,'DD/MM/YYYY') + 1 + 6/24
                       AND FUR_NAME IN ('C','D','E','F')";
+            }
 
-                using (OracleCommand cmd = new OracleCommand(sqlquery, con))
+            using (OracleCommand cmd = new OracleCommand(query, con))
+            {
+                cmd.BindByName = true;
+                cmd.Parameters.Add("pDate", OracleDbType.Varchar2).Value = fDate;
+
+                using (var dr = cmd.ExecuteReader())
                 {
-                    cmd.Parameters.Add("pDate", fDate);
-
-                    using (var dr = cmd.ExecuteReader())
+                    if (dr.Read()) // only 1 row expected
                     {
-                        while (dr.Read())
-                        {
-                            BF_Production row = new BF_Production();
+                        BF_Production row = new BF_Production();
 
-                            row.LD1_TONS = dr["LD1_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1_TONS"]);
-                            row.LD2_TONS = dr["LD2_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2_TONS"]);
-                            row.LD3_TONS = dr["LD3_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3_TONS"]);
-                            row.MRDTP_TONS = dr["MRDTP_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRDTP_TONS"]);
-                            row.NOOFTP = dr["NOOFTP"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NOOFTP"]);
+                        row.LD1_TONS = dr["LD1_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1_TONS"]);
+                        row.LD2_TONS = dr["LD2_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2_TONS"]);
+                        row.LD3_TONS = dr["LD3_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3_TONS"]);
+                        row.MRDTP_TONS = dr["MRDTP_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRDTP_TONS"]);
+                        row.NOOFTP = dr["NOOFTP"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NOOFTP"]);
 
-                            list.Add(row);
-                        }
+                        list.Add(row);
                     }
                 }
             }
@@ -95,7 +75,6 @@ public JsonResult GetATOFBFLDReportData(string fDate)
     }
     catch (Exception ex)
     {
-        // Log error (optional)
         return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
     }
 
