@@ -7,6 +7,8 @@ string tdQuery = @"
 
 using (OracleCommand cmd = new OracleCommand(tdQuery, con))
 {
+    cmd.BindByName = true; // ✅ VERY IMPORTANT
+
     cmd.Parameters.Add("fDate", OracleDbType.Varchar2).Value = fDate;
     cmd.Parameters.Add("furnace", OracleDbType.Varchar2).Value = furnace;
 
