@@ -1,28 +1,103 @@
-	SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD1_TONS from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24					
-					 AND DESTINATION='LD1' and fur_name IN ('C','D','E','F');	
-					:BLK_CONTROL.LD1_TONS_ACTUAL:=:BLK_CONTROL.LD1_TONS;
-					
-					SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD2_TONS from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24			
-						AND DESTINATION='LD2' and fur_name IN ('C','D','E','F');	
-					:BLK_CONTROL.LD2_TONS_ACTUAL:=:BLK_CONTROL.LD2_TONS;					
-			
-						
-			SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD3_TONS from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						-- AND DESTINATION='LD2' and fur_name<>'G';
-						AND DESTINATION='LD3' and fur_name IN ('C','D','E','F');	
-					:BLK_CONTROL.LD3_TONS_ACTUAL:=:BLK_CONTROL.LD3_TONS;
-			
-						SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.MRDTP_TONS from  demo.t_ladle_details where
-		 			  LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-					--	AND DESTINATION='MRD' AND TRP_NO<=50 and fur_name<>'G';		
-					AND DESTINATION='MRD' AND TRP_NO<=50 and fur_name IN ('C','D','E','F');			
-				  	:BLK_CONTROL.MRDTP_TONS_ACTUAL:=:BLK_CONTROL.MRDTP_TONS;
-									
-		     	SELECT NVL(SUM(FILL_STATUS),0) INTO :BLK_CONTROL.NOOFTP from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-					--	AND  TRP_NO<=50 and fur_name<>'G' and ret_flag='N';
-							AND  TRP_NO<=50 and fur_name IN ('C','D','E','F') and ret_flag='N';
-						
+public JsonResult GetATOFBFLDReportData(string fDate)
+{
+    List<BF_Production> list = new List<BF_Production>();
+
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            con.Open();
+
+            // ================= COUNT =================
+            int v_temp = 0;
+
+            string countQuery = @"SELECT COUNT(*) 
+                                  FROM demo.t_ladle 
+                                  WHERE DATE_TIME = TO_DATE(:pDate,'DD/MM/YYYY') 
+                                  AND PLANT = 'A-F'";
+
+            using (OracleCommand cmd = new OracleCommand(countQuery, con))
+            {
+                cmd.Parameters.Add("pDate", fDate);
+                v_temp = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+
+            // ================= IF DATA EXISTS =================
+            if (v_temp > 0)
+            {
+                string query = @"SELECT 
+                                    DATE_TIME,
+                                    LD1_TONS,LD2_TONS,LD3_TONS,
+                                    MRDTP_TONS,NOOFTP,
+                                    LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,
+                                    LD3_TONS_ACTUAL,MRDTP_TONS_ACTUAL
+                                 FROM demo.t_ladle 
+                                 WHERE DATE_TIME = TO_DATE(:pDate,'DD/MM/YYYY') 
+                                 AND PLANT = 'A-F'";
+
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.Parameters.Add("pDate", fDate);
+
+                    using (var dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            BF_Production row = new BF_Production();
+
+                            row.LD1_TONS = dr["LD1_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1_TONS"]);
+                            row.LD2_TONS = dr["LD2_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2_TONS"]);
+                            row.LD3_TONS = dr["LD3_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3_TONS"]);
+                            row.MRDTP_TONS = dr["MRDTP_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRDTP_TONS"]);
+                            row.NOOFTP = dr["NOOFTP"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NOOFTP"]);
+
+                            list.Add(row);
+                        }
+                    }
+                }
+            }
+            // ================= ELSE (CALCULATE) =================
+            else
+            {
+                string sqlquery = @"SELECT 
+                        NVL(SUM(CASE WHEN DESTINATION = 'LD1' THEN NET_WT END), 0) AS LD1_TONS,
+                        NVL(SUM(CASE WHEN DESTINATION = 'LD2' THEN NET_WT END), 0) AS LD2_TONS,
+                        NVL(SUM(CASE WHEN DESTINATION = 'LD3' THEN NET_WT END), 0) AS LD3_TONS,
+                        NVL(SUM(CASE WHEN DESTINATION = 'MRD' AND TRP_NO <= 50 THEN NET_WT END), 0) AS MRDTP_TONS,
+                        NVL(SUM(CASE WHEN TRP_NO <= 50 AND RET_FLAG = 'N' THEN FILL_STATUS END), 0) AS NOOFTP
+                    FROM demo.t_ladle_details
+                    WHERE LADLE_FLEND_TIME >= TO_DATE(:pDate,'DD/MM/YYYY') + 6/24
+                      AND LADLE_FLEND_TIME <  TO_DATE(:pDate,'DD/MM/YYYY') + 1 + 6/24
+                      AND FUR_NAME IN ('C','D','E','F')";
+
+                using (OracleCommand cmd = new OracleCommand(sqlquery, con))
+                {
+                    cmd.Parameters.Add("pDate", fDate);
+
+                    using (var dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            BF_Production row = new BF_Production();
+
+                            row.LD1_TONS = dr["LD1_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1_TONS"]);
+                            row.LD2_TONS = dr["LD2_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2_TONS"]);
+                            row.LD3_TONS = dr["LD3_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3_TONS"]);
+                            row.MRDTP_TONS = dr["MRDTP_TONS"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRDTP_TONS"]);
+                            row.NOOFTP = dr["NOOFTP"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NOOFTP"]);
+
+                            list.Add(row);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log error (optional)
+        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+    }
+
+    return Json(list, JsonRequestBehavior.AllowGet);
+}
