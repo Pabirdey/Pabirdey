@@ -1,58 +1,138 @@
-	select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE IN('C','D','E','F');
-	 
-		IF V_TEMP>0 THEN		
-	
-      			     ------------For C Furnace
-		            :BLK_CONTROL.DATE_TIME_PROD_C:=:ctl_blk.ctl_date_time_prod;
-		            :BLK_CONTROL.FURNACE_C:='C';
-		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_C,:BLK_CONTROL.REPORTED_C,:BLK_CONTROL.BALANCE_C
-      		       FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			     WHERE TIMESTAMP=:ctl_blk.ctl_date_time_prod AND FURNACE='C';
-      			     
-      			     
-      			     SELECT decode(sum(ACTUAL),0,Null,sum(ACTUAL)),decode(sum(REPORTED),0,Null,sum(REPORTED)) into :BLK_CONTROL.ACTUAL_C_TD,:BLK_CONTROL.REPORTED_C_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<=:ctl_blk.ctl_date_time_prod AND FURNACE='C';
-      			     
-      			    
-      			     
-      			     ------------For E Furnace
-		            :BLK_CONTROL.DATE_TIME_PROD_E:=:ctl_blk.ctl_date_time_prod;
-		            :BLK_CONTROL.FURNACE_E:='E';
-		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_E,:BLK_CONTROL.REPORTED_E,:BLK_CONTROL.BALANCE_E
-      		       FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			     WHERE TIMESTAMP=:ctl_blk.ctl_date_time_prod AND FURNACE='E';
-      			     
-      			     --#####
-      			     SELECT decode(sum(ACTUAL),0,Null,sum(ACTUAL)),decode(sum(REPORTED),0,Null,sum(REPORTED)) into :BLK_CONTROL.ACTUAL_E_TD,:BLK_CONTROL.REPORTED_E_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<=:ctl_blk.ctl_date_time_prod AND FURNACE='E';
-      			     --#####
-      			     
-      			     ------------For F Furnace
-		            :BLK_CONTROL.DATE_TIME_PROD_F:=:ctl_blk.ctl_date_time_prod;
-		            :BLK_CONTROL.FURNACE_F:='F';
-		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_F,:BLK_CONTROL.REPORTED_F,:BLK_CONTROL.BALANCE_F
-      		       FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			     WHERE TIMESTAMP=:ctl_blk.ctl_date_time_prod AND FURNACE='F';
-      			     
-      			     --#####
-      			     SELECT decode(sum(ACTUAL),0,Null,sum(ACTUAL)),decode(sum(REPORTED),0,Null,sum(REPORTED)) into :BLK_CONTROL.ACTUAL_F_TD,:BLK_CONTROL.REPORTED_F_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<=:ctl_blk.ctl_date_time_prod AND FURNACE='F';
-      			     --#####
-      			     
-      			     ---- For A-F Actual
-      			   
-                   :BLK_CONTROL.DISPLAY_ACTUAL:=nvl(:BLK_CONTROL.ACTUAL_C,0)+nvl(:BLK_CONTROL.ACTUAL_D,0)+nvl(:BLK_CONTROL.ACTUAL_E,0)+nvl(:BLK_CONTROL.ACTUAL_F,0);
-                 ---- For A-F Reported
-      			   
-      			     :BLK_CONTROL.DISPLAY_REPORTED:=nvl(:BLK_CONTROL.REPORTED_C,0)+nvl(:BLK_CONTROL.REPORTED_D,0)+nvl(:BLK_CONTROL.REPORTED_E,0)+nvl(:BLK_CONTROL.REPORTED_F,0);
-      			     
-      			     ---- For A-F Balance
-      			   
-      			     :BLK_CONTROL.DISPLAY_BALANCE:=nvl(:BLK_CONTROL.BALANCE_C,0)+nvl(:BLK_CONTROL.BALANCE_D,0)+nvl(:BLK_CONTROL.BALANCE_E,0)+nvl(:BLK_CONTROL.BALANCE_F,0);
-      			     --##### For A-F Actual Todate/Reported
-							
-				
-			    
-			    SELECT SUM(NVL(ACTUAL,0)-NVL(REPORTED,0))INTO :BLK_CONTROL.BALANCE_C FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE 
-					TIMESTAMP>=TRUNC(:BLK_CONTROL.DATE_TIME_PROD_C,'MON') AND TIMESTAMP<:BLK_CONTROL.DATE_TIME_PROD_C AND FURNACE=:BLK_CONTROL.FURNACE_C;
-			    
+public JsonResult GetBFProductionData(string fDate)
+{
+    BFProductionModel model = new BFProductionModel();
+
+    using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+    {
+        con.Open();
+
+        model.DateTime = Convert.ToDateTime(fDate);
+
+        int count = 0;
+
+        // ===== COUNT CHECK =====
+        string countQuery = @"
+            SELECT COUNT(*)
+            FROM DEMO.T_BF_PRODUCTION_TRACKING
+            WHERE TIMESTAMP = TO_DATE(:fDate,'DD-MM-YYYY')
+            AND FURNACE IN ('C','D','E','F')";
+
+        using (OracleCommand cmd = new OracleCommand(countQuery, con))
+        {
+            cmd.Parameters.Add("fDate", fDate);
+            count = Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        // ===== IF EXISTS =====
+        if (count > 0)
+        {
+            string[] furnaces = { "C", "E", "F" }; // add D if needed
+
+            foreach (string furnace in furnaces)
+            {
+                decimal actual = 0, reported = 0, balance = 0;
+                decimal actualTD = 0, reportedTD = 0;
+
+                // ===== DAILY =====
+                string dailyQuery = @"
+                    SELECT NVL(ACTUAL,0), NVL(REPORTED,0), NVL(BALANCE,0)
+                    FROM DEMO.T_BF_PRODUCTION_TRACKING
+                    WHERE TIMESTAMP = TO_DATE(:fDate,'DD-MM-YYYY')
+                    AND FURNACE = :furnace";
+
+                using (OracleCommand cmd = new OracleCommand(dailyQuery, con))
+                {
+                    cmd.Parameters.Add("fDate", fDate);
+                    cmd.Parameters.Add("furnace", furnace);
+
+                    using (OracleDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            actual = Convert.ToDecimal(dr[0]);
+                            reported = Convert.ToDecimal(dr[1]);
+                            balance = Convert.ToDecimal(dr[2]);
+                        }
+                    }
+                }
+
+                // ===== TD =====
+                string tdQuery = @"
+                    SELECT 
+                        DECODE(SUM(ACTUAL),0,NULL,SUM(ACTUAL)),
+                        DECODE(SUM(REPORTED),0,NULL,SUM(REPORTED))
+                    FROM DEMO.T_BF_PRODUCTION_TRACKING
+                    WHERE TIMESTAMP >= TRUNC(TO_DATE(:fDate,'DD-MM-YYYY'),'MON')
+                    AND TIMESTAMP <= TO_DATE(:fDate,'DD-MM-YYYY')
+                    AND FURNACE = :furnace";
+
+                using (OracleCommand cmd = new OracleCommand(tdQuery, con))
+                {
+                    cmd.Parameters.Add("fDate", fDate);
+                    cmd.Parameters.Add("furnace", furnace);
+
+                    using (OracleDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            actualTD = dr.IsDBNull(0) ? 0 : Convert.ToDecimal(dr[0]);
+                            reportedTD = dr.IsDBNull(1) ? 0 : Convert.ToDecimal(dr[1]);
+                        }
+                    }
+                }
+
+                // ===== MAP TO MODEL =====
+                if (furnace == "C")
+                {
+                    model.ACTUAL_C = actual;
+                    model.REPORTED_C = reported;
+                    model.BALANCE_C = balance;
+                    model.ACTUAL_C_TD = actualTD;
+                    model.REPORTED_C_TD = reportedTD;
+                }
+                else if (furnace == "E")
+                {
+                    model.ACTUAL_E = actual;
+                    model.REPORTED_E = reported;
+                    model.BALANCE_E = balance;
+                    model.ACTUAL_E_TD = actualTD;
+                    model.REPORTED_E_TD = reportedTD;
+                }
+                else if (furnace == "F")
+                {
+                    model.ACTUAL_F = actual;
+                    model.REPORTED_F = reported;
+                    model.BALANCE_F = balance;
+                    model.ACTUAL_F_TD = actualTD;
+                    model.REPORTED_F_TD = reportedTD;
+                }
+            }
+
+            // ===== TOTAL (A-F) =====
+            model.DISPLAY_ACTUAL =
+                model.ACTUAL_C + model.ACTUAL_D + model.ACTUAL_E + model.ACTUAL_F;
+
+            model.DISPLAY_REPORTED =
+                model.REPORTED_C + model.REPORTED_D + model.REPORTED_E + model.REPORTED_F;
+
+            model.DISPLAY_BALANCE =
+                model.BALANCE_C + model.BALANCE_D + model.BALANCE_E + model.BALANCE_F;
+
+            // ===== BALANCE TD (C only as per your code) =====
+            string balQuery = @"
+                SELECT SUM(NVL(ACTUAL,0) - NVL(REPORTED,0))
+                FROM DEMO.T_BF_PRODUCTION_TRACKING
+                WHERE TIMESTAMP >= TRUNC(TO_DATE(:fDate,'DD-MM-YYYY'),'MON')
+                AND TIMESTAMP < TO_DATE(:fDate,'DD-MM-YYYY')
+                AND FURNACE = 'C'";
+
+            using (OracleCommand cmd = new OracleCommand(balQuery, con))
+            {
+                cmd.Parameters.Add("fDate", fDate);
+                model.BALANCE_C = Convert.ToDecimal(cmd.ExecuteScalar());
+            }
+        }
+    }
+
+    return Json(model, JsonRequestBehavior.AllowGet);
+}
