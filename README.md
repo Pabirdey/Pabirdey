@@ -1,149 +1,77 @@
-public JsonResult SaveProductionData(BF_Production model)
-{
-    try
-    {
-        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
-
-            // ================== COMMON MERGE QUERY ==================
-            string mergeQuery = @"
-MERGE INTO DEMO.T_BF_PRODUCTION_TRACKING t
-USING (
-    SELECT :TIMESTAMP AS TIMESTAMP, :FURNACE AS FURNACE FROM dual
-) s
-ON (t.TIMESTAMP = s.TIMESTAMP AND t.FURNACE = s.FURNACE)
-WHEN MATCHED THEN
-    UPDATE SET 
-        t.ACTUAL = :ACTUAL,
-        t.REPORTED = :REPORTED,
-        t.BALANCE = :BALANCE
-WHEN NOT MATCHED THEN
-    INSERT (TIMESTAMP, FURNACE, ACTUAL, REPORTED, BALANCE)
-    VALUES (:TIMESTAMP, :FURNACE, :ACTUAL, :REPORTED, :BALANCE)";
-
-            // ================== C, E, F LOOP ==================
-            var furnaces = new[]
-            {
-                new { F="C", ACT=model.ACTUAL_C, REP=model.REPORTED_C, BAL=model.BALANCE_C, DT=model.DATE_TIME_PROD_C },
-                new { F="E", ACT=model.ACTUAL_E, REP=model.REPORTED_E, BAL=model.BALANCE_E, DT=model.DATE_TIME_PROD_E },
-                new { F="F", ACT=model.ACTUAL_F, REP=model.REPORTED_F, BAL=model.BALANCE_F, DT=model.DATE_TIME_PROD_F }
-            };
-
-            foreach (var f in furnaces)
-            {
-                using (OracleCommand cmd = new OracleCommand(mergeQuery, con))
-                {
-                    cmd.Parameters.Add("TIMESTAMP", f.DT);
-                    cmd.Parameters.Add("FURNACE", f.F);
-                    cmd.Parameters.Add("ACTUAL", f.ACT);
-                    cmd.Parameters.Add("REPORTED", f.REP);
-                    cmd.Parameters.Add("BALANCE", f.BAL);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            // ================== T_LADLE (A-F) ==================
-            string ladleMerge = @"
-MERGE INTO DEMO.T_LADLE t
-USING (
-    SELECT :DATE_TIME AS DATE_TIME, 'A-F' AS PLANT FROM dual
-) s
-ON (t.DATE_TIME = s.DATE_TIME AND t.PLANT = s.PLANT)
-WHEN MATCHED THEN
-    UPDATE SET 
-        t.LD1_TONS = :LD1,
-        t.LD2_TONS = :LD2,
-        t.LD3_TONS = :LD3,
-        t.MRDTP_TONS = :MRDTP,
-        t.NOOFTP = :NOOFTP
-WHEN NOT MATCHED THEN
-    INSERT (DATE_TIME, LD1_TONS, LD2_TONS, LD3_TONS, MRDTP_TONS, NOOFTP,
-            LD1_TONS_ACTUAL, LD2_TONS_ACTUAL, LD3_TONS_ACTUAL, MRDTP_TONS_ACTUAL, PLANT)
-    VALUES (:DATE_TIME, :LD1, :LD2, :LD3, :MRDTP, :NOOFTP,
-            :LD1A, :LD2A, :LD3A, :MRDTPA, 'A-F')";
-
-            using (OracleCommand cmd = new OracleCommand(ladleMerge, con))
-            {
-                cmd.Parameters.Add("DATE_TIME", model.DATE_TIME);
-                cmd.Parameters.Add("LD1", model.LD1_TONS);
-                cmd.Parameters.Add("LD2", model.LD2_TONS);
-                cmd.Parameters.Add("LD3", model.LD3_TONS);
-                cmd.Parameters.Add("MRDTP", model.MRDTP_TONS);
-                cmd.Parameters.Add("NOOFTP", model.NOOFTP);
-
-                cmd.Parameters.Add("LD1A", model.LD1_TONS_ACTUAL);
-                cmd.Parameters.Add("LD2A", model.LD2_TONS_ACTUAL);
-                cmd.Parameters.Add("LD3A", model.LD3_TONS_ACTUAL);
-                cmd.Parameters.Add("MRDTPA", model.MRDTP_TONS_ACTUAL);
-
-                cmd.ExecuteNonQuery();
-            }
-
-            // ================== TEST TABLE (ONLY C, E, F) ==================
-            string testMerge = @"
-MERGE INTO DEMO.T_BF_PRODUCTION_TEST t
-USING (
-    SELECT :TIMESTAMP AS TIMESTAMP, :FUR_NO AS FUR_NO FROM dual
-) s
-ON (t.TIMESTAMP = s.TIMESTAMP AND t.FUR_NO = s.FUR_NO)
-WHEN MATCHED THEN
-    UPDATE SET t.PRODUCTION = :PROD
-WHEN NOT MATCHED THEN
-    INSERT (TIMESTAMP, FUR_NO, PRODUCTION)
-    VALUES (:TIMESTAMP, :FUR_NO, :PROD)";
-
-            var testFurnaces = new[]
-            {
-                new { F=model.furnace_C, DT=model.DATE_TIME_PROD_C, PROD=model.REPORTED_C },
-                new { F=model.furnace_E, DT=model.DATE_TIME_PROD_E, PROD=model.REPORTED_E },
-                new { F=model.furnace_F, DT=model.DATE_TIME_PROD_F, PROD=model.REPORTED_F }
-            };
-
-            foreach (var f in testFurnaces)
-            {
-                using (OracleCommand cmd = new OracleCommand(testMerge, con))
-                {
-                    cmd.Parameters.Add("TIMESTAMP", f.DT);
-                    cmd.Parameters.Add("FUR_NO", f.F);
-                    cmd.Parameters.Add("PROD", f.PROD);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        return Json(new { success = true, message = "Data Saved Successfully!" }, JsonRequestBehavior.AllowGet);
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-    }
-}
-LSIF :global.username='GBFCTRL' THEN				
-				select count(*) into VCount from DEMO.T_BF_PRODUCTION_TRACKING Where TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_G	AND FURNACE = 'G';			
-				if VCount>0 then
-					Update DEMO.T_BF_PRODUCTION_TRACKING set ACTUAL=:CTL_BLK.TXT_ACTUAL_G,
-									REPORTED=:CTL_BLK.TXT_RPT_G,BALANCE=:CTL_BLK.TXT_BAL_G
-						Where TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_G	AND FURNACE = :CTL_BLK.TXT_FURNACE_G;
-				else								
-					INSERT INTO DEMO.T_BF_PRODUCTION_TRACKING(TIMESTAMP,FURNACE,ACTUAL,REPORTED,BALANCE) 
-							VALUES(:CTL_BLK.TXT_TIMESTAMP_G,:CTL_BLK.TXT_FURNACE_G,:CTL_BLK.TXT_ACTUAL_G,:CTL_BLK.TXT_RPT_G,:CTL_BLK.TXT_BAL_G);									
-				end if;	
-				commit;
-					
-			select count(*) into VCount from DEMO.T_LADLE Where DATE_TIME=:BLK_CONTROL.DATE_TIME_PROD_F and Plant='G';
-			if VCount>0 then
-				 UPDATE DEMO.T_LADLE SET DATE_TIME=:BLK_CONTROL.DATE_TIME,
-				        LD1_TONS=NULL,LD2_TONS=NULL,LD3_TONS=NULL,
-				        MRDTP_TONS=NULL,NOOFTP=:BLK_CONTROL.NOOFTP_G
-				  WHERE DATE_TIME=:BLK_CONTROL.DATE_TIME_PROD_F and Plant='G';
-			ELSE
-				  INSERT INTO DEMO.T_LADLE(DATE_TIME,LD1_TONS,LD2_TONS,LD3_TONS,MRDTP_TONS,NOOFTP,LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,LD3_TONS_ACTUAL,
-				         MRDTP_TONS_ACTUAL,PLANT)
-				         VALUES(:BLK_CONTROL.DATE_TIME,NULL,NULL,NULL,NULL,
-				                :BLK_CONTROL.NOOFTP_G,:BLK_CONTROL.LD1_TONS_ACTUAL_G,:BLK_CONTROL.LD2_TONS_ACTUAL_G,:BLK_CONTROL.LD3_TONS_ACTUAL_G,
-					              :BLK_CONTROL.MRDTP_TONS_ACTUAL_G,'G');
-			END IF;
-			COMMIT;
+  ------------For C Furnace
+		            :BLK_CONTROL.DATE_TIME_PROD_C:=:ctl_blk.ctl_date_time_prod;
+		            :BLK_CONTROL.FURNACE_C:='C';
+		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_C,:BLK_CONTROL.REPORTED_C,:BLK_CONTROL.BALANCE_C
+      		       FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			     WHERE TIMESTAMP=:ctl_blk.ctl_date_time_prod AND FURNACE='C';
+      			     
+      			     
+      			     SELECT decode(sum(ACTUAL),0,Null,sum(ACTUAL)),decode(sum(REPORTED),0,Null,sum(REPORTED)) into :BLK_CONTROL.ACTUAL_C_TD,:BLK_CONTROL.REPORTED_C_TD 
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<=:ctl_blk.ctl_date_time_prod AND FURNACE='C';
+      			     
+      			    
+      			     
+      			     ------------For E Furnace
+		            :BLK_CONTROL.DATE_TIME_PROD_E:=:ctl_blk.ctl_date_time_prod;
+		            :BLK_CONTROL.FURNACE_E:='E';
+		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_E,:BLK_CONTROL.REPORTED_E,:BLK_CONTROL.BALANCE_E
+      		       FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			     WHERE TIMESTAMP=:ctl_blk.ctl_date_time_prod AND FURNACE='E';
+      			     
+      			     --#####
+      			     SELECT decode(sum(ACTUAL),0,Null,sum(ACTUAL)),decode(sum(REPORTED),0,Null,sum(REPORTED)) into :BLK_CONTROL.ACTUAL_E_TD,:BLK_CONTROL.REPORTED_E_TD 
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<=:ctl_blk.ctl_date_time_prod AND FURNACE='E';
+      			     --#####
+      			     
+      			     ------------For F Furnace
+		            :BLK_CONTROL.DATE_TIME_PROD_F:=:ctl_blk.ctl_date_time_prod;
+		            :BLK_CONTROL.FURNACE_F:='F';
+		             SELECT ACTUAL,REPORTED,BALANCE INTO :BLK_CONTROL.ACTUAL_F,:BLK_CONTROL.REPORTED_F,:BLK_CONTROL.BALANCE_F
+      		       FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			     WHERE TIMESTAMP=:ctl_blk.ctl_date_time_prod AND FURNACE='F';
+      			     
+      			     --#####
+      			     SELECT decode(sum(ACTUAL),0,Null,sum(ACTUAL)),decode(sum(REPORTED),0,Null,sum(REPORTED)) into :BLK_CONTROL.ACTUAL_F_TD,:BLK_CONTROL.REPORTED_F_TD 
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<=:ctl_blk.ctl_date_time_prod AND FURNACE='F';
+      			     --#####
+      			     
+      			     ---- For A-F Actual
+      			   
+                   :BLK_CONTROL.DISPLAY_ACTUAL:=nvl(:BLK_CONTROL.ACTUAL_C,0)+nvl(:BLK_CONTROL.ACTUAL_D,0)+nvl(:BLK_CONTROL.ACTUAL_E,0)+nvl(:BLK_CONTROL.ACTUAL_F,0);
+                 ---- For A-F Reported
+      			   
+      			     :BLK_CONTROL.DISPLAY_REPORTED:=nvl(:BLK_CONTROL.REPORTED_C,0)+nvl(:BLK_CONTROL.REPORTED_D,0)+nvl(:BLK_CONTROL.REPORTED_E,0)+nvl(:BLK_CONTROL.REPORTED_F,0);
+      			     
+      			     ---- For A-F Balance
+      			   
+      			     :BLK_CONTROL.DISPLAY_BALANCE:=nvl(:BLK_CONTROL.BALANCE_C,0)+nvl(:BLK_CONTROL.BALANCE_D,0)+nvl(:BLK_CONTROL.BALANCE_E,0)+nvl(:BLK_CONTROL.BALANCE_F,0);
+      			     --##### For A-F Actual Todate/Reported
+      			   
+      			     :BLK_CONTROL.DISPLAY_ACTUAL_TD:=nvl(:BLK_CONTROL.ACTUAL_C_TD,0)+nvl(:BLK_CONTROL.ACTUAL_D_TD,0)+nvl(:BLK_CONTROL.ACTUAL_E_TD,0)+nvl(:BLK_CONTROL.ACTUAL_F_TD,0);
+      			     :BLK_CONTROL.DISPLAY_REPORTED_TD:=nvl(:BLK_CONTROL.REPORTED_C_TD,0)+nvl(:BLK_CONTROL.REPORTED_D_TD,0)+nvl(:BLK_CONTROL.REPORTED_E_TD,0)+nvl(:BLK_CONTROL.REPORTED_F_TD,0);
+      			     --#####
+					 	
+							select sum(NET_WT) into :BLK_CONTROL.ACTUAL_C  from  demo.t_ladle_details where
+ 						   LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME_PROD_C+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME_PROD_C+1+6/24 
+							and DESTINATION<>'R' and fur_name='C';
+								
+								 --#####
+								 vActual_TD:=0;
+								 vReported_TD:=0;
+      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:ctl_blk.ctl_date_time_prod,'MON') AND TIMESTAMP<:ctl_blk.ctl_date_time_prod AND FURNACE='C';
+      			     :BLK_CONTROL.ACTUAL_C_TD:=nvl(vActual_TD,0)+ nvl(:BLK_CONTROL.ACTUAL_C ,0);
+      			     :BLK_CONTROL.REPORTED_C_TD:=nvl(vReported_TD,0)+ nvl(:BLK_CONTROL.REPORTED_C ,0);
+      			     If :BLK_CONTROL.ACTUAL_C_TD=0 Then
+      			     	  :BLK_CONTROL.ACTUAL_C_TD:=Null;
+      			     End If; 
+      			     If :BLK_CONTROL.REPORTED_C_TD=0 Then
+      			     	  :BLK_CONTROL.REPORTED_C_TD:=Null;
+      			     End If;        			     
+      			     --#####
+							
+				
+			    
+			    SELECT SUM(NVL(ACTUAL,0)-NVL(REPORTED,0))INTO :BLK_CONTROL.BALANCE_C FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE 
+					TIMESTAMP>=TRUNC(:BLK_CONTROL.DATE_TIME_PROD_C,'MON') AND TIMESTAMP<:BLK_CONTROL.DATE_TIME_PROD_C AND FURNACE=:BLK_CONTROL.FURNACE_C;
+			    
