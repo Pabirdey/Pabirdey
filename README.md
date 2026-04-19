@@ -1,21 +1,30 @@
 function saveCBFData() {
 
-    var model = {
-        FURNACE_C: $("#CBF_Furnace").val(),
+    var furnaces = ["C", "E", "F"];   // 👉 add more if needed
 
-        ACT_ONDT: Number($("#CBF_ActOnDate").val()) || 0,
-        ACT_TODT: Number($("#CBF_ActToDate").val()) || 0,
+    var modelList = [];
 
-        REPORT_ONDT: Number($("#CBF_ReportOnDate").val()) || 0,
-        REPORT_TODT: Number($("#CBF_ReportToDate").val()) || 0,
+    furnaces.forEach(function (f) {
 
-        BALANCE: Number($("#CBF_Balance").val()) || 0
-    };
+        var model = {
+            FURNACE_C: f,
+
+            ACT_ONDT: Number($("#" + f + "_ActOnDate").val()) || 0,
+            ACT_TODT: Number($("#" + f + "_ActToDate").val()) || 0,
+
+            REPORT_ONDT: Number($("#" + f + "_ReportOnDate").val()) || 0,
+            REPORT_TODT: Number($("#" + f + "_ReportToDate").val()) || 0,
+
+            BALANCE: Number($("#" + f + "_Balance").val()) || 0
+        };
+
+        modelList.push(model);
+    });
 
     $.ajax({
-        url: '/Home/SaveCBFData',
+        url: '/Home/SaveCBFBulk',   // 👈 bulk API
         type: 'POST',
-        data: JSON.stringify(model),
+        data: JSON.stringify(modelList),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
 
