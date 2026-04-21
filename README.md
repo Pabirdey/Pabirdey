@@ -35,3 +35,36 @@ public JsonResult RunProcedure(string p_date, string p_furnace)
         return Json(new { status = false, message = ex.Message });
     }
 }
+
+
+<script>
+    function runProcedure() {
+
+        var date = $("#txtDate").val();
+
+        // Furnace sequence
+        var furnaces = ["C", "E", "F"];
+
+        $("#msg").text("Processing...");
+
+        // Loop one by one
+        furnaces.forEach(function (furnace) {
+
+            $.ajax({
+                url: '/Home/RunProcedure',
+                type: 'POST',
+                data: {
+                    p_date: date,
+                    p_furnace: furnace
+                },
+                success: function (res) {
+                    $("#msg").append("<br>" + furnace + " : " + res.message);
+                },
+                error: function () {
+                    $("#msg").append("<br>" + furnace + " : Error");
+                }
+            });
+
+        });
+    }
+</script>
