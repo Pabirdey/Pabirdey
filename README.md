@@ -1,5 +1,5 @@
 [HttpPost]
-public JsonResult SaveBFProdData(List<BF_Production> modelList)
+public JsonResult RunProcedure(string p_date, string p_furnace)
 {
     try
     {
@@ -7,76 +7,31 @@ public JsonResult SaveBFProdData(List<BF_Production> modelList)
         {
             con.Open();
 
-            foreach (var model in modelList)
+            using (OracleCommand cmd = new OracleCommand("PROC_BF_PRODUCTION", con))
             {
-                // =========================
-                // 1. TABLE 1: TRACKING
-                // =========================
-                string query1 = @"
-MERGE INTO TEST.T_BF_PRODUCTION_TRACKING t
-USING (
-    SELECT :FURNACE AS FURNACE,
-           :DATE_TIME AS TIMESTAMP
-    FROM dual
-) s
-ON (t.FURNACE = s.FURNACE AND t.TIMESTAMP = s.TIMESTAMP)
+                cmd.CommandType = CommandType.StoredProcedure;
 
-WHEN MATCHED THEN
-    UPDATE SET 
-        ACTUAL = :ACT,
-        REPORTED = :RPT,
-        BALANCE = :BAL
+                // INPUT PARAMETERS
+                cmd.Parameters.Add("P_DATE", OracleDbType.Date).Value =
+                    DateTime.Parse(p_date);
 
-WHEN NOT MATCHED THEN
-    INSERT (FURNACE, TIMESTAMP, ACTUAL, REPORTED, BALANCE)
-    VALUES (:FURNACE, :DATE_TIME, :ACT, :RPT, :BAL)";
+                cmd.Parameters.Add("P_FURNACE", OracleDbType.Varchar2).Value =
+                    p_furnace;
 
-                using (OracleCommand cmd = new OracleCommand(query1, con))
-                {
-                    cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = model.FURNACE;
-                    cmd.Parameters.Add("DATE_TIME", OracleDbType.Date).Value = Convert.ToDateTime(model.DATE_TIME);
-                    cmd.Parameters.Add("ACT", OracleDbType.Decimal).Value = model.ACT_ONDT;
-                    cmd.Parameters.Add("RPT", OracleDbType.Decimal).Value = model.REPORT_ONDT;
-                    cmd.Parameters.Add("BAL", OracleDbType.Decimal).Value = model.BALANCE;
+                // OPTIONAL OUTPUT
+                cmd.Parameters.Add("P_MSG", OracleDbType.Varchar2, 200)
+                   .Direction = ParameterDirection.Output;
 
-                    cmd.ExecuteNonQuery();
-                }
+                cmd.ExecuteNonQuery();
 
-                // =========================
-                // 2. TABLE 2: TEST TABLE
-                // =========================
-                string query2 = @"
-MERGE INTO TEST.T_BF_PRODUCTION_TEST t
-USING (
-    SELECT :FURNACE AS FURNACE,
-           :DATE_TIME AS TIMESTAMP
-    FROM dual
-) s
-ON (t.FUR_NO = s.FURNACE AND t.TIMESTAMP = s.TIMESTAMP)
+                string msg = cmd.Parameters["P_MSG"].Value.ToString();
 
-WHEN MATCHED THEN
-    UPDATE SET 
-        PRODUCTION = :RPT
-
-WHEN NOT MATCHED THEN
-    INSERT (FUR_NO, TIMESTAMP, PRODUCTION)
-    VALUES (:FURNACE, :DATE_TIME, :RPT)";
-
-                using (OracleCommand cmd = new OracleCommand(query2, con))
-                {
-                    cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = model.FURNACE;
-                    cmd.Parameters.Add("DATE_TIME", OracleDbType.Date).Value = Convert.ToDateTime(model.DATE_TIME);
-                    cmd.Parameters.Add("RPT", OracleDbType.Decimal).Value = model.REPORT_ONDT;
-
-                    cmd.ExecuteNonQuery();
-                }
+                return Json(new { status = true, message = msg });
             }
         }
-
-        return Json(new { success = true });
     }
     catch (Exception ex)
     {
-        return Json(new { success = false, message = ex.Message });
+        return Json(new { status = false, message = ex.Message });
     }
 }
