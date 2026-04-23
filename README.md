@@ -25,7 +25,6 @@
         }
 
         .table input { width: 60px; }
-
         textarea { height: 120px; }
 
         .card-custom {
@@ -60,6 +59,11 @@
         .btn-custom {
             width: 120px;
             border-radius: 25px;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -131,15 +135,35 @@
                 <!-- RIGHT SIDE -->
                 <div class="col-md-4">
 
-                    <div class="section-box">
-                        <h6>Others</h6>
-                        <input class="form-control mb-2" placeholder="Eastern Bunker">
-                        <input class="form-control mb-2" placeholder="Western Bunker">
-                        <input class="form-control mb-2" placeholder="Middle Bunker">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="section-box">
+                                <h6>Others</h6>
+                                <input class="form-control mb-2" placeholder="Eastern Bunker">
+                                <input class="form-control mb-2" placeholder="Western Bunker">
+                                <input class="form-control mb-2" placeholder="Middle Bunker">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="section-box">
+                                <h6>Coke & Nut Coke</h6>
+                                <input class="form-control mb-2" placeholder="Material advised">
+                                <input class="form-control mb-2" placeholder="Time advised">
+                                <input class="form-control mb-2" placeholder="Material received">
+                                <input class="form-control mb-2" placeholder="Time received">
+                                <input class="form-control mb-2" placeholder="Unloaded">
+                                <input class="form-control mb-2" placeholder="Loco left">
+                                <input class="form-control mb-2" placeholder="Sent down">
+                                <input class="form-control mb-2" placeholder="Total">
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="section-box mt-2">
-                        <h6>Remarks</h6>
+                        <h6>Remarks & Delays</h6>
                         <textarea class="form-control"></textarea>
                     </div>
 
@@ -152,37 +176,42 @@
         <!-- TAB 2 -->
         <div class="tab-pane fade" id="tab2">
 
-            <div class="card-custom mt-3">
+            <div class="container mt-4">
 
-                <h4 class="text-center mb-3">Raw Material Position</h4>
+                <div class="card-custom">
 
-                <table class="table table-bordered table-custom">
-                    <thead>
-                        <tr>
-                            <th>Material</th>
-                            <th>Yard</th>
-                            <th>H.L</th>
-                            <th>Stock</th>
-                            <th>A</th>
-                            <th>B</th>
-                            <th>C</th>
-                        </tr>
-                    </thead>
+                    <h4 class="text-center mb-4">Raw Material Position</h4>
 
-                    <tbody>
-                        <tr>
-                            <td class="material-name">SINTER</td>
-                            <td>R147</td><td>R148</td><td>R149</td>
-                            <td>R150</td><td>R151</td><td>R152</td>
-                        </tr>
+                    <div class="table-container">
+                        <table class="table table-bordered table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Yard</th>
+                                    <th>H.L</th>
+                                    <th>Stock</th>
+                                    <th>A</th>
+                                    <th>B</th>
+                                    <th>C</th>
+                                    <th>D</th>
+                                    <th>E</th>
+                                    <th>F</th>
+                                </tr>
+                            </thead>
 
-                        <tr>
-                            <td class="material-name">PELLET</td>
-                            <td>R383</td><td>R384</td><td>R385</td>
-                            <td>R386</td><td>R387</td><td>R388</td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <tbody>
+                                <tr>
+                                    <td class="material-name">SINTER</td>
+                                    <td>R147</td><td>R148</td><td>R149</td>
+                                    <td>R150</td><td>R151</td><td>R152</td>
+                                    <td>R153</td><td>R154</td><td>R155</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
 
             </div>
 
@@ -195,54 +224,47 @@
 
     </div>
 
-    <!-- FOOTER -->
-    <div class="text-end mt-3">
-        <button class="btn btn-success">Save</button>
-        <button class="btn btn-danger">Delete</button>
-        <button class="btn btn-secondary">Exit</button>
-    </div>
-
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function createRow() {
-        return `
-        <tr>
-            <td><input type="date" class="form-control"></td>
-            <td>
-                <select class="form-control">
-                    <option>A</option>
-                    <option>B</option>
-                    <option>C</option>
-                </select>
-            </td>
-            <td><input class="form-control"></td>
-            <td><input class="form-control c" oninput="calcTotal(this)"></td>
-            <td><input class="form-control e" oninput="calcTotal(this)"></td>
-            <td><input class="form-control f" oninput="calcTotal(this)"></td>
-            <td><input class="form-control total" readonly></td>
-            <td><input class="form-control"></td>
-            <td><input class="form-control"></td>
-        </tr>`;
-    }
+function createRow() {
+    return `
+    <tr>
+        <td><input type="date" class="form-control"></td>
+        <td>
+            <select class="form-control">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+            </select>
+        </td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control c" oninput="calcTotal(this)"></td>
+        <td><input class="form-control e" oninput="calcTotal(this)"></td>
+        <td><input class="form-control f" oninput="calcTotal(this)"></td>
+        <td><input class="form-control total" readonly></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+    </tr>`;
+}
 
-    function calcTotal(el) {
-        var row = el.closest("tr");
+function calcTotal(el) {
+    var row = el.closest("tr");
 
-        var c = parseFloat(row.querySelector(".c").value) || 0;
-        var e = parseFloat(row.querySelector(".e").value) || 0;
-        var f = parseFloat(row.querySelector(".f").value) || 0;
+    var c = parseFloat(row.querySelector(".c").value) || 0;
+    var e = parseFloat(row.querySelector(".e").value) || 0;
+    var f = parseFloat(row.querySelector(".f").value) || 0;
 
-        row.querySelector(".total").value = c + e + f;
-    }
+    row.querySelector(".total").value = c + e + f;
+}
 
-    // Generate rows
-    for (let i = 0; i < 5; i++) {
-        document.getElementById("tblBody").innerHTML += createRow();
-    }
+// generate rows
+for (let i = 0; i < 5; i++) {
+    document.getElementById("tblBody").innerHTML += createRow();
+}
 </script>
 
 </body>
