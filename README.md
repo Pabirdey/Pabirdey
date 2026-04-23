@@ -1,160 +1,146 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Raw Material Position</title>
+    <title>Furnace High Line Log Sheet</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body {
-            background-color: #f4f6f9;
+            background: #f4f6f9;
         }
 
-        .card-custom {
-            background: linear-gradient(to right, #0d47a1, #1976d2);
-            border-radius: 20px;
-            padding: 20px;
+        .header-box {
+            background: #0d47a1;
             color: white;
-        }
-
-        .table-custom {
-            background-color: white;
+            padding: 10px;
             border-radius: 10px;
-            overflow: hidden;
         }
 
-        .table-custom th {
-            background-color: #1565c0;
+        .section-box {
+            background: #1976d2;
             color: white;
-            text-align: center;
-            font-size: 14px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
-        .table-custom td {
-            text-align: center;
-            font-size: 13px;
-            padding: 6px;
+        .table input {
+            width: 60px;
         }
 
-        .table-custom td:hover {
-            background-color: #e3f2fd;
-            cursor: pointer;
+        .small-input {
+            width: 100%;
         }
 
-        .material-name {
-            font-weight: bold;
-            background-color: #e3f2fd;
-        }
-
-        .btn-custom {
-            width: 120px;
-            border-radius: 25px;
-        }
-
-        .table-container {
-            max-height: 400px;
-            overflow-y: auto;
+        textarea {
+            height: 150px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container mt-4">
-
-    <div class="card-custom">
-
-        <h4 class="text-center mb-4">Raw Material Position</h4>
-
-        <div class="table-container">
-            <table class="table table-bordered table-custom">
-                <thead>
-                    <tr>
-                        <th>Material</th>
-                        <th>Yard</th>
-                        <th>H.L</th>
-                        <th>Stock</th>
-                        <th>A</th>
-                        <th>B</th>
-                        <th>C</th>
-                        <th>D</th>
-                        <th>E</th>
-                        <th>F</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td class="material-name">SINTER</td>
-                        <td>R147</td><td>R148</td><td>R149</td>
-                        <td>R150</td><td>R151</td><td>R152</td>
-                        <td>R153</td><td>R154</td><td>R155</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">TFO</td>
-                        <td>R156</td><td>R157</td><td>R158</td>
-                        <td>R159</td><td>R160</td><td>R161</td>
-                        <td>R162</td><td>R163</td><td>R164</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">LRP</td>
-                        <td>R165</td><td>R166</td><td>R167</td>
-                        <td>R168</td><td>R169</td><td>R170</td>
-                        <td>R171</td><td>R172</td><td>R173</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">JODA</td>
-                        <td>R174</td><td>R175</td><td>R176</td>
-                        <td>R177</td><td>R178</td><td>R179</td>
-                        <td>R180</td><td>R181</td><td>R182</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">PELLET</td>
-                        <td>R383</td><td>R384</td><td>R385</td>
-                        <td>R386</td><td>R387</td><td>R388</td>
-                        <td>R389</td><td>R390</td><td>R391</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">NUT COKE</td>
-                        <td>R192</td><td>R193</td><td>R194</td>
-                        <td>R195</td><td>R196</td><td>R197</td>
-                        <td>R198</td><td>R199</td><td>R200</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">LIMESTONE</td>
-                        <td>R201</td><td>R202</td><td>R203</td>
-                        <td>R204</td><td>R205</td><td>R206</td>
-                        <td>R207</td><td>R208</td><td>R209</td>
-                    </tr>
-
-                    <tr>
-                        <td class="material-name">SCRAP</td>
-                        <td>R228</td><td>R229</td><td>R230</td>
-                        <td>R231</td><td>R232</td><td>R233</td>
-                        <td>R234</td><td>R235</td><td>R236</td>
-                    </tr>
-                </tbody>
-
-            </table>
+<div class="container-fluid mt-3">
+    <!-- HEADER -->
+    <div class="header-box d-flex justify-content-between align-items-center">
+        <h4><center>FURNACE HIGH LINE LOG SHEET</center></h4>
+        <div class="d-flex gap-2">
+            <input type="datetime-local" class="form-control">
+            <select class="form-select">
+                <option>Shift A</option>
+                <option>Shift B</option>
+                <option>Shift C</option>
+            </select>
         </div>
+    </div>    
+    <ul class="nav nav-tabs mt-3">
+        <li class="nav-item"><a class="nav-link active">Coke Unloading</a></li>
+        <li class="nav-item"><a class="nav-link">High Line Log</a></li>
+        <li class="nav-item"><a class="nav-link">Bin Position</a></li>
+        <li class="nav-item"><a class="nav-link">Unloading Report</a></li>
+    </ul>
+    <!-- MAIN SECTION -->
+    <div class="row">        
+        <div class="col-md-6">
+            <!-- Coke Unloading -->
+            <div class="section-box">
+                <h6>Coke Unloading</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center bg-white">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Shift</th>
+                                <th>Bunker Name</th>
+                                <th>C-BF</th>
+                                <th>E-BF</th>
+                                <th>F-BF</th>
+                                <th>Total</th>
+                                <th>Position</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBody">
+                            <!-- JS will generate rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>            
+        </div>      
+        <div class="col-md-4">      
+            <div class="section-box">
+                <h6>Others</h6>
+                <label>Stock Coke in Eastern Bunker</label>
+                <input class="form-control mb-2" placeholder="Eastern Bunker">
+                <label>Stock Coke in Western Bunker</label>
+                <input class="form-control mb-2" placeholder="Western Bunker">
+                <label>Behive Coke in Middle Bunker</label>
+                <input class="form-control mb-2" placeholder="Middle Bunker">
+            </div>  
+            <div class="col-md-4">              
+                <div class="section-box">
+                    <h6>Coke & Nut Coke advised & Received</h6>
+                    <label>Material advised</label>        
+                    <input class="form-control mb-2" placeholder="Material advised">
+                    <label>Time advised</label>
+                    <input class="form-control mb-2" placeholder="Time advised">
+                    <label>Material received</label>
+                    <input class="form-control mb-2" placeholder="Material received">
+                    <label>Time received</label>
+                    <input class="form-control mb-2" placeholder="Time received">
+                    <label>Unloaded</label>
+                    <input class="form-control mb-2" placeholder="Unloaded">
+                    <label>Loco left</label>
+                    <input class="form-control mb-2" placeholder="Loco left">
+                    <label>Sent down</label>
+                    <input class="form-control mb-2" placeholder="Sent down">
+                    <label>Total</label>
+                    <input class="form-control mb-2" placeholder="Total">
+                </div>
+            </div>
 
+            <!-- Remarks -->
+            <div class="section-box">
+                <h6>Remarks & Delays</h6>
+                <textarea class="form-control"></textarea>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Buttons -->
-    <div class="text-center mt-4">
-        <button class="btn btn-success btn-custom">Save</button>
-        <button class="btn btn-danger btn-custom">Delete</button>
-        <button class="btn btn-secondary btn-custom">Exit</button>
+    <!-- FOOTER -->
+    <div class="d-flex justify-content-end gap-2 mt-3">
+        <button class="btn btn-success">Save</button>
+        <button class="btn btn-danger">Delete</button>
+        <button class="btn btn-secondary">Exit</button>
     </div>
 
 </div>
+
+
+
 
 </body>
 </html>
