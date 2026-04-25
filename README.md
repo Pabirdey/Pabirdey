@@ -10,67 +10,89 @@
         body {
             background: #f4f6f9;
             font-family: Verdana;
-            font-weight: bold;
+            font-size: 13px;
         }
 
         .header-box {
             background: #0d47a1;
             color: white;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .header-box h4 {
+            font-size: 18px;
         }
 
         .section-box {
             background: #1976d2;
             color: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 8px;
         }
 
         .section-title {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 5px;
         }
 
-        .table input {
-            width: 100%;
-            text-align: center;
-        }
-
-        textarea {
-            height: 100px;
-        }
-
+        /* TABLE */
         .table th {
             background: #1565c0;
             color: white;
+            font-size: 12px;
+            padding: 4px;
         }
 
         .table td {
             background: white;
             color: black;
+            font-size: 12px;
+            padding: 3px;
+        }
+
+        /* INPUT */
+        .table input,
+        .table select {
+            width: 100%;
+            font-size: 12px;
+            padding: 2px;
+            height: 28px;
+            text-align: center;
+        }
+
+        textarea {
+            height: 80px;
+            font-size: 12px;
+        }
+
+        /* TABS */
+        .nav-tabs .nav-link {
+            font-size: 13px;
+            padding: 5px 10px;
         }
 
         .btn-custom {
-            width: 120px;
+            width: 110px;
             border-radius: 20px;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container-fluid mt-3">
+<div class="container-fluid mt-2">
 
     <!-- HEADER -->
     <div class="header-box d-flex justify-content-between align-items-center">
         <h4 class="m-0">Furnace High Line Log Sheet</h4>
 
         <div class="d-flex gap-2">
-            <input type="datetime-local" class="form-control">
-            <select class="form-select">
+            <input type="datetime-local" class="form-control form-control-sm">
+            <select class="form-select form-select-sm">
                 <option>A</option>
                 <option>B</option>
                 <option>C</option>
@@ -79,7 +101,7 @@
     </div>
 
     <!-- TABS -->
-    <ul class="nav nav-tabs mt-3">
+    <ul class="nav nav-tabs mt-2">
         <li class="nav-item">
             <a class="nav-link active" data-bs-toggle="tab" href="#tab1">Coke Unloading</a>
         </li>
@@ -96,7 +118,6 @@
 
         <!-- TAB 1 -->
         <div class="tab-pane fade show active" id="tab1">
-
             <div class="row mt-2">
 
                 <div class="col-md-8">
@@ -225,7 +246,7 @@ function calcTotal(el) {
     row.querySelector(".total").value = c + e + f;
 }
 
-// Generate 5 rows
+// Generate rows
 for (let i = 0; i < 5; i++) {
     document.getElementById("tblBody").innerHTML += createRow();
 }
