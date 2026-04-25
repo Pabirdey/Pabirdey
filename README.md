@@ -1,103 +1,63 @@
-@{
-    ViewBag.Title = "PileMatWiseQualityData";
-}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>PileMatWiseQualityData</title>
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f4f6f9;
-            padding: 20px;
-        }
+<script>
+    $(document).ready(function () {
+        loadFinesData();
+    });
 
-        .card {
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+    function loadFinesData() {
 
-        #loader {
-            display: none;
-            text-align: center;
-            font-weight: bold;
-            color: #0d6efd;
-            margin-bottom: 10px;
-        }
+        $('#loader').show();   // ✅ FIX
 
-        .table th {
-            background-color: #0d47a1;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <h3 class="text-center mb-3">Pile Mat Wise Quality Data</h3>
-            <div id="loader">Loading data...</div>
-            <table class="table table-bordered table-striped table-hover text-center" id="finesTable">
-                <thead>
-                    <tr>
-                        <th>Element</th>
-                        <th>Return Fines</th>
-                        <th>Wet Fines</th>
-                        <th>Dry Fines</th>
-                        <th>Dry Fines 500TPH</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <div id="rowCount" class="mt-2 fw-bold text-end"></div>
-        </div>
-    </div>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            loadFinesData();
-        });
+        $.ajax({
+            url: '/Home/GetFinesData',
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
 
-        function loadFinesData() {            
-            $.ajax({
-                url: '/Home/GetFinesData',
-                type: 'GET',
-                dataType: 'json',
-                success: function (res) {
-                    renderTable(res);                    
-                    $('#loader').hide();
-                },
-                error: function () {
-                    $('#loader').hide();
+                // ✅ Handle if API returns error object
+                if (res.error) {
                     $('#finesTable tbody').html(
-                        "<tr><td colspan='5' class='text-danger'>Error loading data</td></tr>"
+                        "<tr><td colspan='5' class='text-danger'>" + res.error + "</td></tr>"
                     );
+                } else {
+                    renderTable(res);
+                    showRowCount(res);   // ✅ Added again
                 }
+
+                $('#loader').hide();
+            },
+            error: function () {
+                $('#loader').hide();
+                $('#finesTable tbody').html(
+                    "<tr><td colspan='5' class='text-danger'>Error loading data</td></tr>"
+                );
+            }
+        });
+    }
+
+    function renderTable(data) {
+        var html = '';
+
+        if (!data || data.length === 0) {
+            html = "<tr><td colspan='5'>No data found</td></tr>";
+        } else {
+            $.each(data, function (i, item) {
+                html += '<tr>';
+
+                html += '<td>' + (item.ELEMENT ?? '-') + '</td>';
+                html += '<td>' + (item.RETURN_FINES ?? '-') + '</td>';
+                html += '<td>' + (item.WET_FINES ?? '-') + '</td>';
+                html += '<td>' + (item.DRY_FINES ?? '-') + '</td>';
+                html += '<td>' + (item.DRY_FINES_500TPH ?? '-') + '</td>';
+
+                html += '</tr>';
             });
         }
 
-        function renderTable(data) {
-            var html = '';
-            if (!data || data.length === 0) {
-                html = "<tr><td colspan='5'>No data found</td></tr>";
-            } else {
-                $.each(data, function (i, item) {
-                    html += '<tr>';
-                    html += '<td>' + (item.ELEMENT ?? '-') + '</td>';
-                    html += '<td>' + (item.RETURN_FINES ?? '-') + '</td>';
-                    html += '<td>' + (item.WET_FINES ?? '-') + '</td>';
-                    html += '<td>' + (item.DRY_FINES ?? '-') + '</td>';
-                    html += '<td>' + (item.DRY_FINES_500TPH ?? '-') + '</td>';
-                    html += '</tr>';
-                });
-            }
+        $('#finesTable tbody').html(html);
+    }
 
-            $('#finesTable tbody').html(html);
-        }
-
-       
-    </script>
-</body>
-</html>
+    function showRowCount(data) {
+        var count = (data && data.length) ? data.length : 0;
+        $('#rowCount').text("Total Rows: " + count);
+    }
+</script>
