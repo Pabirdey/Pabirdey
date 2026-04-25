@@ -1,58 +1,65 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Web.Mvc;
-using Oracle.ManagedDataAccess.Client;
-
-public class HomeController : Controller
-{
-    public JsonResult GetFinesData()
-    {
-        try
+  public JsonResult GetFinesData()
         {
-            List<object> data = new List<object>();
-
-            using (OracleConnection con = new OracleConnection("YOUR_CONNECTION_STRING"))
+            try
             {
-                con.Open();
-
-                string query = @"
-                    SELECT 
-                        ELEMENT,
-                        RETURN_FINES,
-                        WET_FINES,
-                        DRY_FINES,
-                        DRY_FINES_500TPH
-                    FROM YOUR_TABLE_NAME
-                    ORDER BY ELEMENT";
-
-                using (OracleCommand cmd = new OracleCommand(query, con))
+                List<object> data = new List<object>();
+                using (OracleConnection con = new OracleConnection("mycon"))
                 {
-                    cmd.CommandType = CommandType.Text;
+                    con.Open();
 
-                    using (OracleDataReader dr = cmd.ExecuteReader())
+                    string query = @"
+                   SELECT 'AL2O3' AS ELEMENT,RETURN_FINES_AL2O3 AS RETURN_FINES,WET_FINES_AL2O3 AS WET_FINES,DRY_FINES_AL2O3 AS DRY_FINES,
+                   DRY_FINES_500TPH_AL2O3 AS DRY_FINES_500TPH
+                    FROM (SELECT * FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT) ORDER BY TIMESTAMP DESC)
+                   WHERE ROWNUM = 1
+                    UNION ALL
+                    SELECT 'SIO2',RETURN_FINES_SIO2,WET_FINES_SIO2,DRY_FINES_SIO2,DRY_FINES_500TPH_SIO2
+                    FROM (SELECT *  FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT  WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT) ORDER BY TIMESTAMP DESC)
+                    WHERE ROWNUM = 1
+                    UNION ALL
+                    SELECT 'P',RETURN_FINES_P,WET_FINES_P,DRY_FINES_P,DRY_FINES_500TPH_P
+                    FROM (
+                        SELECT *
+                        FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
+                        WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
+                        ORDER BY TIMESTAMP DESC
+                        )
+                    WHERE ROWNUM = 1
+                UNION ALL
+            SELECT 'K2O',RETURN_FINES_K2O,WET_FINES_K2O,DRY_FINES_K2O,DRY_FINES_500TPH_K20
+        FROM (
+            SELECT *
+            FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
+            WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
+            ORDER BY TIMESTAMP DESC
+            )
+WHERE ROWNUM = 1";
+                    using (OracleCommand cmd = new OracleCommand(query, con))
                     {
-                        while (dr.Read())
+                        cmd.CommandType = CommandType.Text;
+
+                        using (OracleDataReader dr = cmd.ExecuteReader())
                         {
-                            data.Add(new
+                            while (dr.Read())
                             {
-                                ELEMENT = dr["ELEMENT"] == DBNull.Value ? null : dr["ELEMENT"].ToString(),
-                                RETURN_FINES = dr["RETURN_FINES"] == DBNull.Value ? null : Convert.ToDecimal(dr["RETURN_FINES"]),
-                                WET_FINES = dr["WET_FINES"] == DBNull.Value ? null : Convert.ToDecimal(dr["WET_FINES"]),
-                                DRY_FINES = dr["DRY_FINES"] == DBNull.Value ? null : Convert.ToDecimal(dr["DRY_FINES"]),
-                                DRY_FINES_500TPH = dr["DRY_FINES_500TPH"] == DBNull.Value ? null : Convert.ToDecimal(dr["DRY_FINES_500TPH"])
-                            });
+                                data.Add(new
+                                {
+                                    ELEMENT = dr["ELEMENT"] == DBNull.Value ? null : dr["ELEMENT"].ToString(),
+                                    RETURN_FINES = dr["RETURN_FINES"] == DBNull.Value ? null : Convert.ToDecimal(dr["RETURN_FINES"]),
+                                    WET_FINES = dr["WET_FINES"] == DBNull.Value ? null : Convert.ToDecimal(dr["WET_FINES"]),
+                                    DRY_FINES = dr["DRY_FINES"] == DBNull.Value ? null : Convert.ToDecimal(dr["DRY_FINES"]),
+                                    DRY_FINES_500TPH = dr["DRY_FINES_500TPH"] == DBNull.Value ? null : Convert.ToDecimal(dr["DRY_FINES_500TPH"])
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            return Json(data, JsonRequestBehavior.AllowGet);
+                return Json(data, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                // Return error to UI
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
         }
-        catch (Exception ex)
-        {
-            // Return error to UI
-            return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
-        }
-    }
-}
