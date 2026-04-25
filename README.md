@@ -10,17 +10,20 @@ public JsonResult GetFinesData()
 
             string query = @"
             WITH latest AS (
-                SELECT *
-                FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
-                WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
-                ORDER BY TIMESTAMP DESC
+                SELECT t.*,
+                       ROW_NUMBER() OVER (ORDER BY TIMESTAMP DESC) rn
+                FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT t
+                WHERE SHIFT = (
+                    SELECT MAX(SHIFT) 
+                    FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
+                )
             )
             SELECT 'AL2O3' AS ELEMENT,
                    RETURN_FINES_AL2O3 AS RETURN_FINES,
                    WET_FINES_AL2O3 AS WET_FINES,
                    DRY_FINES_AL2O3 AS DRY_FINES,
                    DRY_FINES_500TPH_AL2O3 AS DRY_FINES_500TPH
-            FROM latest WHERE ROWNUM = 1
+            FROM latest WHERE rn = 1
 
             UNION ALL
 
@@ -29,7 +32,7 @@ public JsonResult GetFinesData()
                    WET_FINES_SIO2,
                    DRY_FINES_SIO2,
                    DRY_FINES_500TPH_SIO2
-            FROM latest WHERE ROWNUM = 1
+            FROM latest WHERE rn = 1
 
             UNION ALL
 
@@ -38,7 +41,7 @@ public JsonResult GetFinesData()
                    WET_FINES_P,
                    DRY_FINES_P,
                    DRY_FINES_500TPH_P
-            FROM latest WHERE ROWNUM = 1
+            FROM latest WHERE rn = 1
 
             UNION ALL
 
@@ -47,7 +50,7 @@ public JsonResult GetFinesData()
                    WET_FINES_K2O,
                    DRY_FINES_K2O,
                    DRY_FINES_500TPH_K2O
-            FROM latest WHERE ROWNUM = 1
+            FROM latest WHERE rn = 1
             ";
 
             using (OracleCommand cmd = new OracleCommand(query, con))
