@@ -92,10 +92,6 @@
             });
         }
 
-        function safeValue(val) {
-            return (val === null || val === undefined) ? '-' : val;
-        }
-
         function renderTable(data) {
             var html = '';
 
@@ -104,11 +100,13 @@
             } else {
                 $.each(data, function (i, item) {
                     html += '<tr>';
-                    html += '<td>' + safeValue(item.ELEMENT) + '</td>';
-                    html += '<td>' + safeValue(item.RETURN_FINES) + '</td>';
-                    html += '<td>' + safeValue(item.WET_FINES) + '</td>';
-                    html += '<td>' + safeValue(item.DRY_FINES) + '</td>';
-                    html += '<td>' + safeValue(item.DRY_FINES_500TPH) + '</td>';
+
+                    html += '<td>' + (item.ELEMENT ?? '-') + '</td>';
+                    html += '<td>' + (item.RETURN_FINES ?? '-') + '</td>';
+                    html += '<td>' + (item.WET_FINES ?? '-') + '</td>';
+                    html += '<td>' + (item.DRY_FINES ?? '-') + '</td>';
+                    html += '<td>' + (item.DRY_FINES_500TPH ?? '-') + '</td>';
+
                     html += '</tr>';
                 });
             }
