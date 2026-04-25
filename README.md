@@ -5,8 +5,10 @@
 <html>
 <head>
     <title>PileMatWiseQualityData</title>
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         body {
             background: #f4f6f9;
@@ -33,11 +35,15 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="card">
+
             <h3 class="text-center mb-3">Pile Mat Wise Quality Data</h3>
+
             <div id="loader">Loading data...</div>
+
             <table class="table table-bordered table-striped table-hover text-center" id="finesTable">
                 <thead>
                     <tr>
@@ -50,22 +56,21 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <div id="rowCount" class="mt-2 fw-bold text-end"></div>
+
         </div>
     </div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         $(document).ready(function () {
             loadFinesData();
-
-            // Optional Auto Refresh (every 30 sec)
-            // setInterval(loadFinesData, 30000);
         });
 
         function loadFinesData() {
 
-            $('#loader').show();   // Show loader
+            $('#loader').show();
 
             $.ajax({
                 url: '/Home/GetFinesData',
@@ -74,16 +79,13 @@
 
                 success: function (res) {
 
-                    // Handle error from controller
                     if (res && res.error) {
                         $('#finesTable tbody').html(
                             "<tr><td colspan='5' class='text-danger'>" + res.error + "</td></tr>"
                         );
-                        $('#rowCount').text("");
                     }
                     else {
                         renderTable(res);
-                        showRowCount(res);
                     }
 
                     $('#loader').hide();
@@ -94,11 +96,11 @@
                     $('#finesTable tbody').html(
                         "<tr><td colspan='5' class='text-danger'>Error loading data</td></tr>"
                     );
-                    $('#rowCount').text("");
                 }
             });
         }
 
+        // Handle NULL / empty values
         function getValue(val) {
             if (val === null || val === undefined || val === "" || val === "null") {
                 return '-';
@@ -115,21 +117,20 @@
             }
             else {
                 $.each(data, function (i, item) {
-                    html += '<tr>';
 
+                    html += '<tr>';
                     html += '<td>' + getValue(item.ELEMENT) + '</td>';
                     html += '<td>' + getValue(item.RETURN_FINES) + '</td>';
                     html += '<td>' + getValue(item.WET_FINES) + '</td>';
                     html += '<td>' + getValue(item.DRY_FINES) + '</td>';
                     html += '<td>' + getValue(item.DRY_FINES_500TPH) + '</td>';
-
                     html += '</tr>';
+
                 });
             }
 
             $('#finesTable tbody').html(html);
         }
-
 
     </script>
 </body>
