@@ -643,7 +643,7 @@
 
                             <tbody>
                                 <tr>
-                                    <td class="material-name">SINTER</td>
+                                    <td class="material-name">Sinter</td>
                                     <td><input type="text" class="form-control"></td>
                                     <td><input type="text" class="form-control"></td>
                                     <td><input type="text" class="form-control"></td>
@@ -670,7 +670,7 @@
                                     <td><input type="text" class="form-control"></td>                                    
                                 </tr>
                             <tr>
-                                <td class="material-name">JODA</td>
+                                <td class="material-name">Joda</td>
                                 <td><input type="text" class="form-control"></td>
                                 <td><input type="text" class="form-control"></td>
                                 <td><input type="text" class="form-control"></td>
@@ -807,7 +807,7 @@ function calcTotal(el) {
 }
 
 // Generate rows
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 7; i++) {
     document.getElementById("tblBody").innerHTML += createRow();
 }
 </script>
