@@ -459,148 +459,46 @@
                 <!-- RIGHT PANEL -->
                 <div class="col-md-3">
         
-                    <div class="section-box">
-                        <div class="section-title">Sinter Storage</div>
-                        <label>SP1<input type="text"></label>
-                        <label>SP2<input type="text"></label>
-                        <label>Total Fines(t)<input type="text"></label>
-                        <label>SP1 Fines(%)<input type="text"></label>
-                        <label>SP2 Fines(%)<input type="text"></label>
+                 <div class="section-box">
+                    <div class="section-title">Sinter Storage</div>
+
+    <!-- ROW 1: SP1 + SP2 -->
+    <div class="row align-items-center mb-2">
+
+        <div class="col-md-6 d-flex align-items-center gap-2">
+            <label style="width:70px; color:black;">SP1</label>
+            <input type="text" class="form-control">
+        </div>
+
+        <div class="col-md-6 d-flex align-items-center gap-2">
+            <label style="width:70px; color:black;">SP2</label>
+                        <input type="text" class="form-control">
+        </div>
+
+    </div>
+
+    <!-- ROW 2: TOTAL -->
+    <div class="row align-items-center mb-2">
+        <div class="col-md-12 d-flex align-items-center gap-2">
+            <label style="width:70px; color:black;">Total</label>
+            <input type="text" class="form-control" style="max-width:200px;">
+        </div>
+    </div>
+
+    <!-- ROW 3: PERCENTAGE -->
+    <div class="row align-items-center">
+
+        <div class="col-md-6 d-flex align-items-center gap-2">
+            <label style="width:70px; color:black;">SP1 %</label>
+                        <input type="text" class="form-control">
                     </div>
-        
-                    <div class="section-box">
-                        <div class="section-title">Reclaimed Ore</div>
-                        <label>LRP<input class="form-control"></label>
-                        <label>Direct Fines<input class="form-control"></label>
-                        <label>Reclaimed Fines<input class="form-control"></label>
-                        <label>JODA<input class="form-control"></label>
-                        <label>Direct Fines<input class="form-control"></label>
-                        <label>Reclaimed Fines<input class="form-control"></label>
-                    </div>
-                    <div class="section-box">
-                        <div class="section-title">FLB Data</div>
-                        <table class="table table-bordered bg-white text-dark">
-                            <tr>
-                                <th>SlNo</th>
-                                <th>Material</th>
-                                <th>FLB Position</th>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>                           
-                                    <select class="form-select">
-                                        <option></option>
-                                        <option>LRP</option>
-                                        <option>JODA</option>
-                                        <option>SINTER</option>    
-                                        <option>QUARTZITE</option>
-                                        <option>PYROXINITE</option>
-                                        <option>TFO</option>
-                                        <option>NUT COKE</option>
-                                        <option>LIMESTONE</option>
-                                        <option>SCRAP</option>
-                                        <option>SPONGE IRON</option>                                                                
-                                    </select>
-                                </td>
-                                <td><input class="form-control"></td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>                            
-                                    <select class="form-select">
-                                        <option></option>
-                                        <option>LRP</option>
-                                        <option>JODA</option>
-                                        <option>SINTER</option>    
-                                        <option>QUARTZITE</option>
-                                        <option>PYROXINITE</option>
-                                        <option>TFO</option>
-                                        <option>NUT COKE</option>
-                                        <option>LIMESTONE</option>
-                                        <option>SCRAP</option>
-                                        <option>SPONGE IRON</option>                                                                
-                                    </select>
-                                </td>
-                                <td><input class="form-control"></td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>                            
-                                    <select class="form-select">
-                                        <option></option>
-                                        <option>LRP</option>
-                                        <option>JODA</option>
-                                        <option>SINTER</option>    
-                                        <option>QUARTZITE</option>
-                                        <option>PYROXINITE</option>
-                                        <option>TFO</option>
-                                        <option>NUT COKE</option>
-                                        <option>LIMESTONE</option>
-                                        <option>SCRAP</option>
-                                        <option>SPONGE IRON</option>                                                                
-                                    </select>
-                                </td>
-                                <td><input class="form-control"></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>                            
-                                    <select class="form-select">
-                                        <option></option>
-                                        <option>LRP</option>
-                                        <option>JODA</option>
-                                        <option>SINTER</option>    
-                                        <option>QUARTZITE</option>
-                                        <option>PYROXINITE</option>
-                                        <option>TFO</option>
-                                        <option>NUT COKE</option>
-                                        <option>LIMESTONE</option>
-                                        <option>SCRAP</option>
-                                        <option>SPONGE IRON</option>                                                                
-                                    </select>
-                                </td>
-                                <td><input class="form-control"></td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>                            
-                                    <select class="form-select">
-                                        <option></option>
-                                        <option>LRP</option>
-                                        <option>JODA</option>
-                                        <option>SINTER</option>    
-                                        <option>QUARTZITE</option>
-                                        <option>PYROXINITE</option>
-                                        <option>TFO</option>
-                                        <option>NUT COKE</option>
-                                        <option>LIMESTONE</option>
-                                        <option>SCRAP</option>
-                                        <option>SPONGE IRON</option>                                                                
-                                    </select>
-                                </td>
-                                <td><input class="form-control"></td>
-                            </tr>
-                            <tr>
-                                <td>6</td>
-                                <td>                            
-                                    <select class="form-select">
-                                        <option></option>
-                                        <option>LRP</option>
-                                        <option>JODA</option>
-                                        <option>SINTER</option>    
-                                        <option>QUARTZITE</option>
-                                        <option>PYROXINITE</option>
-                                        <option>TFO</option>
-                                        <option>NUT COKE</option>
-                                        <option>LIMESTONE</option>
-                                        <option>SCRAP</option>
-                                        <option>SPONGE IRON</option>                                                                
-                                    </select>
-                                </td>
-                                <td><input class="form-control"></td>
-                            </tr>
-                        </table>
-                    </div>      
+                    <div class="col-md-6 d-flex align-items-center gap-2">
+                    <label style="width:70px; color:black;">SP2 %</label>
+                    <input type="text" class="form-control">
+        </div>
+
+    </div>
+</div>    
                     <div class="text-center mt-3">
                         <button class="btn btn-success btn-custom">Save</button>                
                         <button class="btn btn-secondary btn-custom">Exit</button>
@@ -643,7 +541,7 @@
 
                             <tbody>
                                 <tr>
-                                    <td class="material-name">Sinter</td>
+                                    <td class="material-name">SINTER</td>
                                     <td><input type="text" class="form-control"></td>
                                     <td><input type="text" class="form-control"></td>
                                     <td><input type="text" class="form-control"></td>
@@ -670,7 +568,7 @@
                                     <td><input type="text" class="form-control"></td>                                    
                                 </tr>
                             <tr>
-                                <td class="material-name">Joda</td>
+                                <td class="material-name">JODA</td>
                                 <td><input type="text" class="form-control"></td>
                                 <td><input type="text" class="form-control"></td>
                                 <td><input type="text" class="form-control"></td>
