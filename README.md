@@ -1,36 +1,19 @@
-function SaveBinPosition() {
-
-    var list = [];
-    var shift = $("#ddlshift").val();
-
-    $(".cell").each(function () {
-        list.push({
-            CellId: $(this).data("id"),
-            Value: $(this).val(),
-            Date: lsSelectedFDate,
-            Shift: shift
+ $(document).ready(function () {
+            lsSelectedFDate = '@DateTime.Today.AddDays(-2).ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
+            $('#currDate-value').text(lsSelectedFDate);
+            $('#hiddenDate').datepicker({
+                format: "dd/mm/yyyy",
+                autoclose: true,
+                todayHighlight: true
+            }).datepicker('setDate', lsSelectedFDate);
+            $('#tbFDatePick').on('click', function (e) {
+                e.preventDefault();
+                $('#hiddenDate').datepicker('show');
+            });
+            $('#hiddenDate').on('changeDate', function (e) {
+                lsSelectedFDate = e.format('dd/mm/yyyy');
+                $('#currDate-value').text(lsSelectedFDate);
+                Display_Bin_Position();
+            });
+            Display_Bin_Position();
         });
-    });
-
-    console.log(list);
-
-    $.ajax({
-        url: '/Furnace_High_line/Save_Furnace_High_Line',
-        type: 'POST',
-        data: JSON.stringify({ list: list }),   // ✅ important fix
-        contentType: 'application/json',
-
-        success: function (res) {
-            if (res.success) {
-                alert(res.message);   // ✅ show controller message
-            }
-            else {
-                alert(res.message);   // ✅ show error message
-            }
-        },
-
-        error: function () {
-            alert("Save failed!");
-        }
-    });
-}
