@@ -1,160 +1,298 @@
-function SaveBinPosition() {
-           var list = [];
-           var shift = $("#ddlshift").val();
-           $(".cell").each(function () {
-               //var value = $(this).val();
-               //var cellId=$(this).data("id");
-               //if(value!==null && value.trim()!==""){
-               list.push({
-                   CellId: $(this).data("id"),
-                   Value: $(this).val(),
-                   Date: lsSelectedFDate,
-                   Shift: shift
-               });
-            //}
-           });
+<div class="tab-pane fade" id="tab2">
+                <div class="row mt-2">
 
-           console.log(list);
-           $.ajax({
-               url: '/Furnace_High_line/Save_Furnace_High_Line',
-               type: 'POST',
-               data: JSON.stringify({ list: list }),  
-               contentType: 'application/json',
-               success: function (res) {
-                   if (res.success) {
-                       alert(res.message);   
-                   }
-                   else {
-                       alert(res.message);
-                   }
-               },
+                    <!-- LEFT PANEL -->
+                    <div class="col-md-7">
+                        <div class="section-box">
+                            <div class="section-title">High Line Log</div>
+                            <table class="table table-bordered text-center bg-white text-dark">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20px;">Material</th>
+                                        <th style="width:15px;">Recd.</th>
+                                        <th style="width:20px;">Retd.</th>
+                                        <th style="width:100px;">Reason</th>
+                                        <th style="width:20px;">U/L</th>
+                                        <th style="width:20px;">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>LRP(FLB)</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>LRP(IN)</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>JODA(FLB)</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>JODA(IN)</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>TFO</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>PELLET</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SCRAP</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>L/STONE</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pyroxinite</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Quartz</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nut Coke</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Stock Sinter</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sinter(FLB)</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-               error: function () {
-                   alert("Save failed!");
-               }
-           });
-       }
+                            <div class="text-end">
+                                <strong>Total: 35 / 7</strong>
+                            </div>
+                        </div>
+                        <div class="section-box mt-2">
+                            <h6>Remarks & Delays</h6>
+                            <textarea class="form-control"></textarea>
+                        </div>
+                    </div>
 
-          [HttpPost]
-        public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
-        {
-            try
-            {
-                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-                {
-                    con.Open();
+                    <!-- CENTER PANEL -->
+                    <div class="col-md-2">
+                        <div class="section-box">
+                            <div class="section-title"><span style="margin-left:100px;">C-BF</span></div>
+                            <table class="table table-bordered text-center bg-white text-dark">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>DMAG</th>
+                                        <th>KO</th>
+                                        <th>BELT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SP1</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SP2</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="section-box">
+                            <div class="section-title"><span style="margin-left:100px;">E-BF</span></div>
+                            <table class="table table-bordered text-center bg-white text-dark">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>DMAG</th>
+                                        <th>KO</th>
+                                        <th>BELT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SP1</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SP2</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="section-box">
+                            <div class="section-title"><span style="margin-left:100px;">F-BF</span></div>
+                            <table class="table table-bordered text-center bg-white text-dark">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>DMAG</th>
+                                        <th>KO</th>
+                                        <th>BELT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SP1</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SP2</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="section-box">
+                            <div class="section-title"><span style="margin-left:100px;">TOTAL</span></div>
+                            <table class="table table-bordered text-center bg-white text-dark">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>DMAG</th>
+                                        <th>KO</th>
+                                        <th>BELT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SP1</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SP2</td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                        <td><input class="form-control"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                    using (OracleTransaction trans = con.BeginTransaction())
-                    {
-                        foreach (var item in list)
-                        {                           
-                            object dbValue;
-                            if (string.IsNullOrWhiteSpace(item.Value))
-                            {
-                                dbValue = DBNull.Value;
-                            }
-                            else
-                            {
-                                dbValue = item.Value.Trim();   
-                            }
+                    <!-- RIGHT PANEL -->
+                    <div class="col-md-3">
 
-                            
-                            string updateSql = @"UPDATE DEMO.T_HIGHLINE_REPORT_DATA
-                                                    SET TAG_VAL = :val
-                                                    WHERE TAG_ID = :TAG_ID
-                                                    AND TRUNC(TIMESTAMP) = :dt
-                                                    AND SHIFT = :shift";
+                        <div class="section-box">
+                            <div class="section-title">Sinter Storage</div>
 
-                            using (OracleCommand updateCmd = new OracleCommand(updateSql, con))
-                            {
-                                updateCmd.Transaction = trans;
-                                updateCmd.Parameters.Add(":val", OracleDbType.Varchar2).Value = dbValue;
-                                updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                                updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                                updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-                                int rowsAffected = updateCmd.ExecuteNonQuery();                                
-                                if (rowsAffected == 0)
-                                {
-                                    string insertSql = @"INSERT INTO DEMO.T_HIGHLINE_REPORT_DATA
-                                                        (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
-                                                        VALUES (:dt, :shift, :TAG_ID, :val)";
+                            <!-- ROW 1: SP1 + SP2 -->
+                            <div class="row align-items-center mb-2">
 
-                                    using (OracleCommand insertCmd = new OracleCommand(insertSql, con))
-                                    {
-                                        insertCmd.Transaction = trans;
-                                        insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                                        insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-                                        insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                                        insertCmd.Parameters.Add(":val", OracleDbType.Varchar2).Value = dbValue;
-                                        insertCmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                        }
+                                <div class="col-md-6 d-flex align-items-center gap-2">
+                                    <label style="width:70px; color:black;">SP1</label>
+                                    <input type="text" class="form-control">
+                                </div>
 
-                        trans.Commit();
-                    }
-                }
+                                <div class="col-md-6 d-flex align-items-center gap-2">
+                                    <label style="width:70px; color:black;">SP2</label>
+                                    <input type="text" class="form-control">
+                                </div>
 
-                return Json(new { success = true, message = " Raw Material Position Data Saved Successfully" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
-[HttpPost]
-public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
-{
-    try
-    {
-        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
+                            </div>
 
-            using (OracleTransaction trans = con.BeginTransaction())
-            {
-                string sql = @"
-MERGE INTO DEMO.T_HIGHLINE_REPORT_DATA t
-USING dual
-ON (t.TAG_ID = :TAG_ID 
-    AND TRUNC(t.TIMESTAMP) = :dt 
-    AND t.SHIFT = :shift)
-WHEN MATCHED THEN
-    UPDATE SET t.TAG_VAL = :val
-WHEN NOT MATCHED THEN
-    INSERT (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
-    VALUES (:dt, :shift, :TAG_ID, :val)";
+                            <!-- ROW 2: TOTAL -->
+                            <div class="row align-items-center mb-2">
+                                <div class="col-md-12 d-flex align-items-center gap-2">
+                                    <label style="width:70px; color:black;">Total</label>
+                                    <input type="text" class="form-control" style="max-width:200px;">
+                                </div>
+                            </div>
 
-                using (OracleCommand cmd = new OracleCommand(sql, con))
-                {
-                    cmd.Transaction = trans;
+                            <!-- ROW 3: PERCENTAGE -->
+                            <div class="row align-items-center">
 
-                    foreach (var item in list)
-                    {
-                        cmd.Parameters.Clear();
+                                <div class="col-md-6 d-flex align-items-center gap-2">
+                                    <label style="width:70px; color:black;">SP1 %</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="col-md-6 d-flex align-items-center gap-2">
+                                    <label style="width:70px; color:black;">SP2 %</label>
+                                    <input type="text" class="form-control">
+                                </div>
 
-                        object dbValue = string.IsNullOrWhiteSpace(item.Value)
-                            ? DBNull.Value
-                            : item.Value.Trim();
-
-                        cmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                        cmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                        cmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-                        cmd.Parameters.Add(":val", OracleDbType.Varchar2).Value = dbValue;
-
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-
-                trans.Commit();
-            }
-        }
-
-        return Json(new { success = true, message = "Saved Successfully" });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message });
-    }
-}
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-success btn-custom">Save</button>
+                            <button class="btn btn-secondary btn-custom">Exit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
