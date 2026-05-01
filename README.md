@@ -1,65 +1,78 @@
- [HttpPost]
-        public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+[HttpPost]
+public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+{
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
         {
-            try
+            con.Open();
+
+            using (OracleTransaction trans = con.BeginTransaction())
             {
-                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+                foreach (var item in list)
                 {
-                    con.Open();
+                    // 🔹 Handle value (number + string + null)
+                    object dbValue;
 
-                    using (OracleTransaction trans = con.BeginTransaction())
+                    if (string.IsNullOrWhiteSpace(item.Value))
                     {
-                        foreach (var item in list)
-                        {                            
-                            decimal val;
-                            object dbValue;
-                            if (decimal.TryParse(item.Value, out val))
-                                dbValue = val;
-                            else
-                                dbValue = DBNull.Value;
+                        dbValue = DBNull.Value;
+                    }
+                    else
+                    {
+                        dbValue = item.Value.Trim();   // store as string
+                    }
 
-                            
-                            string updateSql = @"UPDATE DEMO.T_HIGHLINE_REPORT_DATA
-                                                    SET TAG_VAL = :val
-                                                    WHERE TAG_ID = :TAG_ID
-                                                    AND TRUNC(TIMESTAMP) = :dt
-                                                    AND SHIFT = :shift";
-                            using (OracleCommand updateCmd = new OracleCommand(updateSql, con))
+                    // 🔹 UPDATE first
+                    string updateSql = @"
+                        UPDATE DEMO.T_HIGHLINE_REPORT_DATA
+                        SET TAG_VAL = :val
+                        WHERE TAG_ID = :TAG_ID
+                        AND TRUNC(TIMESTAMP) = :dt
+                        AND SHIFT = :shift";
+
+                    using (OracleCommand updateCmd = new OracleCommand(updateSql, con))
+                    {
+                        updateCmd.Transaction = trans;
+
+                        updateCmd.Parameters.Add(":val", OracleDbType.Varchar2).Value = dbValue;
+                        updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
+                        updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                        updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
+
+                        int rowsAffected = updateCmd.ExecuteNonQuery();
+
+                        // 🔹 If not updated → INSERT
+                        if (rowsAffected == 0)
+                        {
+                            string insertSql = @"
+                                INSERT INTO DEMO.T_HIGHLINE_REPORT_DATA
+                                (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
+                                VALUES (:dt, :shift, :TAG_ID, :val)";
+
+                            using (OracleCommand insertCmd = new OracleCommand(insertSql, con))
                             {
-                                updateCmd.Transaction = trans;
-                                updateCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
-                                updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                                updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                                updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-                                int rowsAffected = updateCmd.ExecuteNonQuery();                                
-                                if (rowsAffected == 0)
-                                {
-                                    string insertSql = @"INSERT INTO DEMO.T_HIGHLINE_REPORT_DATA
-                                                            (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
-                                                            VALUES (:dt, :shift, :TAG_ID, :val)";
+                                insertCmd.Transaction = trans;
 
-                                    using (OracleCommand insertCmd = new OracleCommand(insertSql, con))
-                                    {
-                                        insertCmd.Transaction = trans;
-                                        insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                                        insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-                                        insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                                        insertCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
-                                        insertCmd.ExecuteNonQuery();
-                                    }
-                                }
+                                insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                                insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
+                                insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
+                                insertCmd.Parameters.Add(":val", OracleDbType.Varchar2).Value = dbValue;
+
+                                insertCmd.ExecuteNonQuery();
                             }
                         }
-
-                        trans.Commit();
                     }
                 }
 
-                return Json(new { success = true, message ="Data Saved Successfully" });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
+                trans.Commit();
             }
         }
+
+        return Json(new { success = true, message = "Data Saved Successfully" });
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = ex.Message });
+    }
+}
