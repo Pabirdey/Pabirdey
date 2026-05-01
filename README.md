@@ -1,43 +1,53 @@
-function Display_Bin_Position() {
-    debugger;
+        [HttpPost]
+        public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+        {
+            try
+            {
+                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+                {
+                    con.Open();
+                    using (OracleTransaction trans = con.BeginTransaction())
+                    {
+                        foreach (var item in list)
+                        {
+                            string sql = @"
+                               MERGE INTO DEMO.T_HIGHLINE_REPORT_DATA t
+                            USING (
+                                SELECT :TAG_ID AS TAG_ID,                                                                            
+                                       :val AS VALUE,
+                                       :dt AS TIMESTAMP,
+                                       :shift AS SHIFT
+                                    FROM dual
+                                  ) s
+                                ON (t.TAG_ID = s.TAG_ID 
+                                AND t.TIMESTAMP = s.TIMESTAMP 
+                                AND t.SHIFT = s.SHIFT)
+                                WHEN MATCHED THEN
+                                    UPDATE SET 
+                                        t.TAG_VAL = s.val                                                                              
+                                WHEN NOT MATCHED THEN
+                                    INSERT (TIMESTAMP,SHIFT,TAG_ID,TAG_VAL)
+                                    VALUES (s.dt,s.shift,s.TAG_ID,s.val)";
 
-    var shift = $("#ddlshift").val();
+                            using (OracleCommand cmd = new OracleCommand(sql, con))
+                            {
+                                cmd.Transaction = trans;
+                                cmd.Parameters.Add(":TAG_ID", OracleDbType.Int32).Value = item.CellId;                                                             
+                                cmd.Parameters.Add(":val", OracleDbType.Decimal).Value = (object)item.Value ?? DBNull.Value;
+                                cmd.Parameters.Add(":dt", OracleDbType.Date).Value = item.Date;
+                                cmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
 
-    $.ajax({
-        url: '/Furnace_High_line/Get_Bin_Position',
-        type: 'GET',
-        data: { date: lsSelectedFDate, shift: shift },
-
-        success: function (res) {
-            console.log(res);
-
-            if (res.success) {
-                $(".cell").val("");
-
-                res.data.forEach(function (item) {
-
-                    var id = item.CellId ? item.CellId.trim() : "";
-
-                    console.log("Matching ID:", id);
-
-                    var inputs = document.querySelectorAll('.cell[data-id="' + id + '"]');
-
-                    if (inputs.length > 0) {
-                        inputs.forEach(function (input) {
-                            input.value = item.Value;
-                        });
-                    } else {
-                        console.warn("No matching element for:", id);
+                        trans.Commit();
                     }
-                });
+                }
 
-            } else {
-                alert(res.message);
+                return Json(new { success = true });
             }
-        },
-
-        error: function () {
-            alert("Error Loading Data");
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
-    });
-}
