@@ -1,14 +1,65 @@
-<div class="mb-3 position-relative">
+ [HttpPost]
+        public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+        {
+            try
+            {
+                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+                {
+                    con.Open();
 
-    <!-- 🔹 Center Title -->
-    <h4 class="text-center m-0 fw-bold" style="font-size:22px;">
-        Raw Material Position
-    </h4>
+                    using (OracleTransaction trans = con.BeginTransaction())
+                    {
+                        foreach (var item in list)
+                        {                            
+                            decimal val;
+                            object dbValue;
+                            if (decimal.TryParse(item.Value, out val))
+                                dbValue = val;
+                            else
+                                dbValue = DBNull.Value;
 
-    <!-- 🔹 Right Side Button -->
-    <button class="btn btn-success px-4 position-absolute end-0 top-50 translate-middle-y"
-            onclick="SaveBinPosition()">
-        💾 Save
-    </button>
+                            
+                            string updateSql = @"UPDATE DEMO.T_HIGHLINE_REPORT_DATA
+                                                    SET TAG_VAL = :val
+                                                    WHERE TAG_ID = :TAG_ID
+                                                    AND TRUNC(TIMESTAMP) = :dt
+                                                    AND SHIFT = :shift";
+                            using (OracleCommand updateCmd = new OracleCommand(updateSql, con))
+                            {
+                                updateCmd.Transaction = trans;
+                                updateCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
+                                updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
+                                updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                                updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
+                                int rowsAffected = updateCmd.ExecuteNonQuery();                                
+                                if (rowsAffected == 0)
+                                {
+                                    string insertSql = @"INSERT INTO DEMO.T_HIGHLINE_REPORT_DATA
+                                                            (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
+                                                            VALUES (:dt, :shift, :TAG_ID, :val)";
 
-</div>
+                                    using (OracleCommand insertCmd = new OracleCommand(insertSql, con))
+                                    {
+                                        insertCmd.Transaction = trans;
+                                        insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                                        insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
+                                        insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
+                                        insertCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
+                                        insertCmd.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                        }
+
+                        trans.Commit();
+                    }
+                }
+
+                return Json(new { success = true, message ="Data Saved Successfully" });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
