@@ -1,74 +1,43 @@
 function Display_Bin_Position() {
-           debugger;
-           var shift = $("#ddlshift").val();
-           $.ajax({
-               url: '/Furnace_High_line/Get_Bin_Position',
-               type: 'GET',
-               data: { date: lsSelectedFDate, shift: shift },
+    debugger;
 
-               success: function (res) {
-                   console.log(res);
-                   if (res.success) {
-                       $(".cell").val("");
-                       res.data.forEach(function (item) {
-                           var id = item.CellId ? item.CellId.trim() : "";
-                           console.log("Matching ID:", id);
-                           var input = document.querySelector('.cell[data-id="' + id + '"]');
-                           if (input) {
-                               input.value = item.Value;
-                           } else {
-                               console.warn("No matching element for:", id);
-                           }
-                       });
+    var shift = $("#ddlshift").val();
 
-                   } else {
-                       alert(res.message);
-                   }
-               },
+    $.ajax({
+        url: '/Furnace_High_line/Get_Bin_Position',
+        type: 'GET',
+        data: { date: lsSelectedFDate, shift: shift },
 
-               error: function () {
-                   alert("Error Loading Data");
-               }
-           });
-       }
-        public JsonResult Get_Bin_Position(string date, string shift)
-        {
-            try
-            {
-                List<Furnace_High_line> list = new List<Furnace_High_line>();
+        success: function (res) {
+            console.log(res);
 
-                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-                {
-                    con.Open();
+            if (res.success) {
+                $(".cell").val("");
 
-                    string sql = @"SELECT TIMESTAMP, SHIFT, TAG_ID, TAG_VAL 
-                           FROM DEMO.T_HIGHLINE_REPORT_DATA 
-                           WHERE TIMESTAMP = TO_DATE(:dt,'DD/MM/YYYY') 
-                           AND SHIFT = :shift";
+                res.data.forEach(function (item) {
 
-                    using (OracleCommand cmd = new OracleCommand(sql, con))
-                    {
-                        cmd.Parameters.Add(":dt", date);
-                        cmd.Parameters.Add(":shift", shift);
+                    var id = item.CellId ? item.CellId.trim() : "";
 
-                        using (OracleDataReader dr = cmd.ExecuteReader())
-                        {
-                            while (dr.Read())
-                            {
-                                list.Add(new Furnace_High_line
-                                {
-                                    CellId = dr["TAG_ID"].ToString(),
-                                    Value = dr["TAG_VAL"] == DBNull.Value ? "" : dr["TAG_VAL"].ToString()
-                                });
-                            }
-                        }
+                    console.log("Matching ID:", id);
+
+                    var inputs = document.querySelectorAll('.cell[data-id="' + id + '"]');
+
+                    if (inputs.length > 0) {
+                        inputs.forEach(function (input) {
+                            input.value = item.Value;
+                        });
+                    } else {
+                        console.warn("No matching element for:", id);
                     }
-                }
+                });
 
-                return Json(new { success = true, data = list }, JsonRequestBehavior.AllowGet);
+            } else {
+                alert(res.message);
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
+        },
+
+        error: function () {
+            alert("Error Loading Data");
         }
+    });
+}
