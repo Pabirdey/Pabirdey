@@ -103,3 +103,58 @@ function SaveBinPosition() {
                 return Json(new { success = false, message = ex.Message });
             }
         }
+[HttpPost]
+public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+{
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            con.Open();
+
+            using (OracleTransaction trans = con.BeginTransaction())
+            {
+                string sql = @"
+MERGE INTO DEMO.T_HIGHLINE_REPORT_DATA t
+USING dual
+ON (t.TAG_ID = :TAG_ID 
+    AND TRUNC(t.TIMESTAMP) = :dt 
+    AND t.SHIFT = :shift)
+WHEN MATCHED THEN
+    UPDATE SET t.TAG_VAL = :val
+WHEN NOT MATCHED THEN
+    INSERT (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
+    VALUES (:dt, :shift, :TAG_ID, :val)";
+
+                using (OracleCommand cmd = new OracleCommand(sql, con))
+                {
+                    cmd.Transaction = trans;
+
+                    foreach (var item in list)
+                    {
+                        cmd.Parameters.Clear();
+
+                        object dbValue = string.IsNullOrWhiteSpace(item.Value)
+                            ? DBNull.Value
+                            : item.Value.Trim();
+
+                        cmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
+                        cmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                        cmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
+                        cmd.Parameters.Add(":val", OracleDbType.Varchar2).Value = dbValue;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                trans.Commit();
+            }
+        }
+
+        return Json(new { success = true, message = "Saved Successfully" });
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = ex.Message });
+    }
+}
