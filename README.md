@@ -1,53 +1,70 @@
-        [HttpPost]
-        public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+[HttpPost]
+public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
+{
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
         {
-            try
-            {
-                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-                {
-                    con.Open();
-                    using (OracleTransaction trans = con.BeginTransaction())
-                    {
-                        foreach (var item in list)
-                        {
-                            string sql = @"
-                               MERGE INTO DEMO.T_HIGHLINE_REPORT_DATA t
-                            USING (
-                                SELECT :TAG_ID AS TAG_ID,                                                                            
-                                       :val AS VALUE,
-                                       :dt AS TIMESTAMP,
-                                       :shift AS SHIFT
-                                    FROM dual
-                                  ) s
-                                ON (t.TAG_ID = s.TAG_ID 
-                                AND t.TIMESTAMP = s.TIMESTAMP 
-                                AND t.SHIFT = s.SHIFT)
-                                WHEN MATCHED THEN
-                                    UPDATE SET 
-                                        t.TAG_VAL = s.val                                                                              
-                                WHEN NOT MATCHED THEN
-                                    INSERT (TIMESTAMP,SHIFT,TAG_ID,TAG_VAL)
-                                    VALUES (s.dt,s.shift,s.TAG_ID,s.val)";
+            con.Open();
 
-                            using (OracleCommand cmd = new OracleCommand(sql, con))
+            using (OracleTransaction trans = con.BeginTransaction())
+            {
+                foreach (var item in list)
+                {
+                    // 🔹 1. UPDATE first
+                    string updateSql = @"
+                        UPDATE DEMO.T_HIGHLINE_REPORT_DATA
+                        SET TAG_VAL = :val
+                        WHERE TAG_ID = :TAG_ID
+                        AND TRUNC(TIMESTAMP) = :dt
+                        AND SHIFT = :shift";
+
+                    using (OracleCommand updateCmd = new OracleCommand(updateSql, con))
+                    {
+                        updateCmd.Transaction = trans;
+
+                        updateCmd.Parameters.Add(":val", OracleDbType.Decimal).Value =
+                            string.IsNullOrEmpty(item.Value) ? (object)DBNull.Value : Convert.ToDecimal(item.Value);
+
+                        updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId;
+                        updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                        updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift;
+
+                        int rowsAffected = updateCmd.ExecuteNonQuery();
+
+                        // 🔹 2. If no row updated → INSERT
+                        if (rowsAffected == 0)
+                        {
+                            string insertSql = @"
+                                INSERT INTO DEMO.T_HIGHLINE_REPORT_DATA
+                                (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
+                                VALUES (:dt, :shift, :TAG_ID, :val)";
+
+                            using (OracleCommand insertCmd = new OracleCommand(insertSql, con))
                             {
-                                cmd.Transaction = trans;
-                                cmd.Parameters.Add(":TAG_ID", OracleDbType.Int32).Value = item.CellId;                                                             
-                                cmd.Parameters.Add(":val", OracleDbType.Decimal).Value = (object)item.Value ?? DBNull.Value;
-                                cmd.Parameters.Add(":dt", OracleDbType.Date).Value = item.Date;
-                                cmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift;
-                                cmd.ExecuteNonQuery();
+                                insertCmd.Transaction = trans;
+
+                                insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
+                                insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift;
+                                insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId;
+
+                                insertCmd.Parameters.Add(":val", OracleDbType.Decimal).Value =
+                                    string.IsNullOrEmpty(item.Value) ? (object)DBNull.Value : Convert.ToDecimal(item.Value);
+
+                                insertCmd.ExecuteNonQuery();
                             }
                         }
-
-                        trans.Commit();
                     }
                 }
 
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
+                trans.Commit();
             }
         }
+
+        return Json(new { success = true });
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = ex.Message });
+    }
+}
