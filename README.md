@@ -11,6 +11,15 @@ public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
             {
                 foreach (var item in list)
                 {
+                    // 🔹 Convert value safely
+                    decimal val;
+                    object dbValue;
+
+                    if (decimal.TryParse(item.Value, out val))
+                        dbValue = val;
+                    else
+                        dbValue = DBNull.Value;
+
                     // 🔹 1. UPDATE first
                     string updateSql = @"
                         UPDATE DEMO.T_HIGHLINE_REPORT_DATA
@@ -23,12 +32,10 @@ public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
                     {
                         updateCmd.Transaction = trans;
 
-                        updateCmd.Parameters.Add(":val", OracleDbType.Decimal).Value =
-                            string.IsNullOrEmpty(item.Value) ? (object)DBNull.Value : Convert.ToDecimal(item.Value);
-
-                        updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId;
+                        updateCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
+                        updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
                         updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                        updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift;
+                        updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
 
                         int rowsAffected = updateCmd.ExecuteNonQuery();
 
@@ -45,11 +52,9 @@ public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
                                 insertCmd.Transaction = trans;
 
                                 insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                                insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift;
-                                insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId;
-
-                                insertCmd.Parameters.Add(":val", OracleDbType.Decimal).Value =
-                                    string.IsNullOrEmpty(item.Value) ? (object)DBNull.Value : Convert.ToDecimal(item.Value);
+                                insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
+                                insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
+                                insertCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
 
                                 insertCmd.ExecuteNonQuery();
                             }
