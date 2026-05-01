@@ -1,75 +1,33 @@
-[HttpPost]
-public JsonResult Save_Furnace_High_Line(List<Furnace_High_line> list)
-{
-    try
-    {
-        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
+function Display_Bin_Position() {
+           debugger;
+           var shift = $("#ddlshift").val();
+           $.ajax({
+               url: '/Furnace_High_line/Get_Bin_Position',
+               type: 'GET',
+               data: { date: lsSelectedFDate, shift: shift },
+               success: function (res) {
+                   console.log(res);
+                   if (res.success) {
+                       $(".cell").val("");
+                       res.data.forEach(function (item) {
+                           var id = item.CellId ? item.CellId.trim() : "";                           
+                           var inputs = document.querySelectorAll('.cell[data-id="' + id + '"]');
+                           if (inputs.length > 0) {
+                               inputs.forEach(function (input) {
+                                   input.value = item.Value;
+                               });
+                           } else {
+                               console.warn("No matching element for:", id);
+                           }
+                       });
 
-            using (OracleTransaction trans = con.BeginTransaction())
-            {
-                foreach (var item in list)
-                {
-                    // 🔹 Convert value safely
-                    decimal val;
-                    object dbValue;
+                   } else {
+                       alert(res.message);
+                   }
+               },
 
-                    if (decimal.TryParse(item.Value, out val))
-                        dbValue = val;
-                    else
-                        dbValue = DBNull.Value;
-
-                    // 🔹 1. UPDATE first
-                    string updateSql = @"
-                        UPDATE DEMO.T_HIGHLINE_REPORT_DATA
-                        SET TAG_VAL = :val
-                        WHERE TAG_ID = :TAG_ID
-                        AND TRUNC(TIMESTAMP) = :dt
-                        AND SHIFT = :shift";
-
-                    using (OracleCommand updateCmd = new OracleCommand(updateSql, con))
-                    {
-                        updateCmd.Transaction = trans;
-
-                        updateCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
-                        updateCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                        updateCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                        updateCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-
-                        int rowsAffected = updateCmd.ExecuteNonQuery();
-
-                        // 🔹 2. If no row updated → INSERT
-                        if (rowsAffected == 0)
-                        {
-                            string insertSql = @"
-                                INSERT INTO DEMO.T_HIGHLINE_REPORT_DATA
-                                (TIMESTAMP, SHIFT, TAG_ID, TAG_VAL)
-                                VALUES (:dt, :shift, :TAG_ID, :val)";
-
-                            using (OracleCommand insertCmd = new OracleCommand(insertSql, con))
-                            {
-                                insertCmd.Transaction = trans;
-
-                                insertCmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(item.Date);
-                                insertCmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = item.Shift ?? "";
-                                insertCmd.Parameters.Add(":TAG_ID", OracleDbType.Varchar2).Value = item.CellId ?? "";
-                                insertCmd.Parameters.Add(":val", OracleDbType.Decimal).Value = dbValue;
-
-                                insertCmd.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                }
-
-                trans.Commit();
-            }
-        }
-
-        return Json(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message });
-    }
-}
+               error: function () {
+                   alert("Error Loading Data");
+               }
+           });
+       }
