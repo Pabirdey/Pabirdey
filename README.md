@@ -1,41 +1,43 @@
-public JsonResult Get_Bin_Position(string date, string shift)
-{
-    try
-    {
-        List<Furnace_High_line> list = new List<Furnace_High_line>();
+function Display_Bin_Position() {
+    debugger;
 
-        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
+    var shift = $("#ddlshift").val();
 
-            string sql = @"SELECT TIMESTAMP, SHIFT, TAG_ID, TAG_VAL 
-                           FROM DEMO.T_HIGHLINE_REPORT_DATA 
-                           WHERE TRUNC(TIMESTAMP) = :dt 
-                           AND SHIFT = :shift";
+    $.ajax({
+        url: '/Furnace_High_line/Get_Bin_Position',
+        type: 'GET',
+        data: { date: lsSelectedFDate, shift: shift },
 
-            using (OracleCommand cmd = new OracleCommand(sql, con))
-            {
-                cmd.Parameters.Add(":dt", OracleDbType.Date).Value = Convert.ToDateTime(date);
-                cmd.Parameters.Add(":shift", OracleDbType.Varchar2).Value = shift;
+        success: function (res) {
+            console.log(res);
 
-                using (OracleDataReader dr = cmd.ExecuteReader())
-                {
-                    while (dr.Read())
-                    {
-                        list.Add(new Furnace_High_line
-                        {
-                            CellId = dr["TAG_ID"] == DBNull.Value ? "" : dr["TAG_ID"].ToString().Trim(),
-                            Value = dr["TAG_VAL"] == DBNull.Value ? "" : dr["TAG_VAL"].ToString()
+            if (res.success) {
+                $(".cell").val("");
+
+                res.data.forEach(function (item) {
+
+                    var id = item.CellId ? item.CellId.trim() : "";
+
+                    console.log("Matching ID:", id);
+
+                    var inputs = document.querySelectorAll('.cell[data-id="' + id + '"]');
+
+                    if (inputs.length > 0) {
+                        inputs.forEach(function (input) {
+                            input.value = item.Value;
                         });
+                    } else {
+                        console.warn("No matching element for:", id);
                     }
-                }
-            }
-        }
+                });
 
-        return Json(new { success = true, data = list }, JsonRequestBehavior.AllowGet);
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-    }
+            } else {
+                alert(res.message);
+            }
+        },
+
+        error: function () {
+            alert("Error Loading Data");
+        }
+    });
 }
