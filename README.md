@@ -1,184 +1,125 @@
 <div class="section-box">
-    <div class="section-title">FLB Data</div>
+                            <div class="section-title">High Line Log</div>
+                            <table class="table table-bordered text-center bg-white text-dark">
+                                <thead>
+                                    <tr>
+                                        <th style="width:5px;">Material</th>
+                                        <th style="width:15px;">Recd.</th>
+                                        <th style="width:20px;">Retd.</th>
+                                        <th style="width:120px;">Reason</th>
+                                        <th style="width:20px;">U/L</th>
+                                        <th style="width:20px;">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-start ps-1">LRP(FLB)</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">LRP(IN)</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">JODA(FLB)</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">JODA(IN)</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">TFO</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">PELLET</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">SCRAP</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">L/STONE</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">Pyroxinite</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">Quartz</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">Nut Coke</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">Stock Sinter</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start ps-1">Sinter(FLB)</td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                        <td><input class="form-control cell" data-id=""></td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-    <table class="table table-bordered bg-white text-dark text-center align-middle">
-
-        <thead>
-            <tr>
-                <th style="width:60px;">SlNo</th>
-                <th style="width:300px;">Material</th>
-                <th style="width:180px;">FLB Position</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            <!-- ROW 1 -->
-            <tr>
-                <td>1</td>
-                <td>
-                    <select class="form-select material-select">
-                        <option value="">-- Select Material --</option>
-                        <option>LRP</option>
-                        <option>JODA</option>
-                        <option>SINTER</option>
-                        <option>QUARTZITE</option>
-                        <option>PYROXINITE</option>
-                        <option>TFO</option>
-                        <option>NUT COKE</option>
-                        <option>LIMESTONE</option>
-                        <option>SCRAP</option>
-                        <option>SPONGE IRON</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control flb-input mx-auto">
-                </td>
-            </tr>
-
-            <!-- ROW 2 -->
-            <tr>
-                <td>2</td>
-                <td>
-                    <select class="form-select material-select">
-                        <option value="">-- Select Material --</option>
-                        <option>LRP</option>
-                        <option>JODA</option>
-                        <option>SINTER</option>
-                        <option>QUARTZITE</option>
-                        <option>PYROXINITE</option>
-                        <option>TFO</option>
-                        <option>NUT COKE</option>
-                        <option>LIMESTONE</option>
-                        <option>SCRAP</option>
-                        <option>SPONGE IRON</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control flb-input mx-auto">
-                </td>
-            </tr>
-
-            <!-- ROW 3 -->
-            <tr>
-                <td>3</td>
-                <td>
-                    <select class="form-select material-select">
-                        <option value="">-- Select Material --</option>
-                        <option>LRP</option>
-                        <option>JODA</option>
-                        <option>SINTER</option>
-                        <option>QUARTZITE</option>
-                        <option>PYROXINITE</option>
-                        <option>TFO</option>
-                        <option>NUT COKE</option>
-                        <option>LIMESTONE</option>
-                        <option>SCRAP</option>
-                        <option>SPONGE IRON</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control flb-input mx-auto">
-                </td>
-            </tr>
-
-            <!-- ROW 4 -->
-            <tr>
-                <td>4</td>
-                <td>
-                    <select class="form-select material-select">
-                        <option value="">-- Select Material --</option>
-                        <option>LRP</option>
-                        <option>JODA</option>
-                        <option>SINTER</option>
-                        <option>QUARTZITE</option>
-                        <option>PYROXINITE</option>
-                        <option>TFO</option>
-                        <option>NUT COKE</option>
-                        <option>LIMESTONE</option>
-                        <option>SCRAP</option>
-                        <option>SPONGE IRON</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control flb-input mx-auto">
-                </td>
-            </tr>
-
-            <!-- ROW 5 -->
-            <tr>
-                <td>5</td>
-                <td>
-                    <select class="form-select material-select">
-                        <option value="">-- Select Material --</option>
-                        <option>LRP</option>
-                        <option>JODA</option>
-                        <option>SINTER</option>
-                        <option>QUARTZITE</option>
-                        <option>PYROXINITE</option>
-                        <option>TFO</option>
-                        <option>NUT COKE</option>
-                        <option>LIMESTONE</option>
-                        <option>SCRAP</option>
-                        <option>SPONGE IRON</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control flb-input mx-auto">
-                </td>
-            </tr>
-
-            <!-- ROW 6 -->
-            <tr>
-                <td>6</td>
-                <td>
-                    <select class="form-select material-select">
-                        <option value="">-- Select Material --</option>
-                        <option>LRP</option>
-                        <option>JODA</option>
-                        <option>SINTER</option>
-                        <option>QUARTZITE</option>
-                        <option>PYROXINITE</option>
-                        <option>TFO</option>
-                        <option>NUT COKE</option>
-                        <option>LIMESTONE</option>
-                        <option>SCRAP</option>
-                        <option>SPONGE IRON</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control flb-input mx-auto">
-                </td>
-            </tr>
-
-        </tbody>
-    </table>
-</div>
-<style>
-    /* Large Material Dropdown */
-    .material-select {
-        width: 260px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    /* Medium FLB Input */
-    .flb-input {
-        width: 130px;
-        height: 32px;
-        font-size: 14px;
-        text-align: center;
-    }
-
-    /* Section UI */
-    .section-box {
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 6px;
-    }
-
-    .section-title {
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-</style>
+                            <div class="text-end">
+                                <strong>Total: 35 / 7</strong>
+                            </div>
+                        </div>
