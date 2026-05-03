@@ -1,3 +1,10 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+let chartInstance = null;
+
+$(document).ready(function () {
+    loadFinesData();
+});
+
+// CLICK CELL
+$(document).on("click", ".chart-cell", function () {
+    let type = $(this).data("type");
+    loadTrend(type);
