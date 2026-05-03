@@ -1,7 +1,20 @@
-$(document).on("click", ".chart-cell", function () {
+function loadTrend(type, value) {
 
-    let type = $(this).data("type");
-    let value = $(this).text().trim();
+    $.ajax({
+        url: '/Ore_Beneficiation/GetFinesTrend',
+        type: 'GET',
+        data: {
+            type: type,
+            value: value
+        },
+        success: function (res) {
 
-    loadTrend(type, value);
-});
+            $("#trendModal").modal("show");
+
+            drawChart(res);
+        },
+        error: function () {
+            alert("Chart load failed");
+        }
+    });
+}
