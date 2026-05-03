@@ -1,10 +1,19 @@
-let chartInstance = null;
+function loadTrend(type) {
 
-$(document).ready(function () {
-    loadFinesData();
-});
+    $.ajax({
+        url: '/Ore_Beneficiation/GetFinesTrend',
+        type: 'GET',
+        data: { type: type },
+        success: function (res) {
 
-// CLICK CELL
-$(document).on("click", ".chart-cell", function () {
-    let type = $(this).data("type");
-    loadTrend(type);
+            // ✅ Bootstrap 5 correct modal open
+            const modal = new bootstrap.Modal(document.getElementById('trendModal'));
+            modal.show();
+
+            drawChart(res);
+        },
+        error: function () {
+            alert("Chart load failed");
+        }
+    });
+}
