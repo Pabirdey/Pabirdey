@@ -1,45 +1,26 @@
-using Oracle.ManagedDataAccess.Client;
-using System.Configuration;
-using System.Data;
-using System.Collections.Generic;
-using System.Web.Mvc;
-
-public JsonResult GetFinesTrend(string type, string value)
-{
-    List<object> list = new List<object>();
-
-    string connStr = ConfigurationManager.ConnectionStrings["OracleConn"].ConnectionString;
-
-    using (OracleConnection con = new OracleConnection(connStr))
-    {
-        con.Open();
-
-        string query = @"
-            SELECT TREND_DATE, VALUE
-            FROM T_FINES_TREND
-            WHERE ELEMENT_TYPE = :p_type
-              AND VALUE_NAME = :p_value
-              AND TREND_DATE >= SYSDATE - 30
-            ORDER BY TREND_DATE";
-
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        {
-            cmd.Parameters.Add(":p_type", type);
-            cmd.Parameters.Add(":p_value", value);
-
-            using (OracleDataReader dr = cmd.ExecuteReader())
-            {
-                while (dr.Read())
-                {
-                    list.Add(new
-                    {
-                        DATE = Convert.ToDateTime(dr["TREND_DATE"]).ToString("yyyy-MM-dd"),
-                        VALUE = Convert.ToDecimal(dr["VALUE"])
-                    });
-                }
-            }
-        }
-    }
-
-    return Json(list, JsonRequestBehavior.AllowGet);
-}
+SELECT 'AL2O3' AS ELEMENT,RETURN_FINES_AL2O3 AS RETURN_FINES,WET_FINES_AL2O3 AS WET_FINES,DRY_FINES_AL2O3 AS DRY_FINES,
+                   DRY_FINES_500TPH_AL2O3 AS DRY_FINES_500TPH
+                    FROM (SELECT * FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT) ORDER BY TIMESTAMP DESC)
+                   WHERE ROWNUM = 1
+                    UNION ALL
+                    SELECT 'SIO2',RETURN_FINES_SIO2,WET_FINES_SIO2,DRY_FINES_SIO2,DRY_FINES_500TPH_SIO2
+                    FROM (SELECT *  FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT  WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT) ORDER BY TIMESTAMP DESC)
+                    WHERE ROWNUM = 1
+                    UNION ALL
+                    SELECT 'P',RETURN_FINES_P,WET_FINES_P,DRY_FINES_P,DRY_FINES_500TPH_P
+                    FROM (
+                        SELECT *
+                        FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
+                        WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
+                        ORDER BY TIMESTAMP DESC
+                        )
+                    WHERE ROWNUM = 1
+                UNION ALL
+            SELECT 'K2O',RETURN_FINES_K2O,WET_FINES_K2O,DRY_FINES_K2O,DRY_FINES_500TPH_K20
+        FROM (
+            SELECT *
+            FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
+            WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
+            ORDER BY TIMESTAMP DESC
+            )
+WHERE ROWNUM = 1
