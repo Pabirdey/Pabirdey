@@ -1,34 +1,57 @@
-public JsonResult GetData()
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Web.Mvc;
+using Oracle.ManagedDataAccess.Client;
+
+public class HomeController : Controller
 {
-    List<object> list = new List<object>();
-
-    using (OracleConnection con = new OracleConnection(conString))
+    public JsonResult GetData()
     {
-        con.Open();
+        List<object> list = new List<object>();
 
-        OracleCommand cmd = new OracleCommand("SELECT * FROM COKE_UNLOADING", con);
+        string conStr = "YOUR_ORACLE_CONNECTION_STRING";
 
-        OracleDataReader dr = cmd.ExecuteReader();
-
-        while (dr.Read())
+        using (OracleConnection con = new OracleConnection(conStr))
         {
-            list.Add(new
-            {
-                TIMESTAMP = dr["TIMESTAMP"].ToString(),
-                SHIFT = dr["SHIFT"].ToString(),
-                BUNKER = dr["BUNKER"].ToString(),
-                A = dr["A"].ToString(),
-                B = dr["B"].ToString(),
-                C = dr["C"].ToString(),
-                D = dr["D"].ToString(),
-                E = dr["E"].ToString(),
-                F = dr["F"].ToString(),
-                TOTAL = dr["TOTAL"].ToString(),
-                BUNKER_P = dr["BUNKER_P"].ToString(),
-                BALANCE = dr["BALANCE"].ToString()
-            });
-        }
-    }
+            con.Open();
 
-    return Json(list, JsonRequestBehavior.AllowGet);
+            string query = @"SELECT 
+                                TIMESTAMP,
+                                SHIFT,
+                                BUNKER,
+                                C,
+                                E,
+                                F,
+                                TOTAL,
+                                BUNKER_P,
+                                BALANCE
+                             FROM YOUR_TABLE_NAME
+                             ORDER BY TIMESTAMP";
+
+            using (OracleCommand cmd = new OracleCommand(query, con))
+            {
+                using (OracleDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        list.Add(new
+                        {
+                            TIMESTAMP = dr["TIMESTAMP"] == DBNull.Value ? null : Convert.ToDateTime(dr["TIMESTAMP"]),
+                            SHIFT = dr["SHIFT"]?.ToString(),
+                            BUNKER = dr["BUNKER"]?.ToString(),
+                            C = dr["C"]?.ToString(),
+                            E = dr["E"]?.ToString(),
+                            F = dr["F"]?.ToString(),
+                            TOTAL = dr["TOTAL"]?.ToString(),
+                            BUNKER_P = dr["BUNKER_P"]?.ToString(),
+                            BALANCE = dr["BALANCE"]?.ToString()
+                        });
+                    }
+                }
+            }
+        }
+
+        return Json(list, JsonRequestBehavior.AllowGet);
+    }
 }
