@@ -1,88 +1,27 @@
-@{
-    ViewBag.Title = ProcessTrends.App.PageTitle;
+function renderTable(data) {
+
+    let html = '';
+
+    if (!data || data.length === 0) {
+        html = "<tr><td colspan='5'>No Data Found</td></tr>";
+    }
+    else {
+        data.forEach(item => {
+
+            html += `
+            <tr>
+                <td>${item.ELEMENT}</td>
+
+                <td class="chart-cell" data-type="RETURN_FINES">${item.RETURN_FINES}</td>
+
+                <td class="chart-cell" data-type="WET_FINES">${item.WET_FINES}</td>
+
+                <td class="chart-cell" data-type="DRY_FINES">${item.DRY_FINES}</td>
+
+                <td class="chart-cell" data-type="DRY_FINES_500TPH">${item.DRY_FINES_500TPH}</td>
+            </tr>`;
+        });
+    }
+
+    $("#finesTable tbody").html(html);
 }
-
-@section css {
-<style>
-    body {
-        background: white;
-        padding: 20px;
-    }
-
-    .card {
-        margin-top: 20px;
-        margin-left: 300px;
-        width: 800px;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    #loader {
-        display: none;
-        text-align: center;
-        font-weight: bold;
-        color: #0d6efd;
-        margin-bottom: 10px;
-    }
-
-    .chart-cell {
-        cursor: pointer;
-        color: #0d6efd;
-    }
-
-    .chart-cell:hover {
-        background: #f1f1f1;
-    }
-</style>
-}
-
-<div class="app-content">
-    @Html.Partial("_Header")
-
-    <div class="main-content">
-        <div class="container">
-
-            <div class="card">
-                <h3 class="text-center">Pile Mat Wise Quality Data</h3>
-
-                <div id="loader">Loading data...</div>
-
-                <table class="table table-bordered text-center" id="finesTable">
-                    <thead>
-                        <tr>
-                            <th>Element</th>
-                            <th>Return Fines</th>
-                            <th>Wet Fines</th>
-                            <th>Dry Fines</th>
-                            <th>Dry Fines 500TPH</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- MODAL -->
-<div class="modal fade" id="trendModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">30 Days Trend</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div id="trendChart" style="height:400px;"></div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- ECHART -->
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
