@@ -1,4 +1,4 @@
- <script>
+<script>
         function createRow() {
             return `
     <tr>
