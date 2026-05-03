@@ -85,3 +85,22 @@
         </div>
     </div>
 </div>
+
+function loadTrend(type) {
+
+    $.ajax({
+        url: '/Ore_Beneficiation/GetFinesTrend',
+        type: 'GET',
+        data: { type: type },
+        success: function (res) {
+
+            // ✅ Bootstrap 4 safe modal open
+            $("#trendModal").modal("show");
+
+            drawChart(res);
+        },
+        error: function () {
+            alert("Chart load failed");
+        }
+    });
+}
