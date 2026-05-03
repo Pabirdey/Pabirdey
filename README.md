@@ -1,8 +1,9 @@
 @{
     ViewBag.Title = ProcessTrends.App.PageTitle;
 }
+
 @section css {
-    <link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")" media="screen">
+<link rel="stylesheet" href="@Url.Content("~/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone.min.css")" />
 
 <style>
     body {
@@ -30,15 +31,20 @@
     }
 </style>
 }
+
 <div class="app-content">
-    <!-- start: TOP NAVBAR -->
+
     @Html.Partial("_Header")
-    <!-- end: TOP NAVBAR -->
+
     <div class="main-content">
         <div class="container">
+
             <div class="card">
+
                 <h3 class="text-center mb-3">Pile Mat Wise Quality Data</h3>
+
                 <div id="loader">Loading data...</div>
+
                 <table class="table table-bordered table-striped table-hover text-center" id="finesTable">
                     <thead>
                         <tr>
@@ -49,26 +55,34 @@
                             <th>Dry Fines 500TPH</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">Loading...</td>
+                        </tr>
+                    </tbody>
                 </table>
+
             </div>
+
         </div>
-    </div>   
+    </div>
+
 </div>
 
 @section scripts {
+
+    <!-- ✅ REQUIRED LIBRARIES -->
+    <script src="@Url.Content("~/bower_components/jquery/dist/jquery.min.js")"></script>
     <script src="@Url.Content("~/bower_components/moment/moment.min.js")"></script>
     <script src="@Url.Content("~/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")"></script>
-    <script src="@Url.Content("~/bower_components/echarts/echarts.min.js")"></script>
-    <script src="@Url.Content("~/bower_components/Math.js/Math.min.js")"></script>
-    <!-- start: Packet JAVASCRIPTS -->
-    <script src="@Url.Content("~/Content/js/echart-custom-options/common.js")"></script>
-    <script src="@Url.Content("~/Content/js/echart-custom-options/oven-health-visualisation.js")"></script>
-    <script type="text/javascript">
+
+    <script>
+
         $(document).ready(function () {
             loadFinesData();
         });
 
+        // ✅ LOAD DATA FROM CONTROLLER
         function loadFinesData() {
 
             $('#loader').show();
@@ -80,11 +94,19 @@
 
                 success: function (res) {
 
+                    console.log("API Response:", res);
+
+                    // CASE 1: error
                     if (res && res.error) {
-                        $('#finesTable tbody').html(
-                            "<tr><td colspan='5' class='text-danger'>" + res.error + "</td></tr>"
-                        );
+                        showError(res.error);
                     }
+
+                    // CASE 2: { success, data }
+                    else if (res && res.data) {
+                        renderTable(res.data);
+                    }
+
+                    // CASE 3: direct array
                     else {
                         renderTable(res);
                     }
@@ -94,14 +116,19 @@
 
                 error: function () {
                     $('#loader').hide();
-                    $('#finesTable tbody').html(
-                        "<tr><td colspan='5' class='text-danger'>Error loading data</td></tr>"
-                    );
+                    showError("Error loading data");
                 }
             });
         }
 
-        // Handle NULL / empty values
+        // ✅ SHOW ERROR
+        function showError(msg) {
+            $('#finesTable tbody').html(
+                `<tr><td colspan="5" class="text-danger">${msg}</td></tr>`
+            );
+        }
+
+        // ✅ HANDLE NULL VALUES
         function getValue(val) {
             if (val === null || val === undefined || val === "" || val === "null") {
                 return '-';
@@ -109,27 +136,32 @@
             return val;
         }
 
+        // ✅ RENDER TABLE
         function renderTable(data) {
 
-            var html = '';
+            let html = '';
 
             if (!data || data.length === 0) {
                 html = "<tr><td colspan='5'>No data found</td></tr>";
             }
             else {
-                $.each(data, function (i, item) {
 
-                    html += '<tr>';
-                    html += '<td>' + getValue(item.ELEMENT) + '</td>';
-                    html += '<td>' + getValue(item.RETURN_FINES) + '</td>';
-                    html += '<td>' + getValue(item.WET_FINES) + '</td>';
-                    html += '<td>' + getValue(item.DRY_FINES) + '</td>';
-                    html += '<td>' + getValue(item.DRY_FINES_500TPH) + '</td>';
-                    html += '</tr>';
+                data.forEach(function (item) {
 
+                    html += `
+                        <tr>
+                            <td>${getValue(item.ELEMENT)}</td>
+                            <td>${getValue(item.RETURN_FINES)}</td>
+                            <td>${getValue(item.WET_FINES)}</td>
+                            <td>${getValue(item.DRY_FINES)}</td>
+                            <td>${getValue(item.DRY_FINES_500TPH)}</td>
+                        </tr>
+                    `;
                 });
             }
 
             $('#finesTable tbody').html(html);
         }
-        </script>
+
+    </script>
+}
