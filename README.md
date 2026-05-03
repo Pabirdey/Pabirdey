@@ -1,23 +1,36 @@
-function renderTable(data) {
+<div class="card">
+    <h3 class="text-center">Pile Mat Wise Quality Data</h3>
 
-    let html = '';
+    <div id="loader">Loading...</div>
 
-    if (!data || data.length === 0) {
-        html = "<tr><td colspan='5'>No Data Found</td></tr>";
-    }
-    else {
-        data.forEach(item => {
-
-            html += `
+    <table class="table table-bordered text-center" id="finesTable">
+        <thead>
             <tr>
-                <td class="chart-cell" data-type="ELEMENT">${item.ELEMENT}</td>
-                <td class="chart-cell" data-type="RETURN_FINES">${item.RETURN_FINES}</td>
-                <td class="chart-cell" data-type="WET_FINES">${item.WET_FINES}</td>
-                <td class="chart-cell" data-type="DRY_FINES">${item.DRY_FINES}</td>
-                <td class="chart-cell" data-type="DRY_FINES_500TPH">${item.DRY_FINES_500TPH}</td>
-            </tr>`;
-        });
-    }
+                <th>Element</th>
+                <th>Return Fines</th>
+                <th>Wet Fines</th>
+                <th>Dry Fines</th>
+                <th>Dry Fines 500TPH</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 
-    $("#finesTable tbody").html(html);
-}
+<!-- MODAL -->
+<div class="modal fade" id="trendModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">30 Days Trend</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="trendChart" style="height:400px;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
