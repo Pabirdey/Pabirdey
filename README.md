@@ -80,59 +80,44 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<script>
+function createRow(item = {}) {
 
-    $(document).ready(function () {
+    return `
+    <tr>
+        <td>
+            <input type="text" class="form-control row-date" style="width:100px;" 
+            value="${formatDate(item.TIMESTAMP)}" readonly>
+        </td>
 
-        $.ajax({
-            url: '/Home/GetData',
-            type: 'GET',
-            success: function (data) {
+        <td>
+            <select class="form-control row-shift">
+                <option ${item.SHIFT == 'A' ? 'selected' : ''}>A</option>
+                <option ${item.SHIFT == 'B' ? 'selected' : ''}>B</option>
+                <option ${item.SHIFT == 'C' ? 'selected' : ''}>C</option>
+            </select>
+        </td>
 
-                var html = '';
+        <td>
+            <select class="form-control bunker">
+                <option value="">---Pls. Select---</option>
+                <option ${item.BUNKER=='WESTERN'?'selected':''}>WESTERN</option>
+                <option ${item.BUNKER=='MIDDLE'?'selected':''}>MIDDLE</option>
+                <option ${item.BUNKER=='EASTERN'?'selected':''}>EASTERN</option>
+                <option ${item.BUNKER=='H/S NC'?'selected':''}>H/S NC</option>
+                <option ${item.BUNKER=='NC BF KO'?'selected':''}>NC BF KO</option>
+            </select>
+        </td>
 
-                $.each(data, function (i, item) {
+        <td><input class="form-control val" value="${item.C || ''}"></td>
+        <td><input class="form-control val" value="${item.E || ''}"></td>
+        <td><input class="form-control val" value="${item.F || ''}"></td>
 
-                    html += '<tr>';
+        <td><input class="form-control total" value="${item.TOTAL || ''}" readonly></td>
 
-                    html += '<td>' + item.TIMESTAMP + '</td>';
-                    html += '<td>' + item.SHIFT + '</td>';
-
-                    html += '<td>' +
-                            '<select class="form-select">' +
-                            '<option>' + item.BUNKER + '</option>' +
-                            '</select>' +
-                            '</td>';
-
-                    html += '<td><input type="text" class="form-control" value="' + item.A + '"></td>';
-
-                    html += '<td><input type="text" class="form-control" value="' + item.B + '"></td>';
-
-                    html += '<td><input type="text" class="form-control" value="' + item.C + '"></td>';
-
-                    html += '<td><input type="text" class="form-control" value="' + item.D + '"></td>';
-
-                    html += '<td><input type="text" class="form-control" value="' + item.E + '"></td>';
-
-                    html += '<td><input type="text" class="form-control" value="' + item.F + '"></td>';
-
-                    html += '<td>' + item.TOTAL + '</td>';
-
-                    html += '<td>' + item.BUNKER_P + '</td>';
-
-                    html += '<td>' + item.BALANCE + '</td>';
-
-                    html += '</tr>';
-
-                });
-
-                $('#tblData tbody').html(html);
-            }
-        });
-
-    });
-
-</script>
+        <td><input class="form-control position" value="${item.BUNKER_P || ''}"></td>
+        <td><input class="form-control balance" value="${item.BALANCE || ''}"></td>
+    </tr>`;
+}
 [03/05, 11:01 am] ♥️Wife😡🥰🤩: public JsonResult GetData()
 {
     List<object> list = new List<object>();
@@ -167,3 +152,30 @@
 
     return Json(list, JsonRequestBehavior.AllowGet);
 }
+$(document).ready(function () {
+
+    $.ajax({
+        url: '/Home/GetData',
+        type: 'GET',
+        success: function (data) {
+
+            let tbody = $("#tblBody");
+            tbody.empty();
+
+            if (data.length > 0) {
+
+                data.forEach(function (item) {
+                    tbody.append(createRow(item)); // ✅ merged
+                });
+
+            } else {
+
+                // if no data → create blank rows
+                for (let i = 0; i < 8; i++) {
+                    tbody.append(createRow());
+                }
+            }
+        }
+    });
+
+});
