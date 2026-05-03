@@ -1,3 +1,51 @@
+   <script>
+        function createRow() {
+            return `
+    <tr>
+        <td><input type="text" class="form-control row-date" style="width:100px;" readonly></td>
+
+        <td>
+            <select class="form-control row-shift" style="height:30px;width:50px;">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+            </select>
+        </td>        
+        <td>
+            <select class ="form-control bunker text-start ps-01" style="height:30px;width:200px;">
+                <option value="">---Pls. Select---</option>
+                <option value="WESTERN">WESTERN</option>
+                <option value="MIDDLE">MIDDLE</option>
+                <option value="EASTERN">EASTERN</option>
+                <option value="H/S NC">H/S NC</option>
+                <option value="NC BF KO">NC BF KO</option>
+                <option value="ST.COKE-HALDIA">ST.COKE-HALDIA</option>
+                <option value="ST.COKE-IMPORTED">ST.COKE-IMPORTED</option>
+                <option value="ST.COKE-OWN">ST.COKE-OWN</option>
+                <option value="ST.COKE-TOTAL">ST.COKE-TOTAL</option>
+                <option value="B/H HIGH ASH">B/H HIGH ASH</option>
+                <option value="B/H LOW ASH">B/H LOW ASH</option>
+                <option value="B/H COKE-TOTAL">B/H COKE-TOTAL</option>
+                <option value="ROUGH BREEZE">ROUGH BREEZE</option>
+                <option value="PLS_25MM_NC">PLS_25MM_NC</option>
+            </select>
+        </td>
+
+        <td><input type="text" class="form-control val" data-field="C"></td>
+        <td><input type="text" class ="form-control val" data-field="E"></td>
+        <td><input type="text" class ="form-control val" data-field="F"></td>
+        <td><input type="text" class ="form-control total" readonly></td>
+        <td><input type="text" class ="form-control position"></td>
+        <td><input type="text" class ="form-control balance"></td>
+    </tr>`;
+        }
+
+        // generate rows
+        for (let i = 0; i < 8; i++) {
+            document.getElementById("tblBody").innerHTML += createRow();
+        }
+
+    </script>
 [03/05, 11:00 am] ♥️Wife😡🥰🤩: <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <div class="table-responsive">
