@@ -1,75 +1,112 @@
-<div class="container-fluid mt-2">
-
-    <div class="row mt-2">
-
-        <!-- LEFT SIDE -->
-        <div class="col-md-8">
-
-            <!-- 🔹 Coke Unloading -->
-            <div class="section-box">
-                <div class="section-title">Coke Unloading</div>
-                <table class="table table-bordered text-center">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Shift</th>
-                            <th>Bunker</th>
-                            <th>C-BF</th>
-                            <th>E-BF</th>
-                            <th>F-BF</th>
-                            <th>Total</th>
-                            <th>Position</th>
-                            <th>Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblBodyMain"></tbody>
-                </table>
+<div class="ms-auto d-flex gap-2">                
+                <label for="tbFDatePick" class="LabelControl" style="font-family:Courier New, Courier, monospace;font-size:22px;font-weight:bold;">Date:&nbsp;</label>
+                <a id="tbFDatePick" class="btn btn-primary">
+                    <label id="currDate-value" style="font-size:12px;color:white"></label>
+                </a>
+                <input type="text" id="hiddenDate" style="position:absolute; opacity:0; height:0; width:0;" />
+                <select class="form-select" id="ddlshift">
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
+                </select>
             </div>
+            <script>
+        function createRow() {
+            return `
+    <tr>
+        <td><input type="date" class="form-control row-date"></td>
 
-            <!-- 🔹 SIDE BY SIDE TABLES -->
-            <div class="row">
+        <td>
+            <select class="form-control row-shift" style="height:30px;width:50px;">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+            </select>
+        </td>
 
-                <!-- Tonnage of Coke -->
-                <div class="col-md-6 col-12">
-                    <div class="section-box">
-                        <div class="section-title">Tonnage of Coke</div>
-                        <table class="table table-bordered text-center">
-                            <thead>
-                                <tr>
-                                    <th>Bunker</th>
-                                    <th>C-BF</th>
-                                    <th>E-BF</th>
-                                    <th>F-BF</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblBodyCoke"></tbody>
-                        </table>
-                    </div>
-                </div>
+        
+        <td>
+            <select class ="form-control text-start ps-01" style="height:30px;width:220px;">
+                <option value="">---Pls. Select---</option>
+                <option value="WESTERN">WESTERN</option>
+                <option value="MIDDLE">MIDDLE</option>
+                <option value="EASTERN">EASTERN</option>
+                <option value="H/S NC">H/S NC</option>
+                <option value="NC BF KO">NC BF KO</option>
+                <option value="ST.COKE-HALDIA">ST.COKE-HALDIA</option>
+                <option value="ST.COKE-IMPORTED">ST.COKE-IMPORTED</option>
+                <option value="ST.COKE-OWN">ST.COKE-OWN</option>
+                <option value="ST.COKE-TOTAL">ST.COKE-TOTAL</option>
+                <option value="B/H HIGH ASH">B/H HIGH ASH</option>
+                <option value="B/H LOW ASH">B/H LOW ASH</option>
+                <option value="B/H COKE-TOTAL">B/H COKE-TOTAL</option>
+                <option value="ROUGH BREEZE">ROUGH BREEZE</option>
+                <option value="PLS_25MM_NC">PLS_25MM_NC</option>
+            </select>
+        </td>
 
-                <!-- Tonnage of Nut Coke -->
-                <div class="col-md-6 col-12">
-                    <div class="section-box">
-                        <div class="section-title">Tonnage of Nut Coke</div>
-                        <table class="table table-bordered text-center">
-                            <thead>
-                                <tr>
-                                    <th>Bunker</th>
-                                    <th>C-BF</th>
-                                    <th>E-BF</th>
-                                    <th>F-BF</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblBodyNutCoke"></tbody>
-                        </table>
-                    </div>
-                </div>
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control total" readonly></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+    </tr>`;
+        }
 
-            </div>
+        // generate rows
+        for (let i = 0; i < 8; i++) {
+            document.getElementById("tblBody").innerHTML += createRow();
+        }
 
-        </div>
+    </script>
+    <script>
+        function createRow() {
+            return `
+    <tr>
+        <td><input type="date" class="form-control row-date"></td>
 
-    </div>
-</div>
+        <td>
+            <select class="form-control row-shift" style="height:30px;width:50px;">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+            </select>
+        </td>
+
+        
+        <td>
+            <select class ="form-control text-start ps-01" style="height:30px;width:220px;">
+                <option value="">---Pls. Select---</option>
+                <option value="WESTERN">WESTERN</option>
+                <option value="MIDDLE">MIDDLE</option>
+                <option value="EASTERN">EASTERN</option>
+                <option value="H/S NC">H/S NC</option>
+                <option value="NC BF KO">NC BF KO</option>
+                <option value="ST.COKE-HALDIA">ST.COKE-HALDIA</option>
+                <option value="ST.COKE-IMPORTED">ST.COKE-IMPORTED</option>
+                <option value="ST.COKE-OWN">ST.COKE-OWN</option>
+                <option value="ST.COKE-TOTAL">ST.COKE-TOTAL</option>
+                <option value="B/H HIGH ASH">B/H HIGH ASH</option>
+                <option value="B/H LOW ASH">B/H LOW ASH</option>
+                <option value="B/H COKE-TOTAL">B/H COKE-TOTAL</option>
+                <option value="ROUGH BREEZE">ROUGH BREEZE</option>
+                <option value="PLS_25MM_NC">PLS_25MM_NC</option>
+            </select>
+        </td>
+
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control total" readonly></td>
+        <td><input class="form-control"></td>
+        <td><input class="form-control"></td>
+    </tr>`;
+        }
+
+        // generate rows
+        for (let i = 0; i < 8; i++) {
+            document.getElementById("tblBody").innerHTML += createRow();
+        }
+
+    </script>
