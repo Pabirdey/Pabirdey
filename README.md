@@ -1,17 +1,27 @@
-<!-- Modal -->
-<div class="modal fade" id="trendModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+let chartInstance = null;
 
-            <div class="modal-header">
-                <h5 class="modal-title">30 Days Trend</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+$(document).on("click", ".clickable", function () {
 
-            <div class="modal-body">
-                <canvas id="trendChart" height="100"></canvas>
-            </div>
+    let element = $(this).data("element");   // AL2O3
+    let type = $(this).data("type");         // Return Fines
 
-        </div>
-    </div>
-</div>
+    $("#trendModal").modal("show");
+
+    $.ajax({
+        url: '/YourController/Get30DaysData',
+        type: 'GET',
+        data: { element: element, type: type },
+        success: function (res) {
+
+            let labels = [];
+            let values = [];
+
+            res.forEach(x => {
+                labels.push(x.DATE);
+                values.push(x.VALUE);
+            });
+
+            drawChart(labels, values, element + " - " + type);
+        }
+    });
+});
