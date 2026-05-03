@@ -1,27 +1,52 @@
-function renderTable(data) {
+$(document).on("click", ".chart-cell", function () {
 
-    let html = '';
+    let type = $(this).data("type");
 
-    if (!data || data.length === 0) {
-        html = "<tr><td colspan='5'>No Data Found</td></tr>";
-    }
-    else {
-        data.forEach(item => {
+    loadTrend(type);
+});
+function loadTrend(type) {
 
-            html += `
-            <tr>
-                <td>${item.ELEMENT}</td>
+    $.ajax({
+        url: '/Ore_Beneficiation/GetFinesTrend',
+        type: 'GET',
+        data: { type: type },
+        success: function (res) {
 
-                <td class="chart-cell" data-type="RETURN_FINES">${item.RETURN_FINES}</td>
+            $("#trendModal").modal("show");
 
-                <td class="chart-cell" data-type="WET_FINES">${item.WET_FINES}</td>
-
-                <td class="chart-cell" data-type="DRY_FINES">${item.DRY_FINES}</td>
-
-                <td class="chart-cell" data-type="DRY_FINES_500TPH">${item.DRY_FINES_500TPH}</td>
-            </tr>`;
-        });
-    }
-
-    $("#finesTable tbody").html(html);
+            drawChart(res);
+        },
+        error: function () {
+            alert("Chart load failed");
+        }
+    });
 }
+function drawChart(data) {
+
+    if (chartInstance != null) {
+        chartInstance.dispose();
+    }
+
+    chartInstance = echarts.init(document.getElementById("trendChart"));
+
+    chartInstance.setOption({
+        tooltip: { trigger: 'axis' },
+
+        xAxis: {
+            type: 'category',
+            data: data.map(x => x.DATE)
+        },
+
+        yAxis: {
+            type: 'value'
+        },
+
+        series: [{
+            type: 'line',
+            smooth: true,
+            data: data.map(x => x.VALUE),
+            lineStyle: { width: 3 }
+        }]
+    });
+}
+</script>
