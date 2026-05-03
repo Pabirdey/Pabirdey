@@ -1,26 +1,62 @@
-SELECT 'AL2O3' AS ELEMENT,RETURN_FINES_AL2O3 AS RETURN_FINES,WET_FINES_AL2O3 AS WET_FINES,DRY_FINES_AL2O3 AS DRY_FINES,
-                   DRY_FINES_500TPH_AL2O3 AS DRY_FINES_500TPH
-                    FROM (SELECT * FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT) ORDER BY TIMESTAMP DESC)
-                   WHERE ROWNUM = 1
-                    UNION ALL
-                    SELECT 'SIO2',RETURN_FINES_SIO2,WET_FINES_SIO2,DRY_FINES_SIO2,DRY_FINES_500TPH_SIO2
-                    FROM (SELECT *  FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT  WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT) ORDER BY TIMESTAMP DESC)
-                    WHERE ROWNUM = 1
-                    UNION ALL
-                    SELECT 'P',RETURN_FINES_P,WET_FINES_P,DRY_FINES_P,DRY_FINES_500TPH_P
-                    FROM (
-                        SELECT *
-                        FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
-                        WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
-                        ORDER BY TIMESTAMP DESC
-                        )
-                    WHERE ROWNUM = 1
-                UNION ALL
-            SELECT 'K2O',RETURN_FINES_K2O,WET_FINES_K2O,DRY_FINES_K2O,DRY_FINES_500TPH_K20
-        FROM (
-            SELECT *
+public JsonResult GetFinesTrend(string type, string value)
+{
+    List<object> list = new List<object>();
+
+    string connStr = ConfigurationManager.ConnectionStrings["OracleConn"].ConnectionString;
+
+    using (OracleConnection con = new OracleConnection(connStr))
+    {
+        con.Open();
+
+        string column = "";
+
+        // Map clicked element to DB column
+        switch (type.ToUpper())
+        {
+            case "AL2O3":
+                column = "RETURN_FINES_AL2O3";
+                break;
+
+            case "SIO2":
+                column = "RETURN_FINES_SIO2";
+                break;
+
+            case "P":
+                column = "RETURN_FINES_P";
+                break;
+
+            case "K2O":
+                column = "RETURN_FINES_K2O";
+                break;
+
+            default:
+                column = "RETURN_FINES_AL2O3";
+                break;
+        }
+
+        string query = $@"
+            SELECT 
+                TRUNC(TIMESTAMP) AS TREND_DATE,
+                {column} AS VALUE
             FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
-            WHERE SHIFT = (SELECT MAX(SHIFT) FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT)
-            ORDER BY TIMESTAMP DESC
-            )
-WHERE ROWNUM = 1
+            WHERE TRUNC(TIMESTAMP) >= TRUNC(SYSDATE - 30)
+            ORDER BY TIMESTAMP";
+
+        using (OracleCommand cmd = new OracleCommand(query, con))
+        {
+            using (OracleDataReader dr = cmd.ExecuteReader())
+            {
+                while (dr.Read())
+                {
+                    list.Add(new
+                    {
+                        DATE = Convert.ToDateTime(dr["TREND_DATE"]).ToString("yyyy-MM-dd"),
+                        VALUE = dr["VALUE"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["VALUE"])
+                    });
+                }
+            }
+        }
+    }
+
+    return Json(list, JsonRequestBehavior.AllowGet);
+}
