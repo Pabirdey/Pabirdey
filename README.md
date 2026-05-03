@@ -1,20 +1,17 @@
-function loadTrend(type, value) {
+function drawChart(data) {
 
-    $.ajax({
-        url: '/Ore_Beneficiation/GetFinesTrend',
-        type: 'GET',
-        data: {
-            type: type,
-            value: value
-        },
-        success: function (res) {
-
-            $("#trendModal").modal("show");
-
-            drawChart(res);
-        },
-        error: function () {
-            alert("Chart load failed");
-        }
-    });
+    echarts.init(document.getElementById("trendChart"))
+        .setOption({
+            xAxis: {
+                type: 'category',
+                data: data.map(d => d.DATE)
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                type: 'line',
+                data: data.map(d => d.VALUE)
+            }]
+        });
 }
