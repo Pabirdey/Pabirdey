@@ -1,52 +1,57 @@
-$(document).on("click", ".chart-cell", function () {
+public JsonResult GetFinesTrend(string type)
+{
+    List<object> list = new List<object>();
 
-    let type = $(this).data("type");
+    using (OracleConnection con = new OracleConnection(mycon))
+    {
+        con.Open();
 
-    loadTrend(type);
-});
-function loadTrend(type) {
+        string column = "";
 
-    $.ajax({
-        url: '/Ore_Beneficiation/GetFinesTrend',
-        type: 'GET',
-        data: { type: type },
-        success: function (res) {
+        switch (type.ToUpper())
+        {
+            case "RETURN_FINES":
+                column = "RETURN_FINES_AL2O3";
+                break;
 
-            $("#trendModal").modal("show");
+            case "WET_FINES":
+                column = "WET_FINES_AL2O3";
+                break;
 
-            drawChart(res);
-        },
-        error: function () {
-            alert("Chart load failed");
+            case "DRY_FINES":
+                column = "DRY_FINES_AL2O3";
+                break;
+
+            case "DRY_FINES_500TPH":
+                column = "DRY_FINES_500TPH_AL2O3";
+                break;
+
+            default:
+                column = "RETURN_FINES_AL2O3";
+                break;
         }
-    });
-}
-function drawChart(data) {
 
-    if (chartInstance != null) {
-        chartInstance.dispose();
+        string query = $@"
+        SELECT 
+            TRUNC(TIMESTAMP) AS TREND_DATE,
+            {column} AS VALUE
+        FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
+        WHERE TIMESTAMP >= SYSDATE - 30
+        ORDER BY TIMESTAMP";
+
+        using (OracleCommand cmd = new OracleCommand(query, con))
+        using (OracleDataReader dr = cmd.ExecuteReader())
+        {
+            while (dr.Read())
+            {
+                list.Add(new
+                {
+                    DATE = Convert.ToDateTime(dr["TREND_DATE"]).ToString("yyyy-MM-dd"),
+                    VALUE = dr["VALUE"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["VALUE"])
+                });
+            }
+        }
     }
 
-    chartInstance = echarts.init(document.getElementById("trendChart"));
-
-    chartInstance.setOption({
-        tooltip: { trigger: 'axis' },
-
-        xAxis: {
-            type: 'category',
-            data: data.map(x => x.DATE)
-        },
-
-        yAxis: {
-            type: 'value'
-        },
-
-        series: [{
-            type: 'line',
-            smooth: true,
-            data: data.map(x => x.VALUE),
-            lineStyle: { width: 3 }
-        }]
-    });
+    return Json(list, JsonRequestBehavior.AllowGet);
 }
-</script>
