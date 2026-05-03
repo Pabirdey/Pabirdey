@@ -1,27 +1,30 @@
-let chartInstance = null;
 
-$(document).on("click", ".clickable", function () {
+        $(document).ready(function () {
+            loadFinesData();
+        });       
+        function loadFinesData() {
+            $('#loader').show();
+            $.ajax({
+                url: '/Ore_Beneficiation/GetFinesData',
+                type: 'GET',
+                dataType: 'json',
+                success: function (res) {                                        
+                    if (res && res.error) {
+                        showError(res.error);
+                    }                    
+                    else if (res && res.data) {
+                        renderTable(res.data);
+                    }
+                    else {
+                        renderTable(res);
+                    }
 
-    let element = $(this).data("element");   // AL2O3
-    let type = $(this).data("type");         // Return Fines
+                    $('#loader').hide();
+                },
 
-    $("#trendModal").modal("show");
-
-    $.ajax({
-        url: '/YourController/Get30DaysData',
-        type: 'GET',
-        data: { element: element, type: type },
-        success: function (res) {
-
-            let labels = [];
-            let values = [];
-
-            res.forEach(x => {
-                labels.push(x.DATE);
-                values.push(x.VALUE);
+                error: function () {
+                    $('#loader').hide();
+                    showError("Error loading data");
+                }
             });
-
-            drawChart(labels, values, element + " - " + type);
         }
-    });
-});
