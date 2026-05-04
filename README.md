@@ -1,59 +1,58 @@
-public JsonResult GetFinesTrend(string type, string element)
-{
-    List<object> list = new List<object>();
+function drawChart(data, element, type) {
 
-    using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
-
-        // ✅ safety
-        var allowed = new List<string> { "AL2O3", "SIO2", "P", "K2O" };
-        if (!allowed.Contains(element?.ToUpper()))
-        {
-            element = "AL2O3";
-        }
-
-        string column = "";
-
-        switch (type.ToUpper())
-        {
-            case "RETURN_FINES":
-                column = $"RETURN_FINES_{element}";
-                break;
-
-            case "WET_FINES":
-                column = $"WET_FINES_{element}";
-                break;
-
-            case "DRY_FINES":
-                column = $"DRY_FINES_{element}";
-                break;
-
-            case "DRY_FINES_500TPH":
-                column = $"DRY_FINES_500TPH_{element}";
-                break;
-        }
-
-        string query = $@"
-        SELECT TRUNC(TIMESTAMP) TREND_DATE,
-               NVL({column},0) VALUE
-        FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
-        WHERE TIMESTAMP >= SYSDATE - 30
-        ORDER BY TIMESTAMP";
-
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        using (OracleDataReader dr = cmd.ExecuteReader())
-        {
-            while (dr.Read())
-            {
-                list.Add(new
-                {
-                    DATE = Convert.ToDateTime(dr["TREND_DATE"]).ToString("dd-MM-yyyy"),
-                    VALUE = Convert.ToDecimal(dr["VALUE"])
-                });
-            }
-        }
+    if (chartInstance != null) {
+        chartInstance.dispose();
     }
 
-    return Json(list, JsonRequestBehavior.AllowGet);
+    chartInstance = echarts.init(document.getElementById("trendChart"));
+
+    chartInstance.setOption({
+
+        // ✅ Show Title
+        title: {
+            text: element + " - " + type + " (30 Days Trend)",
+            left: 'center'
+        },
+
+        tooltip: { trigger: 'axis' },
+
+        xAxis: {
+            type: 'category',
+            data: data.map(x => x.DATE)
+        },
+
+        yAxis: {
+            type: 'value',
+            name: type   // ✅ Y-axis label
+        },
+
+        series: [{
+            name: element + " (" + type + ")",   // ✅ Legend name
+            type: 'line',
+            smooth: true,
+            data: data.map(x => x.VALUE),
+            lineStyle: { width: 3 }
+        }]
+    });
+}
+function loadTrend(type, element) {
+
+    $.ajax({
+        url: '/RmbbPile/GetFinesTrend',
+        type: 'GET',
+        data: { type: type, element: element },
+
+        success: function (res) {
+
+            const modal = new bootstrap.Modal(document.getElementById('trendModal'));
+            modal.show();
+
+            // ✅ Modal title also
+            $("#modalTitle").text(element + " - " + type);
+
+            setTimeout(function () {
+                drawChart(res, element, type);   // ✅ pass both
+            }, 300);
+        }
+    });
 }
