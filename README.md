@@ -1,30 +1,17 @@
-
-function drawChart(data, element, type) {
-    if (chartInstance != null) {
-        chartInstance.dispose();
+title: {
+    text: element + " - " + type.replaceAll("_", " "),
+    left: 'center',
+    textStyle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        fontFamily: 'Segoe UI',
+        color: {
+            type: 'linear',
+            x: 0, y: 0, x2: 1, y2: 0,
+            colorStops: [
+                { offset: 0, color: '#007bff' },
+                { offset: 1, color: '#00c6ff' }
+            ]
+        }
     }
-    chartInstance = echarts.init(document.getElementById("trendChart"));
-
-    chartInstance.setOption({
-        title: {
-            text: element + " - " + type + " (30 Days Trend)",
-            left: 'center'
-        },
-        tooltip: { trigger: 'axis' },
-        xAxis: {
-            type: 'category',
-            data: data.map(x => x.DATE)
-        },
-        yAxis: {
-            type: 'value',
-            name: type
-        },
-        series: [{
-            name: element + " (" + type + ")",
-            type: 'line',
-            smooth: true,
-            data: data.map(x => x.VALUE),
-            lineStyle: { width: 3 }
-        }]
-    });
-}
+},
