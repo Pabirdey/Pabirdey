@@ -1,3 +1,14 @@
+let chartInstance = null;
+
+$(document).ready(function () {
+    loadFinesData();
+});
+function loadFinesData() {
+
+    $.get('/RmbbPile/GetFinesData', function (res) {
+        renderTable(res);
+    });
+}
 function loadFinesData() {
 
     $.get('/RmbbPile/GetFinesData', function (res) {
