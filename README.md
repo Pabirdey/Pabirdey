@@ -1,59 +1,88 @@
-public JsonResult GetFinesTrend(string type, string element)
-{
-    List<object> list = new List<object>();
+function loadFinesData() {
 
-    using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
+    $.get('/RmbbPile/GetFinesData', function (res) {
+        renderTable(res);
+    });
+}
+function renderTable(data) {
 
-        // सुरक्षा
-        var allowed = new List<string> { "AL2O3", "SIO2", "P", "K2O" };
-        if (!allowed.Contains(element.ToUpper()))
-        {
-            element = "AL2O3";
-        }
+    let html = '';
 
-        string column = "";
+    data.forEach(item => {
 
-        switch (type.ToUpper())
-        {
-            case "RETURN_FINES":
-                column = $"RETURN_FINES_{element}";
-                break;
+        html += `
+        <tr>
+            <td>${item.ELEMENT}</td>
 
-            case "WET_FINES":
-                column = $"WET_FINES_{element}";
-                break;
+            <td class="chart-cell" data-type="RETURN_FINES" data-element="${item.ELEMENT}">
+                ${item.RETURN_FINES}
+            </td>
 
-            case "DRY_FINES":
-                column = $"DRY_FINES_{element}";
-                break;
+            <td class="chart-cell" data-type="WET_FINES" data-element="${item.ELEMENT}">
+                ${item.WET_FINES}
+            </td>
 
-            case "DRY_FINES_500TPH":
-                column = $"DRY_FINES_500TPH_{element}";
-                break;
-        }
+            <td class="chart-cell" data-type="DRY_FINES" data-element="${item.ELEMENT}">
+                ${item.DRY_FINES}
+            </td>
 
-        string query = $@"
-        SELECT TRUNC(TIMESTAMP) TREND_DATE,
-               NVL({column},0) VALUE
-        FROM imtg.T_NOA_PILE_MAT_ANAL_SHIFT
-        WHERE TIMESTAMP >= SYSDATE - 30
-        ORDER BY TIMESTAMP";
+            <td class="chart-cell" data-type="DRY_FINES_500TPH" data-element="${item.ELEMENT}">
+                ${item.DRY_FINES_500TPH}
+            </td>
+        </tr>`;
+    });
 
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        using (OracleDataReader dr = cmd.ExecuteReader())
-        {
-            while (dr.Read())
-            {
-                list.Add(new
-                {
-                    DATE = Convert.ToDateTime(dr["TREND_DATE"]).ToString("dd-MM-yyyy"),
-                    VALUE = Convert.ToDecimal(dr["VALUE"])
-                });
-            }
-        }
+    $("#finesTable tbody").html(html);
+}
+
+$(document).on("click", ".chart-cell", function () {
+
+    let type = $(this).data("type");
+    let element = $(this).data("element");
+
+    loadTrend(type, element);
+});
+function loadTrend(type, element) {
+
+    $.get('/RmbbPile/GetFinesTrend',
+        { type: type, element: element },
+        function (res) {
+
+            $("#modalTitle").text(type + " - " + element);
+
+            let modal = new bootstrap.Modal(document.getElementById('trendModal'));
+            modal.show();
+
+            setTimeout(() => {
+                drawChart(res, element);
+            }, 300);
+        });
+}
+function drawChart(data, element) {
+
+    if (chartInstance) {
+        chartInstance.dispose();
     }
 
-    return Json(list, JsonRequestBehavior.AllowGet);
+    chartInstance = echarts.init(document.getElementById("trendChart"));
+
+    chartInstance.setOption({
+        tooltip: { trigger: 'axis' },
+
+        xAxis: {
+            type: 'category',
+            data: data.map(x => x.DATE)
+        },
+
+        yAxis: {
+            type: 'value'
+        },
+
+        series: [{
+            name: element,
+            type: 'line',
+            smooth: true,
+            data: data.map(x => x.VALUE)
+        }]
+    });
 }
