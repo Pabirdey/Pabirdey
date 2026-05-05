@@ -1,119 +1,136 @@
-public class SaveModel
+[HttpPost]
+public JsonResult SaveData(SaveModel model)
 {
-    public List<MainData> main { get; set; }
-    public List<TonnageData> coke { get; set; }
-    public List<TonnageData> nut { get; set; }
-}
-public class MainData
-{
-    public string Date { get; set; }      // dd/MM/yyyy
-    public string Shift { get; set; }
-    public string Bunker { get; set; }
+    using (OracleConnection con = new OracleConnection("YOUR_CONNECTION"))
+    {
+        con.Open();
+        OracleTransaction trans = con.BeginTransaction();
 
-    public string C { get; set; }
-    public string E { get; set; }
-    public string F { get; set; }
+        try
+        {
+            // ============================
+            // 🔷 MAIN DATA
+            // ============================
+            foreach (var item in model.main)
+            {
+                string query = @"
+                MERGE INTO T_COKE_ALL t
+                USING dual
+                ON (t.TDATE = TO_DATE(:TDATE,'DD/MM/YYYY') 
+                    AND t.SHIFT = :SHIFT 
+                    AND t.BUNKER = :BUNKER
+                    AND t.CATEGORY = 'MAIN')
 
-    public string Total { get; set; }
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        t.C_BF = :C,
+                        t.E_BF = :E,
+                        t.F_BF = :F,
+                        t.TOTAL = :TOTAL,
+                        t.POSITION = :POSITION,
+                        t.BALANCE = :BALANCE
 
-    public string Position { get; set; }
-    public string Balance { get; set; }
-}
-public class TonnageData
-{
-    public string Bunker { get; set; }
+                WHEN NOT MATCHED THEN
+                    INSERT (TDATE, SHIFT, BUNKER, C_BF, E_BF, F_BF, TOTAL, POSITION, BALANCE, CATEGORY)
+                    VALUES (TO_DATE(:TDATE,'DD/MM/YYYY'), :SHIFT, :BUNKER, :C, :E, :F, :TOTAL, :POSITION, :BALANCE, 'MAIN')";
+                
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.Transaction = trans;
 
-    public string C { get; set; }
-    public string E { get; set; }
-    public string F { get; set; }
+                    cmd.Parameters.Add("TDATE", item.Date);
+                    cmd.Parameters.Add("SHIFT", item.Shift);
+                    cmd.Parameters.Add("BUNKER", item.Bunker);
 
-    public string Total { get; set; }
-}
-function saveData() {
+                    cmd.Parameters.Add("C", item.C ?? "0");
+                    cmd.Parameters.Add("E", item.E ?? "0");
+                    cmd.Parameters.Add("F", item.F ?? "0");
+                    cmd.Parameters.Add("TOTAL", item.Total ?? "0");
 
-    var mainList = [];
-    var cokeList = [];
-    var nutList = [];
+                    cmd.Parameters.Add("POSITION", item.Position ?? "0");
+                    cmd.Parameters.Add("BALANCE", item.Balance ?? "0");
 
-    // 🔷 MAIN TABLE (Coke Unloading)
-    var mainRows = document.querySelectorAll("#tblBody tr");
+                    cmd.ExecuteNonQuery();
+                }
+            }
 
-    for (var i = 0; i < mainRows.length; i++) {
+            // ============================
+            // 🔷 COKE DATA
+            // ============================
+            foreach (var item in model.coke)
+            {
+                string query = @"
+                MERGE INTO T_COKE_ALL t
+                USING dual
+                ON (t.BUNKER = :BUNKER AND t.CATEGORY = 'COKE')
 
-        var row = mainRows[i];
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        t.C_BF = :C,
+                        t.E_BF = :E,
+                        t.F_BF = :F,
+                        t.TOTAL = :TOTAL
 
-        var obj = {
-            Date: row.querySelector(".row-date").value,
-            Shift: row.querySelector(".row-shift").value,
-            Bunker: row.querySelector(".bunker").value,
+                WHEN NOT MATCHED THEN
+                    INSERT (BUNKER, C_BF, E_BF, F_BF, TOTAL, CATEGORY)
+                    VALUES (:BUNKER, :C, :E, :F, :TOTAL, 'COKE')";
+                
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.Transaction = trans;
 
-            C: row.querySelector(".c").value,
-            E: row.querySelector(".e").value,
-            F: row.querySelector(".f").value,
+                    cmd.Parameters.Add("BUNKER", item.Bunker);
+                    cmd.Parameters.Add("C", item.C ?? "0");
+                    cmd.Parameters.Add("E", item.E ?? "0");
+                    cmd.Parameters.Add("F", item.F ?? "0");
+                    cmd.Parameters.Add("TOTAL", item.Total ?? "0");
 
-            Total: row.querySelector(".total").value,
-            Position: row.querySelector(".position").value,
-            Balance: row.querySelector(".balance").value
-        };
+                    cmd.ExecuteNonQuery();
+                }
+            }
 
-        mainList.push(obj);
-    }
+            // ============================
+            // 🔷 NUT DATA
+            // ============================
+            foreach (var item in model.nut)
+            {
+                string query = @"
+                MERGE INTO T_COKE_ALL t
+                USING dual
+                ON (t.BUNKER = :BUNKER AND t.CATEGORY = 'NUT')
 
-    // 🔷 TONNAGE OF COKE
-    var cokeRows = document.querySelectorAll("#cokeTable tbody tr");
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        t.C_BF = :C,
+                        t.E_BF = :E,
+                        t.F_BF = :F,
+                        t.TOTAL = :TOTAL
 
-    for (var j = 0; j < cokeRows.length; j++) {
+                WHEN NOT MATCHED THEN
+                    INSERT (BUNKER, C_BF, E_BF, F_BF, TOTAL, CATEGORY)
+                    VALUES (:BUNKER, :C, :E, :F, :TOTAL, 'NUT')";
+                
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.Transaction = trans;
 
-        var row = cokeRows[j];
+                    cmd.Parameters.Add("BUNKER", item.Bunker);
+                    cmd.Parameters.Add("C", item.C ?? "0");
+                    cmd.Parameters.Add("E", item.E ?? "0");
+                    cmd.Parameters.Add("F", item.F ?? "0");
+                    cmd.Parameters.Add("TOTAL", item.Total ?? "0");
 
-        var obj = {
-            Bunker: row.cells[0].innerText,
-            C: row.querySelector(".c").value,
-            E: row.querySelector(".e").value,
-            F: row.querySelector(".f").value,
-            Total: row.querySelector(".total").value
-        };
+                    cmd.ExecuteNonQuery();
+                }
+            }
 
-        cokeList.push(obj);
-    }
-
-    // 🔷 TONNAGE OF NUT COKE
-    var nutRows = document.querySelectorAll("#nutTable tbody tr");
-
-    for (var k = 0; k < nutRows.length; k++) {
-
-        var row = nutRows[k];
-
-        var obj = {
-            Bunker: row.cells[0].innerText,
-            C: row.querySelector(".c").value,
-            E: row.querySelector(".e").value,
-            F: row.querySelector(".f").value,
-            Total: row.querySelector(".total").value
-        };
-
-        nutList.push(obj);
-    }
-
-    console.log("MAIN:", mainList);
-    console.log("COKE:", cokeList);
-    console.log("NUT:", nutList);
-
-    // 🔥 AJAX CALL
-    $.ajax({
-        url: '/YourController/SaveData',
-        type: 'POST',
-        data: JSON.stringify({
-            main: mainList,
-            coke: cokeList,
-            nut: nutList
-        }),
-        contentType: 'application/json',
-        success: function () {
-            alert("Data Saved Successfully");
-        },
-        error: function () {
-            alert("Error Saving Data");
+            trans.Commit();
+            return Json("Success");
         }
-    });
+        catch (Exception ex)
+        {
+            trans.Rollback();
+            return Json("Error: " + ex.Message);
+        }
+    }
 }
