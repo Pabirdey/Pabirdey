@@ -1,11 +1,20 @@
-$.ajax({
+function loadTonnageData() {
+
+    var date = $("#txtDate").val();
+    var shift = $("#ddlShift").val();
+    var bunker = $("#bunkerInput").val();
+
+    if (!date || !shift || !bunker) {
+        return; // ❌ don't alert here (avoid multiple alerts)
+    }
+
+    $.ajax({
         url: "/YourController/GetTonnageData",
         type: "GET",
         data: { date: date, shift: shift },
 
         success: function (data) {
 
-            // ✅ API error handling
             if (!data.success) {
                 alert(data.message);
                 return;
@@ -17,7 +26,7 @@ $.ajax({
             cokeBody.html("");
             nutBody.html("");
 
-            // ✅ Coke row find
+            // ✅ Coke
             var cokeRow = null;
             for (var i = 0; i < data.coke.length; i++) {
                 if (data.coke[i].BUNKER === bunker) {
@@ -37,7 +46,7 @@ $.ajax({
                 );
             }
 
-            // ✅ Nut row find
+            // ✅ Nut
             var nutRow = null;
             for (var j = 0; j < data.nut.length; j++) {
                 if (data.nut[j].BUNKER === bunker) {
@@ -62,3 +71,4 @@ $.ajax({
             alert("Error: " + xhr.statusText);
         }
     });
+}
