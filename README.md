@@ -1,74 +1,50 @@
-function loadTonnageData() {
+  public JsonResult GetTonnageData(string date, string shift)
+        {
+            List<object> cokeList = new List<object>();
+            List<object> nutList = new List<object>();
 
-    var date = $("#txtDate").val();
-    var shift = $("#ddlShift").val();
-    var bunker = $("#bunkerInput").val();
+            using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+            {
+                con.Open();
 
-    if (!date || !shift || !bunker) {
-        return; // ❌ don't alert here (avoid multiple alerts)
-    }
+                string query = @"
+        SELECT BUNKER,
+               TON_C_SC,TON_E_SC,TON_F_SC,
+               TON_C_NC,TON_E_NC,TON_F_NC
+        FROM imtg.T_BF_CK_CONTROL_UNLOADING 
+        WHERE TRUNC(TIMESTAMP)=:date 
+        AND SHIFT=:shift";
 
-    $.ajax({
-        url: "/YourController/GetTonnageData",
-        type: "GET",
-        data: { date: date, shift: shift },
+                using (OracleCommand cmd = new OracleCommand(query, con))
+                {
+                    cmd.BindByName = true;
 
-        success: function (data) {
+                    DateTime dt = DateTime.ParseExact(date, "dd/MM/yyyy", null);
 
-            if (!data.success) {
-                alert(data.message);
-                return;
-            }
+                    cmd.Parameters.Add("date", OracleDbType.Date).Value = dt;
+                    cmd.Parameters.Add("shift", OracleDbType.Varchar2).Value = shift;
 
-            var cokeBody = $("#cokeTable tbody");
-            var nutBody = $("#nutTable tbody");
+                    OracleDataReader dr = cmd.ExecuteReader();
 
-            cokeBody.html("");
-            nutBody.html("");
-
-            // ✅ Coke
-            var cokeRow = null;
-            for (var i = 0; i < data.coke.length; i++) {
-                if (data.coke[i].BUNKER === bunker) {
-                    cokeRow = data.coke[i];
-                    break;
+                    while (dr.Read())
+                    {
+                        cokeList.Add(new
+                        {
+                            BUNKER = dr["BUNKER"].ToString(),
+                            C = dr["TON_C_SC"].ToString(),
+                            E = dr["TON_E_SC"].ToString(),
+                            F = dr["TON_F_SC"].ToString()
+                        });
+                        nutList.Add(new
+                        {
+                            BUNKER = dr["BUNKER"].ToString(),
+                            C = dr["TON_C_NC"].ToString(),
+                            E = dr["TON_E_NC"].ToString(),
+                            F = dr["TON_F_NC"].ToString()
+                        });
+                    }
                 }
             }
 
-            if (cokeRow) {
-                cokeBody.append(
-                    "<tr>" +
-                    "<td>" + cokeRow.BUNKER + "</td>" +
-                    "<td>" + cokeRow.C + "</td>" +
-                    "<td>" + cokeRow.E + "</td>" +
-                    "<td>" + cokeRow.F + "</td>" +
-                    "</tr>"
-                );
-            }
-
-            // ✅ Nut
-            var nutRow = null;
-            for (var j = 0; j < data.nut.length; j++) {
-                if (data.nut[j].BUNKER === bunker) {
-                    nutRow = data.nut[j];
-                    break;
-                }
-            }
-
-            if (nutRow) {
-                nutBody.append(
-                    "<tr>" +
-                    "<td>" + nutRow.BUNKER + "</td>" +
-                    "<td>" + nutRow.C + "</td>" +
-                    "<td>" + nutRow.E + "</td>" +
-                    "<td>" + nutRow.F + "</td>" +
-                    "</tr>"
-                );
-            }
-        },
-
-        error: function (xhr) {
-            alert("Error: " + xhr.statusText);
+            return Json(new { coke = cokeList, nut = nutList }, JsonRequestBehavior.AllowGet);
         }
-    });
-}
