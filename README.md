@@ -1,53 +1,64 @@
-public JsonResult GetTonnageData(string date, string shift)
-{
-    List<object> cokeList = new List<object>();
-    List<object> nutList = new List<object>();
+$.ajax({
+        url: "/YourController/GetTonnageData",
+        type: "GET",
+        data: { date: date, shift: shift },
 
-    using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
+        success: function (data) {
 
-        string query = @"
-        SELECT BUNKER,
-               TON_C_SC,TON_E_SC,TON_F_SC,
-               TON_C_NC,TON_E_NC,TON_F_NC
-        FROM imtg.T_BF_CK_CONTROL_UNLOADING 
-        WHERE TRUNC(TIMESTAMP)=:date 
-        AND SHIFT=:shift";
-
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        {
-            cmd.BindByName = true;
-
-            DateTime dt = DateTime.ParseExact(date, "dd/MM/yyyy", null);
-
-            cmd.Parameters.Add("date", OracleDbType.Date).Value = dt;
-            cmd.Parameters.Add("shift", OracleDbType.Varchar2).Value = shift;
-
-            OracleDataReader dr = cmd.ExecuteReader();
-
-            while (dr.Read())
-            {
-                // ✅ Coke (SC)
-                cokeList.Add(new
-                {
-                    BUNKER = dr["BUNKER"].ToString(),
-                    C = dr["TON_C_SC"].ToString(),
-                    E = dr["TON_E_SC"].ToString(),
-                    F = dr["TON_F_SC"].ToString()
-                });
-
-                // ✅ Nut (NC)
-                nutList.Add(new
-                {
-                    BUNKER = dr["BUNKER"].ToString(),
-                    C = dr["TON_C_NC"].ToString(),
-                    E = dr["TON_E_NC"].ToString(),
-                    F = dr["TON_F_NC"].ToString()
-                });
+            // ✅ API error handling
+            if (!data.success) {
+                alert(data.message);
+                return;
             }
-        }
-    }
 
-    return Json(new { coke = cokeList, nut = nutList }, JsonRequestBehavior.AllowGet);
-}
+            var cokeBody = $("#cokeTable tbody");
+            var nutBody = $("#nutTable tbody");
+
+            cokeBody.html("");
+            nutBody.html("");
+
+            // ✅ Coke row find
+            var cokeRow = null;
+            for (var i = 0; i < data.coke.length; i++) {
+                if (data.coke[i].BUNKER === bunker) {
+                    cokeRow = data.coke[i];
+                    break;
+                }
+            }
+
+            if (cokeRow) {
+                cokeBody.append(
+                    "<tr>" +
+                    "<td>" + cokeRow.BUNKER + "</td>" +
+                    "<td>" + cokeRow.C + "</td>" +
+                    "<td>" + cokeRow.E + "</td>" +
+                    "<td>" + cokeRow.F + "</td>" +
+                    "</tr>"
+                );
+            }
+
+            // ✅ Nut row find
+            var nutRow = null;
+            for (var j = 0; j < data.nut.length; j++) {
+                if (data.nut[j].BUNKER === bunker) {
+                    nutRow = data.nut[j];
+                    break;
+                }
+            }
+
+            if (nutRow) {
+                nutBody.append(
+                    "<tr>" +
+                    "<td>" + nutRow.BUNKER + "</td>" +
+                    "<td>" + nutRow.C + "</td>" +
+                    "<td>" + nutRow.E + "</td>" +
+                    "<td>" + nutRow.F + "</td>" +
+                    "</tr>"
+                );
+            }
+        },
+
+        error: function (xhr) {
+            alert("Error: " + xhr.statusText);
+        }
+    });
