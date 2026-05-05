@@ -17,3 +17,6 @@ nutBody.append(
     "<td><input type='number' class='form-control total' readonly></td>" +
     "</tr>"
 );
+function getVal(val) {
+    return (val === null || val === undefined) ? "" : val;
+}
