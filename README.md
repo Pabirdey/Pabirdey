@@ -1,133 +1,215 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bunker Selection</title>
+    <title>Furnace High Line Log Sheet</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body {
-            background: #f5f7fa;
+            background: #eef3f9;
             padding: 20px;
         }
         .card {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h4 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        table input {
+            height: 28px;
         }
     </style>
 </head>
 
 <body>
 
+<h4>Furnace High Line Log Sheet</h4>
+
+<!-- 🔷 TOP TABLE -->
 <div class="card">
+    <h5>Coke Unloading</h5>
 
-    <h4 class="text-center mb-3">Bunker Selection Screen</h4>
+    <table class="table table-bordered" id="mainTable">
+        <thead class="table-primary">
+            <tr>
+                <th>Date</th>
+                <th>Shift</th>
+                <th>Bunker</th>
+            </tr>
+        </thead>
 
-    <!-- Dropdown -->
-    <div class="mb-3">
-        <label><b>Select Bunker:</b></label>
-        <select id="bunker" class="form-control" onchange="handleBunkerChange()">
-            <option value="">--Select--</option>
-            <option value="ST COKE">ST COKE</option>
-            <option value="H/S NC">H/S NC</option>
-            <option value="WESTERN">WESTERN</option>
-            <option value="MIDDLE">MIDDLE</option>
-            <option value="EASTERN">EASTERN</option>
-            <option value="NC BF KO">NC BF KO</option>
-            <option value="B/H COKE">B/H COKE</option>
-            <option value="PLS 25MM NC">PLS 25MM NC</option>
-        </select>
-    </div>
+        <tbody>
 
-    <!-- ST COKE -->
-    <table id="stcokeTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-primary"><th>ST COKE</th></tr>
-        <tr><td>ST Coke Row Data</td></tr>
+            <!-- Row 1 -->
+            <tr>
+                <td><input type="text" value="03/05/2026" class="form-control"></td>
+
+                <td>
+                    <select class="form-control">
+                        <option>A</option>
+                        <option>B</option>
+                    </select>
+                </td>
+
+                <td>
+                    <select class="form-control bunker" onchange="updateTonnage()">
+                        <option value="">--Select--</option>
+                        <option>WESTERN</option>
+                        <option>MIDDLE</option>
+                        <option>EASTERN</option>
+                        <option>H/S NC</option>
+                        <option>ST COKE</option>
+                    </select>
+                </td>
+            </tr>
+
+            <!-- Row 2 -->
+            <tr>
+                <td><input type="text" value="03/05/2026" class="form-control"></td>
+
+                <td>
+                    <select class="form-control">
+                        <option>A</option>
+                        <option>B</option>
+                    </select>
+                </td>
+
+                <td>
+                    <select class="form-control bunker" onchange="updateTonnage()">
+                        <option value="">--Select--</option>
+                        <option>WESTERN</option>
+                        <option>MIDDLE</option>
+                        <option>EASTERN</option>
+                        <option>H/S NC</option>
+                        <option>ST COKE</option>
+                    </select>
+                </td>
+            </tr>
+
+            <!-- Row 3 -->
+            <tr>
+                <td><input type="text" value="03/05/2026" class="form-control"></td>
+
+                <td>
+                    <select class="form-control">
+                        <option>A</option>
+                        <option>B</option>
+                    </select>
+                </td>
+
+                <td>
+                    <select class="form-control bunker" onchange="updateTonnage()">
+                        <option value="">--Select--</option>
+                        <option>WESTERN</option>
+                        <option>MIDDLE</option>
+                        <option>EASTERN</option>
+                        <option>H/S NC</option>
+                        <option>ST COKE</option>
+                    </select>
+                </td>
+            </tr>
+
+        </tbody>
     </table>
-
-    <!-- H/S NC -->
-    <table id="hsncTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-warning"><th>H/S NC</th></tr>
-        <tr><td>H/S NC Row Data</td></tr>
-    </table>
-
-    <!-- WESTERN -->
-    <table id="westernTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-success"><th>WESTERN</th></tr>
-        <tr><td>Western Row Data</td></tr>
-    </table>
-
-    <!-- MIDDLE -->
-    <table id="middleTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-info"><th>MIDDLE</th></tr>
-        <tr><td>Middle Row Data</td></tr>
-    </table>
-
-    <!-- EASTERN -->
-    <table id="easternTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-danger"><th>EASTERN</th></tr>
-        <tr><td>Eastern Row Data</td></tr>
-    </table>
-
-    <!-- NC BF KO -->
-    <table id="ncbfkoTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-secondary"><th>NC BF KO</th></tr>
-        <tr><td>NC BF KO Row Data</td></tr>
-    </table>
-
-    <!-- B/H COKE -->
-    <table id="bhcokeTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-dark text-white"><th>B/H COKE</th></tr>
-        <tr><td>B/H Coke Row Data</td></tr>
-    </table>
-
-    <!-- PLS 25MM NC -->
-    <table id="plsTable" class="table table-bordered mt-3" style="display:none;">
-        <tr class="table-light"><th>PLS 25MM NC</th></tr>
-        <tr><td>PLS 25MM NC Row Data</td></tr>
-    </table>
-
 </div>
 
+<!-- 🔷 TONNAGE OF COKE -->
+<div class="card">
+    <h5>Tonnage of Coke</h5>
+
+    <table class="table table-bordered" id="cokeTable">
+        <thead class="table-success">
+            <tr>
+                <th>Bunker</th>
+                <th>C-BF</th>
+                <th>E-BF</th>
+                <th>F-BF</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- 🔷 TONNAGE OF NUT COKE -->
+<div class="card">
+    <h5>Tonnage of Nut Coke</h5>
+
+    <table class="table table-bordered" id="nutTable">
+        <thead class="table-warning">
+            <tr>
+                <th>Bunker</th>
+                <th>C-BF</th>
+                <th>E-BF</th>
+                <th>F-BF</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- 🔷 SCRIPT -->
 <script>
 
-function handleBunkerChange() {
+function updateTonnage() {
 
-    let value = document.getElementById("bunker").value;
+    let bunkers = [];
 
-    // Hide all tables
-    let tables = document.querySelectorAll("table");
-    tables.forEach(t => t.style.display = "none");
+    // Collect unique bunker values
+    document.querySelectorAll(".bunker").forEach(el => {
+        let val = el.value.trim();
+        if (val !== "" && !bunkers.includes(val)) {
+            bunkers.push(val);
+        }
+    });
 
-    // Show based on selection (Oracle logic style)
-    if (value === "ST COKE") {
-        document.getElementById("stcokeTable").style.display = "table";
-    }
-    else if (value === "H/S NC") {
-        document.getElementById("hsncTable").style.display = "table";
-    }
-    else if (value === "WESTERN") {
-        document.getElementById("westernTable").style.display = "table";
-    }
-    else if (value === "MIDDLE") {
-        document.getElementById("middleTable").style.display = "table";
-    }
-    else if (value === "EASTERN") {
-        document.getElementById("easternTable").style.display = "table";
-    }
-    else if (value === "NC BF KO") {
-        document.getElementById("ncbfkoTable").style.display = "table";
-    }
-    else if (value === "B/H COKE") {
-        document.getElementById("bhcokeTable").style.display = "table";
-    }
-    else if (value === "PLS 25MM NC") {
-        document.getElementById("plsTable").style.display = "table";
-    }
+    // Get table bodies
+    let cokeBody = document.querySelector("#cokeTable tbody");
+    let nutBody = document.querySelector("#nutTable tbody");
+
+    // Clear old rows
+    cokeBody.innerHTML = "";
+    nutBody.innerHTML = "";
+
+    // Create rows
+    bunkers.forEach(bunker => {
+
+        let row = `
+            <tr>
+                <td><b>${bunker}</b></td>
+                <td><input type="number" class="form-control c"></td>
+                <td><input type="number" class="form-control e"></td>
+                <td><input type="number" class="form-control f"></td>
+                <td><input type="number" class="form-control total" readonly></td>
+            </tr>
+        `;
+
+        cokeBody.innerHTML += row;
+        nutBody.innerHTML += row;
+    });
+
+    // Add auto total calculation
+    document.querySelectorAll("#cokeTable input, #nutTable input").forEach(input => {
+        input.addEventListener("input", calculateTotal);
+    });
+}
+
+function calculateTotal() {
+
+    let row = this.closest("tr");
+
+    let c = parseFloat(row.querySelector(".c")?.value) || 0;
+    let e = parseFloat(row.querySelector(".e")?.value) || 0;
+    let f = parseFloat(row.querySelector(".f")?.value) || 0;
+
+    row.querySelector(".total").value = c + e + f;
 }
 
 </script>
