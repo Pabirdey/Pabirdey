@@ -66,3 +66,26 @@
 
 </body>
 </html>
+
+function saveData() {
+
+    $("#loaderDiv").show();
+
+    $.ajax({
+        url: '/Home/Save',
+        type: 'POST',
+        data: {},
+
+        success: function (response) {
+
+            alert("Saved Successfully");
+
+            $("#loaderDiv").hide();
+        },
+
+        error: function () {
+
+            $("#loaderDiv").hide();
+        }
+    });
+}
