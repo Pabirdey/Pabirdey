@@ -1,78 +1,28 @@
-<div class="blue-box">
+public JsonResult GetUsers()
+{
+    List<object> list = new List<object>();
 
-    <!-- Datalist -->
-    <div class="left-section">
+    using (OracleConnection con =
+        new OracleConnection("YOUR_CONNECTION_STRING"))
+    {
+        con.Open();
 
-        <input type="text"
-               class="form-control custom-input"
-               list="materialList"
-               id="material"
-               placeholder="Select Users">
+        string query = @"SELECT USER_NAME
+                         FROM USER_MASTER
+                         ORDER BY USER_NAME";
 
-        <datalist id="materialList">
-        </datalist>
+        OracleCommand cmd = new OracleCommand(query, con);
 
-    </div>
+        OracleDataReader dr = cmd.ExecuteReader();
 
-    <!-- Checkbox -->
-    <div class="right-section">
-
-        <input class="form-check-input"
-               type="checkbox"
-               id="signoff">
-
-        <label for="signoff">
-            Sign OFF
-        </label>
-
-    </div>
-
-</div>
-
-<script>
-
-    $(document).ready(function () {
-
-        loadUsers();
-
-    });
-
-    // Load Oracle Data
-    function loadUsers() {
-
-        $.ajax({
-
-            url: '/Home/GetUsers',
-            type: 'GET',
-
-            success: function (data) {
-
-                var dl = document.getElementById("materialList");
-
-                // Clear old option
-                dl.innerHTML = "";
-
-                // Using length function
-                for (var i = 0; i < data.length; i++) {
-
-                    var option = document.createElement("option");
-
-                    option.value = data[i].USER_NAME;
-
-                    dl.appendChild(option);
-
-                }
-
-            },
-
-            error: function () {
-
-                alert("Data Load Error");
-
-            }
-
-        });
-
+        while (dr.Read())
+        {
+            list.Add(new
+            {
+                USER_NAME = dr["USER_NAME"].ToString()
+            });
+        }
     }
 
-</script>
+    return Json(list, JsonRequestBehavior.AllowGet);
+}
