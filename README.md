@@ -1,50 +1,22 @@
-function loadUsers() {
-
-        $.ajax({
-
-            url: '/Furnace_High_line/GetUsers',
-
-            type: 'GET',
-
-            success: function (data) {
-
-                console.log(data);
-
-                var dl =
-                    document.getElementById("UserList");
-
-                dl.innerHTML = "";
-
-                for (var i = 0; i < data.length; i++) {
-
-                    var option =
-                        document.createElement("option");
-
-                    option.value =
-                        data[i].USER_NAME;
-
-                    dl.appendChild(option);
-
-                }
-
-            },
-
-            error: function (xhr) {
-
-                console.log(xhr);
-
-                alert("Data Load Error");
-
-            }
-
-        });
-
-    }
-<input type="text"
-       class="form-control custom-input"
-       list="UserList"
-       id="txtUser"
-       placeholder="Select Users">
-
-<datalist id="UserList">
-</datalist>
+SELECT COUNT(*) INTO VCOUNT 
+     FROM DEMO.T_BF_SIGNOFF 
+     WHERE SO_DATE     = :TIMESTAMP.NVL_DATE  AND 
+           SO_SHIFT    = :TIMESTAMP.NVL_SHIFT AND 
+           SO_PAGE     = 'COKE_UNLOADING' and 
+           SO_CHECK    = 1;
+		 if VCOUNT>0 then
+  		 set_item_property('TIMESTAMP.PBSAVE',enabled,property_false);
+		   set_item_property('TIMESTAMP.PBDELETE',enabled,property_false);
+		  					 
+  		 select NAME,SO_CHECK into :T_BF_SIGNOFF_UNLOADING.NAME,:T_BF_SIGNOFF_UNLOADING.SO_CHECK   
+  		 FROM DEMO.T_BF_SIGNOFF 
+  		 WHERE SO_DATE    = :TIMESTAMP.NVL_DATE  AND 
+  		       SO_SHIFT   = :TIMESTAMP.NVL_SHIFT AND 
+  		       SO_PAGE    = 'COKE_UNLOADING';
+							 
+		 else
+		   go_block('T_BF_SIGNOFF_UNLOADING');
+	  	 clear_block;
+	  	 set_item_property('TIMESTAMP.PBSAVE',enabled,property_true);
+		   set_item_property('TIMESTAMP.PBDELETE',enabled,property_true);
+		 end if;
