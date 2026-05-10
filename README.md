@@ -1,259 +1,70 @@
-<script>
-
-$("#ddlShift,#txtDate").change(function () {
-
-    loadShiftData();
-
-});
-
-function loadShiftData() {
-
-    var sDate = $("#txtDate").val();
-
-    var sShift = $("#ddlShift").val();
-
-    if (sDate == "" || sShift == "") {
-
-        return;
-
-    }
-
-    $.ajax({
-
-        url: '/Furnace_High_line/GetShiftData',
-
-        type: 'GET',
-
-        data: {
-
-            sDate: sDate,
-            sShift: sShift
-
-        },
-
-        success: function (res) {
-
-            if (res.success == true) {
-
-                // Set Signoff Data
-                $("#txtUser").val(res.SIGNOFF_NAME);
-
-                if (res.SO_CHECK == 1) {
-
-                    $("#signoff").prop("checked", true);
-
-                    // Disable Buttons
-                    $("#PBSAVE").prop("disabled", true);
-
-                    $("#PBDELETE").prop("disabled", true);
-                }
-                else {
-
-                    $("#signoff").prop("checked", false);
-
-                    $("#PBSAVE").prop("disabled", false);
-
-                    $("#PBDELETE").prop("disabled", false);
-                }
-
-                // Call Table Load Functions
-                LoadCokeUnloading();
-
-                LoadHighlineData();
-
-                LoadRawMaterial();
-
-                LoadUnloadReport();
-            }
-
-        },
-
-        error: function () {
-
-            alert("Error Loading Data");
-
-        }
-
-    });
-
-}
-
-</script>
-
-
-[HttpGet]
-public JsonResult GetShiftData(string sDate, string sShift)
-{
-    object data = null;
-
-    using (OracleConnection con =
-        new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
-
-        try
-        {
-            int vCount = 0;
-
-            // =====================================
-            // CHECK SIGNOFF
-            // =====================================
-
-            string countQuery = @"
-                SELECT COUNT(*)
-                FROM DEMO.T_BF_SIGNOFF
-                WHERE SO_DATE  = TO_DATE(:SO_DATE,'YYYY-MM-DD')
-                AND   SO_SHIFT = :SO_SHIFT
-                AND   SO_PAGE  = 'COKE_UNLOADING'
-                AND   SO_CHECK = 1";
-
-            OracleCommand cmdCount =
-                new OracleCommand(countQuery, con);
-
-            cmdCount.Parameters.Add("SO_DATE",
-                OracleDbType.Varchar2).Value = sDate;
-
-            cmdCount.Parameters.Add("SO_SHIFT",
-                OracleDbType.Varchar2).Value = sShift;
-
-            vCount = Convert.ToInt32(
-                cmdCount.ExecuteScalar());
-
-            string userName = "";
-            int soCheck = 0;
-
-            // =====================================
-            // IF SIGNOFF EXISTS
-            // =====================================
-
-            if (vCount > 0)
-            {
-                string query = @"
-                    SELECT NAME, SO_CHECK
-                    FROM DEMO.T_BF_SIGNOFF
-                    WHERE SO_DATE  = TO_DATE(:SO_DATE,'YYYY-MM-DD')
-                    AND   SO_SHIFT = :SO_SHIFT
-                    AND   SO_PAGE  = 'COKE_UNLOADING'";
-
-                OracleCommand cmd =
-                    new OracleCommand(query, con);
-
-                cmd.Parameters.Add("SO_DATE",
-                    OracleDbType.Varchar2).Value = sDate;
-
-                cmd.Parameters.Add("SO_SHIFT",
-                    OracleDbType.Varchar2).Value = sShift;
-
-                OracleDataReader dr = cmd.ExecuteReader();
-
-                if (dr.Read())
-                {
-                    userName = dr["NAME"].ToString();
-
-                    soCheck = Convert.ToInt32(
-                        dr["SO_CHECK"]);
-                }
-            }
-
-            // =====================================
-            // CALL PROCEDURES
-            // =====================================
-
-            OracleCommand proc1 =
-                new OracleCommand(
-                    "PROC_POPULATE_COKEUNLOADING", con);
-
-            proc1.CommandType =
-                CommandType.StoredProcedure;
-
-            proc1.Parameters.Add("P_DATE",
-                OracleDbType.Date).Value =
-                Convert.ToDateTime(sDate);
-
-            proc1.Parameters.Add("P_SHIFT",
-                OracleDbType.Varchar2).Value =
-                sShift;
-
-            proc1.ExecuteNonQuery();
-
-            // =====================================
-
-            OracleCommand proc2 =
-                new OracleCommand(
-                    "PROC_POPULATE_HIGHLINE_DATA", con);
-
-            proc2.CommandType =
-                CommandType.StoredProcedure;
-
-            proc2.Parameters.Add("P_DATE",
-                OracleDbType.Date).Value =
-                Convert.ToDateTime(sDate);
-
-            proc2.Parameters.Add("P_SHIFT",
-                OracleDbType.Varchar2).Value =
-                sShift;
-
-            proc2.ExecuteNonQuery();
-
-            // =====================================
-
-            OracleCommand proc3 =
-                new OracleCommand(
-                    "PROC_POPULATE_RAWMATERIAL_POSI", con);
-
-            proc3.CommandType =
-                CommandType.StoredProcedure;
-
-            proc3.Parameters.Add("P_DATE",
-                OracleDbType.Date).Value =
-                Convert.ToDateTime(sDate);
-
-            proc3.Parameters.Add("P_SHIFT",
-                OracleDbType.Varchar2).Value =
-                sShift;
-
-            proc3.ExecuteNonQuery();
-
-            // =====================================
-
-            OracleCommand proc4 =
-                new OracleCommand(
-                    "PROC_POPULATE_UNLOAD_REP", con);
-
-            proc4.CommandType =
-                CommandType.StoredProcedure;
-
-            proc4.Parameters.Add("P_DATE",
-                OracleDbType.Date).Value =
-                Convert.ToDateTime(sDate);
-
-            proc4.Parameters.Add("P_SHIFT",
-                OracleDbType.Varchar2).Value =
-                sShift;
-
-            proc4.ExecuteNonQuery();
-
-            // =====================================
-
-            data = new
-            {
-                success = true,
-                SIGNOFF_NAME = userName,
-                SO_CHECK = soCheck,
-                IS_SIGNOFF = vCount > 0
-            };
-        }
-
-        catch (Exception ex)
-        {
-            data = new
-            {
-                success = false,
-                message = ex.Message
-            };
-        }
-    }
-
-    return Json(data,
-        JsonRequestBehavior.AllowGet);
-}
+DECLARE
+	VCOUNT NUMBER;
+BEGIN
+	
+	if :T_BF_SIGNOFF_UNLOADING.NAME is null then
+	    message('Select Your Name Please');
+	    message('Select Your Name Please');
+	    raise form_trigger_failure;
+	end if;
+	
+		Begin
+			   Insert into demo.t_bf_signoff_authority
+			   values(:t_bf_signoff_UNLOADING.name);
+			   Commit;
+		Exception 
+			   When Dup_Val_On_Index then
+			   Null;
+	  End;
+	
+	
+	
+	
+	
+			IF :TIMESTAMP.NVL_DATE IS NOT NULL  AND :TIMESTAMP.NVL_SHIFT IS NOT NULL THEN
+				
+				SELECT COUNT(*) INTO VCOUNT 
+				FROM DEMO.T_BF_SIGNOFF 
+				WHERE SO_DATE  = :TIMESTAMP.NVL_DATE  AND 
+				      SO_SHIFT = :TIMESTAMP.NVL_SHIFT AND 
+				      SO_PAGE  = 'COKE_UNLOADING';
+				
+				IF VCOUNT >0 THEN
+						UPDATE DEMO.T_BF_SIGNOFF 
+						SET SO_CHECK    = :T_BF_SIGNOFF_UNLOADING.SO_CHECK,
+								NAME        = :T_BF_SIGNOFF_UNLOADING.NAME,
+								SO_TIME     = SYSDATE
+						WHERE SO_DATE    = :TIMESTAMP.NVL_DATE  AND 
+						      SO_SHIFT   = :TIMESTAMP.NVL_SHIFT AND 
+						      SO_PAGE    = 'COKE_UNLOADING';
+				ELSE
+								insert into DEMO.T_BF_SIGNOFF
+								      (NAME,
+								       SO_DATE,
+								       SO_SHIFT,
+								       SO_CHECK,
+								       SO_TIME,
+								       SO_PAGE)
+							  values(:T_BF_SIGNOFF_UNLOADING.NAME,
+							         :TIMESTAMP.NVL_DATE,
+							         :TIMESTAMP.NVL_SHIFT,
+							         :T_BF_SIGNOFF_UNLOADING.SO_CHECK,
+							         SYSDATE,
+							         'COKE_UNLOADING');
+				END IF;
+				
+					COMMIT;		
+					IF :T_BF_SIGNOFF_UNLOADING.SO_CHECK = 1 THEN	
+             set_item_property('TIMESTAMP.PBSAVE',enabled,property_false);
+					   set_item_property('TIMESTAMP.PBDELETE',enabled,property_false);
+					ELSE
+ 					   set_item_property('TIMESTAMP.PBSAVE',enabled,property_TRUE);
+					   set_item_property('TIMESTAMP.PBDELETE',enabled,property_TRUE);
+					END IF;
+			END IF;
+END;
+
+
+
+
+							 
