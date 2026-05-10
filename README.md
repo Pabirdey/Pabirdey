@@ -1,43 +1,90 @@
-[HttpPost]
-public JsonResult SaveSignOff(
-    string NAME,
-    string SO_DATE,
-    string SO_SHIFT,
-    int SO_CHECK)
-{
-    using (OracleConnection con =
-        new OracleConnection(
-            iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
+ <div class="right-section">
+                                        <input class="form-check-input" type="checkbox" id="signoff">
+                                        <label for="signoff">
+                                            Sign OFF
+                                        </label>
+                                    </div>
 
-        OracleTransaction trans =
-            con.BeginTransaction();
+                                    function signoff() {
+    alert("My Name is pabir");
+    var obj = {
+        NAME: $("#txtUser").val(),
+        SO_DATE:lsSelectedFDate,
+        SO_SHIFT:$("#ddlshift").val(),
+        SO_CHECK:$("#signoff").is(":checked") ? 1 : 0
+    };
+    alert("My Name is pabir");
 
-        try
-        {
-            int VCOUNT = 0;
+    $.ajax({
+        url: '/Furnace_High_line/SaveSignOff',
+        type: 'POST',
+        data: obj,
+        success: function (res) {
+            if (res.success == true) {
+                if (res.disableButton == true) {
+                    $("#CokeUnloading").prop("disabled", true);                    
+                }
+                else {
 
-            // ============================
-            // NAME VALIDATION
-            // ============================
-
-            if (string.IsNullOrEmpty(NAME))
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Select Your Name Please"
-                });
+                    $("#CokeUnloading").prop("disabled", false);
+                   
+                }                
+            }
+            else {
+                alert(res.message);
             }
 
-            // ============================
-            // INSERT AUTHORITY TABLE
-            // ============================
+        },
 
-            try
+        error: function () {
+
+            alert("Error");
+
+        }
+
+    });
+
+}
+ [HttpPost]
+        public JsonResult SaveSignOff(
+            string NAME,
+            string SO_DATE,
+            string SO_SHIFT,
+            int SO_CHECK)
+        {
+            using (OracleConnection con =
+                new OracleConnection(
+                    iMonitorWebUtils.msConRWString))
             {
-                string authQuery = @"
+                con.Open();
+
+                OracleTransaction trans =
+                    con.BeginTransaction();
+
+                try
+                {
+                    int VCOUNT = 0;
+
+                    // ============================
+                    // NAME VALIDATION
+                    // ============================
+
+                    if (string.IsNullOrEmpty(NAME))
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Select Your Name Please"
+                        });
+                    }
+
+                    // ============================
+                    // INSERT AUTHORITY TABLE
+                    // ============================
+
+                    try
+                    {
+                        string authQuery = @"
                     INSERT INTO
                     DEMO.T_BF_SIGNOFF_AUTHORITY
                     (
@@ -48,35 +95,35 @@ public JsonResult SaveSignOff(
                         :NAME
                     )";
 
-                OracleCommand authCmd =
-                    new OracleCommand(
-                        authQuery,
-                        con);
+                        OracleCommand authCmd =
+                            new OracleCommand(
+                                authQuery,
+                                con);
 
-                authCmd.Transaction = trans;
+                        authCmd.Transaction = trans;
 
-                authCmd.Parameters.Add(
-                    "NAME",
-                    OracleDbType.Varchar2)
-                    .Value = NAME;
+                        authCmd.Parameters.Add(
+                            "NAME",
+                            OracleDbType.Varchar2)
+                            .Value = NAME;
 
-                authCmd.ExecuteNonQuery();
-            }
+                        authCmd.ExecuteNonQuery();
+                    }
 
-            catch (OracleException ex)
-            {
-                // DUP_VAL_ON_INDEX
-                if (ex.Number != 1)
-                {
-                    throw;
-                }
-            }
+                    catch (OracleException ex)
+                    {
+                        // DUP_VAL_ON_INDEX
+                        if (ex.Number != 1)
+                        {
+                            throw;
+                        }
+                    }
 
-            // ============================
-            // CHECK COUNT
-            // ============================
+                    // ============================
+                    // CHECK COUNT
+                    // ============================
 
-            string countQuery = @"
+                    string countQuery = @"
                 SELECT COUNT(*)
                 FROM DEMO.T_BF_SIGNOFF
                 WHERE SO_DATE =
@@ -84,33 +131,33 @@ public JsonResult SaveSignOff(
                 AND SO_SHIFT = :SO_SHIFT
                 AND SO_PAGE = 'COKE_UNLOADING'";
 
-            OracleCommand countCmd =
-                new OracleCommand(
-                    countQuery,
-                    con);
+                    OracleCommand countCmd =
+                        new OracleCommand(
+                            countQuery,
+                            con);
 
-            countCmd.Transaction = trans;
+                    countCmd.Transaction = trans;
 
-            countCmd.Parameters.Add(
-                "SO_DATE",
-                OracleDbType.Varchar2)
-                .Value = SO_DATE;
+                    countCmd.Parameters.Add(
+                        "SO_DATE",
+                        OracleDbType.Varchar2)
+                        .Value = SO_DATE;
 
-            countCmd.Parameters.Add(
-                "SO_SHIFT",
-                OracleDbType.Varchar2)
-                .Value = SO_SHIFT;
+                    countCmd.Parameters.Add(
+                        "SO_SHIFT",
+                        OracleDbType.Varchar2)
+                        .Value = SO_SHIFT;
 
-            VCOUNT = Convert.ToInt32(
-                countCmd.ExecuteScalar());
+                    VCOUNT = Convert.ToInt32(
+                        countCmd.ExecuteScalar());
 
-            // ============================
-            // UPDATE
-            // ============================
+                    // ============================
+                    // UPDATE
+                    // ============================
 
-            if (VCOUNT > 0)
-            {
-                string updateQuery = @"
+                    if (VCOUNT > 0)
+                    {
+                        string updateQuery = @"
                     UPDATE DEMO.T_BF_SIGNOFF
                     SET SO_CHECK = :SO_CHECK,
                         NAME     = :NAME,
@@ -120,43 +167,43 @@ public JsonResult SaveSignOff(
                     AND SO_SHIFT = :SO_SHIFT
                     AND SO_PAGE = 'COKE_UNLOADING'";
 
-                OracleCommand updateCmd =
-                    new OracleCommand(
-                        updateQuery,
-                        con);
+                        OracleCommand updateCmd =
+                            new OracleCommand(
+                                updateQuery,
+                                con);
 
-                updateCmd.Transaction = trans;
+                        updateCmd.Transaction = trans;
 
-                updateCmd.Parameters.Add(
-                    "SO_CHECK",
-                    OracleDbType.Int32)
-                    .Value = SO_CHECK;
+                        updateCmd.Parameters.Add(
+                            "SO_CHECK",
+                            OracleDbType.Int32)
+                            .Value = SO_CHECK;
 
-                updateCmd.Parameters.Add(
-                    "NAME",
-                    OracleDbType.Varchar2)
-                    .Value = NAME;
+                        updateCmd.Parameters.Add(
+                            "NAME",
+                            OracleDbType.Varchar2)
+                            .Value = NAME;
 
-                updateCmd.Parameters.Add(
-                    "SO_DATE",
-                    OracleDbType.Varchar2)
-                    .Value = SO_DATE;
+                        updateCmd.Parameters.Add(
+                            "SO_DATE",
+                            OracleDbType.Varchar2)
+                            .Value = SO_DATE;
 
-                updateCmd.Parameters.Add(
-                    "SO_SHIFT",
-                    OracleDbType.Varchar2)
-                    .Value = SO_SHIFT;
+                        updateCmd.Parameters.Add(
+                            "SO_SHIFT",
+                            OracleDbType.Varchar2)
+                            .Value = SO_SHIFT;
 
-                updateCmd.ExecuteNonQuery();
-            }
+                        updateCmd.ExecuteNonQuery();
+                    }
 
-            // ============================
-            // INSERT
-            // ============================
+                    // ============================
+                    // INSERT
+                    // ============================
 
-            else
-            {
-                string insertQuery = @"
+                    else
+                    {
+                        string insertQuery = @"
                     INSERT INTO DEMO.T_BF_SIGNOFF
                     (
                         NAME,
@@ -176,122 +223,61 @@ public JsonResult SaveSignOff(
                         'COKE_UNLOADING'
                     )";
 
-                OracleCommand insertCmd =
-                    new OracleCommand(
-                        insertQuery,
-                        con);
+                        OracleCommand insertCmd =
+                            new OracleCommand(
+                                insertQuery,
+                                con);
 
-                insertCmd.Transaction = trans;
+                        insertCmd.Transaction = trans;
 
-                insertCmd.Parameters.Add(
-                    "NAME",
-                    OracleDbType.Varchar2)
-                    .Value = NAME;
+                        insertCmd.Parameters.Add(
+                            "NAME",
+                            OracleDbType.Varchar2)
+                            .Value = NAME;
 
-                insertCmd.Parameters.Add(
-                    "SO_DATE",
-                    OracleDbType.Varchar2)
-                    .Value = SO_DATE;
+                        insertCmd.Parameters.Add(
+                            "SO_DATE",
+                            OracleDbType.Varchar2)
+                            .Value = SO_DATE;
 
-                insertCmd.Parameters.Add(
-                    "SO_SHIFT",
-                    OracleDbType.Varchar2)
-                    .Value = SO_SHIFT;
+                        insertCmd.Parameters.Add(
+                            "SO_SHIFT",
+                            OracleDbType.Varchar2)
+                            .Value = SO_SHIFT;
 
-                insertCmd.Parameters.Add(
-                    "SO_CHECK",
-                    OracleDbType.Int32)
-                    .Value = SO_CHECK;
+                        insertCmd.Parameters.Add(
+                            "SO_CHECK",
+                            OracleDbType.Int32)
+                            .Value = SO_CHECK;
 
-                insertCmd.ExecuteNonQuery();
-            }
+                        insertCmd.ExecuteNonQuery();
+                    }
 
-            trans.Commit();
+                    trans.Commit();
 
-            // ============================
-            // RETURN RESULT
-            // ============================
+                    // ============================
+                    // RETURN RESULT
+                    // ============================
 
-            return Json(new
-            {
-                success = true,
-                SO_CHECK = SO_CHECK,
-                disableButton =
-                    SO_CHECK == 1 ? true : false
-            });
-        }
-
-        catch (Exception ex)
-        {
-            trans.Rollback();
-
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
-        }
-    }
-}
-function signoff() {
-
-    var obj = {
-
-        NAME: $("#txtUser").val(),
-
-        SO_DATE: $("#currDate-value").val(),
-
-        SO_SHIFT: $("#ddlshift").val(),
-
-        SO_CHECK:
-            $("#signoff").is(":checked") ? 1 : 0
-    };
-
-    $.ajax({
-
-        url: '/Furnace_High_line/SaveSignOff',
-
-        type: 'POST',
-
-        data: obj,
-
-        success: function (res) {
-
-            if (res.success == true) {
-
-                if (res.disableButton == true) {
-
-                    $("#PBSAVE")
-                        .prop("disabled", true);
-
-                    $("#PBDELETE")
-                        .prop("disabled", true);
-                }
-                else {
-
-                    $("#PBSAVE")
-                        .prop("disabled", false);
-
-                    $("#PBDELETE")
-                        .prop("disabled", false);
+                    return Json(new
+                    {
+                        success = true,
+                        SO_CHECK = SO_CHECK,
+                        disableButton =
+                            SO_CHECK == 1 ? true : false
+                    });
                 }
 
-                alert("Saved Successfully");
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+
+                    return Json(new
+                    {
+                        success = false,
+                        message = ex.Message
+                    });
+                }
             }
-            else {
-
-                alert(res.message);
-
-            }
-
-        },
-
-        error: function () {
-
-            alert("Error");
-
         }
 
-    });
-
-}
