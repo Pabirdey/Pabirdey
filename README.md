@@ -1,16 +1,11 @@
 <script>
-
-    function LoadTonnageFromDB() {
-
+    function LoadTonnageFromDB() {    
+        debugger;
         var shift = $("#ddlshift").val();
 
         var date = lsSelectedFDate;
 
         var bunkers = [];
-
-        // =========================================
-        // GET ALL SELECTED BUNKERS
-        // =========================================
 
         $(".bunker").each(function () {
 
@@ -20,7 +15,6 @@
 
                 bunkers.push(val);
             }
-
         });
 
         if (!date || !shift || bunkers.length === 0) {
@@ -34,10 +28,7 @@
 
             type: "GET",
 
-            data: {
-                date: date,
-                shift: shift
-            },
+            data: { date: date, shift: shift },
 
             success: function (data) {
 
@@ -47,14 +38,14 @@
 
                     return;
                 }
-
+                
                 var cokeBody = $("#cokeTable tbody");
 
                 var nutBody = $("#nutTable tbody");
 
-                cokeBody.html("");
+                cokeBody.empty();
 
-                nutBody.html("");
+                nutBody.empty();
 
                 // =========================================
                 // TOTAL VARIABLES
@@ -76,10 +67,6 @@
 
                     var bunker = bunkers[b];
 
-                    // =========================================
-                    // FIND COKE ROW
-                    // =========================================
-
                     var cokeRow = null;
 
                     for (var i = 0; i < data.coke.length; i++) {
@@ -91,10 +78,6 @@
                             break;
                         }
                     }
-
-                    // =========================================
-                    // FIND NUT ROW
-                    // =========================================
 
                     var nutRow = null;
 
@@ -109,22 +92,23 @@
                     }
 
                     // =========================================
-                    // COMMON VALUES
+                    // VALUES
                     // =========================================
 
-                 $("#anotherTable tr").each(function () {
+                   
+                    $("#tblBody tr").each(function () {
+                        debugger;
+                        var c = parseFloat($(this).find(".c").val()) || 0;
 
-    var c = parseFloat($(this).find(".c").val()) || 0;
+                        var e = parseFloat($(this).find(".e").val()) || 0;
 
-    var e = parseFloat($(this).find(".e").val()) || 0;
+                        var f = parseFloat($(this).find(".f").val()) || 0;
 
-    var f = parseFloat($(this).find(".f").val()) || 0;
+                        var total = c + e + f;
 
-    var total = c + e + f;
+                        $(this).find(".total").val(total);
 
-    $(this).find(".total").val(total);
-
-});
+                    });
 
                     // =========================================
                     // ST.COKE
@@ -148,21 +132,21 @@
 
                             "<td>" + bunker + "</td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + cVal + "'></td>" +
+                            "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + eVal + "'></td>" +
+                            "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + fVal + "'></td>" +
+                            "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + rowTotal + "'></td>" +
+                            "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
 
                             "</tr>"
                         );
                     }
 
-                    // =========================================
-                    // H/S NC
-                    // =========================================
+                        // =========================================
+                        // H/S NC
+                        // =========================================
 
                     else if (bunker === "H/S NC") {
 
@@ -182,21 +166,21 @@
 
                             "<td>" + bunker + "</td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + cVal + "'></td>" +
+                            "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + eVal + "'></td>" +
+                            "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + fVal + "'></td>" +
+                            "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + rowTotal + "'></td>" +
+                            "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
 
                             "</tr>"
                         );
                     }
 
-                    // =========================================
-                    // NC BF KO
-                    // =========================================
+                        // =========================================
+                        // NC BF KO
+                        // =========================================
 
                     else if (bunker === "NC BF KO") {
 
@@ -216,21 +200,21 @@
 
                             "<td>" + bunker + "</td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + cVal + "'></td>" +
+                            "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + eVal + "'></td>" +
+                            "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + fVal + "'></td>" +
+                            "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + rowTotal + "'></td>" +
+                            "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
 
                             "</tr>"
                         );
                     }
 
-                    // =========================================
-                    // PLS_25MM_NC
-                    // =========================================
+                        // =========================================
+                        // PLS_25MM_NC
+                        // =========================================
 
                     else if (bunker === "PLS_25MM_NC") {
 
@@ -250,21 +234,21 @@
 
                             "<td>" + bunker + "</td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + cVal + "'></td>" +
+                            "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + eVal + "'></td>" +
+                            "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + fVal + "'></td>" +
+                            "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + rowTotal + "'></td>" +
+                            "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
 
                             "</tr>"
                         );
                     }
 
-                    // =========================================
-                    // OTHER BUNKERS
-                    // =========================================
+                        // =========================================
+                        // OTHER BUNKERS
+                        // =========================================
 
                     else {
 
@@ -274,13 +258,13 @@
 
                             "<td>" + bunker + "</td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + c + "'></td>" +
+                            "<td><input type='number' class='form-control c' readonly value='" + c + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + e + "'></td>" +
+                            "<td><input type='number' class='form-control e' readonly value='" + e + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + f + "'></td>" +
+                            "<td><input type='number' class='form-control f' readonly value='" + f + "'></td>" +
 
-                            "<td><input type='number' class='form-control' readonly value='" + total + "'></td>" +
+                            "<td><input type='number' class='form-control total' readonly value='" + total + "'></td>" +
 
                             "</tr>"
                         );
@@ -307,24 +291,15 @@
                 // DISPLAY TOTALS
                 // =========================================
 
-                $("#TOTAL_TON_SC_S").val(TOTAL_TON_SC_S);
+                //$("#TOTAL_TON_SC_S").val(TOTAL_TON_SC_S);
 
-                $("#TOTAL_TON_NC_H").val(TOTAL_TON_NC_H);
+                //$("#TOTAL_TON_NC_H").val(TOTAL_TON_NC_H);
 
-                $("#TOTAL_TON_NC_BF_KO").val(TOTAL_TON_NC_BF_KO);
+                //$("#TOTAL_TON_NC_BF_KO").val(TOTAL_TON_NC_BF_KO);
 
-                $("#TOTAL_TON_NC_P25").val(TOTAL_TON_NC_P25);
-
-            },
-
-            error: function () {
-
-                alert("Error");
-
+                //$("#TOTAL_TON_NC_P25").val(TOTAL_TON_NC_P25);
             }
-
         });
-
     }
 
 </script>
