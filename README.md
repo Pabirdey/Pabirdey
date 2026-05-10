@@ -1,19 +1,10 @@
- <div class="right-section">
-                                        <input class="form-check-input" type="checkbox" id="signoff">
-                                        <label for="signoff">
-                                            Sign OFF
-                                        </label>
-                                    </div>
-
-                                    function signoff() {
-    alert("My Name is pabir");
+function signoff() {   
     var obj = {
         NAME: $("#txtUser").val(),
         SO_DATE:lsSelectedFDate,
         SO_SHIFT:$("#ddlshift").val(),
         SO_CHECK:$("#signoff").is(":checked") ? 1 : 0
-    };
-    alert("My Name is pabir");
+    };   
 
     $.ajax({
         url: '/Furnace_High_line/SaveSignOff',
@@ -45,29 +36,16 @@
     });
 
 }
- [HttpPost]
-        public JsonResult SaveSignOff(
-            string NAME,
-            string SO_DATE,
-            string SO_SHIFT,
-            int SO_CHECK)
+  [HttpPost]
+        public JsonResult SaveSignOff(string NAME,string SO_DATE,string SO_SHIFT,int SO_CHECK)
         {
-            using (OracleConnection con =
-                new OracleConnection(
-                    iMonitorWebUtils.msConRWString))
+            using (OracleConnection con =new OracleConnection(iMonitorWebUtils.msConRWString))
             {
                 con.Open();
-
-                OracleTransaction trans =
-                    con.BeginTransaction();
-
+                OracleTransaction trans =con.BeginTransaction();
                 try
                 {
-                    int VCOUNT = 0;
-
-                    // ============================
-                    // NAME VALIDATION
-                    // ============================
+                    int VCOUNT = 0;                    
 
                     if (string.IsNullOrEmpty(NAME))
                     {
@@ -77,36 +55,12 @@
                             message = "Select Your Name Please"
                         });
                     }
-
-                    // ============================
-                    // INSERT AUTHORITY TABLE
-                    // ============================
-
                     try
                     {
-                        string authQuery = @"
-                    INSERT INTO
-                    DEMO.T_BF_SIGNOFF_AUTHORITY
-                    (
-                        NAME
-                    )
-                    VALUES
-                    (
-                        :NAME
-                    )";
-
-                        OracleCommand authCmd =
-                            new OracleCommand(
-                                authQuery,
-                                con);
-
+                        string authQuery = @"INSERT INTO DEMO.T_BF_SIGNOFF_AUTHORITY(NAME)VALUES(:NAME)";
+                        OracleCommand authCmd =new OracleCommand(authQuery,con);
                         authCmd.Transaction = trans;
-
-                        authCmd.Parameters.Add(
-                            "NAME",
-                            OracleDbType.Varchar2)
-                            .Value = NAME;
-
+                        authCmd.Parameters.Add("NAME",OracleDbType.Varchar2).Value = NAME;
                         authCmd.ExecuteNonQuery();
                     }
 
@@ -118,60 +72,16 @@
                             throw;
                         }
                     }
-
-                    // ============================
-                    // CHECK COUNT
-                    // ============================
-
-                    string countQuery = @"
-                SELECT COUNT(*)
-                FROM DEMO.T_BF_SIGNOFF
-                WHERE SO_DATE =
-                TO_DATE(:SO_DATE,'YYYY-MM-DD')
-                AND SO_SHIFT = :SO_SHIFT
-                AND SO_PAGE = 'COKE_UNLOADING'";
-
-                    OracleCommand countCmd =
-                        new OracleCommand(
-                            countQuery,
-                            con);
-
+                    string countQuery = @"SELECT COUNT(*) FROM DEMO.T_BF_SIGNOFF  WHERE SO_DATE =TO_DATE(:SO_DATE,'DD/MM/YYYY'') AND SO_SHIFT = :SO_SHIFT  AND SO_PAGE = 'COKE_UNLOADING'";
+                    OracleCommand countCmd =new OracleCommand(countQuery,con);
                     countCmd.Transaction = trans;
-
-                    countCmd.Parameters.Add(
-                        "SO_DATE",
-                        OracleDbType.Varchar2)
-                        .Value = SO_DATE;
-
-                    countCmd.Parameters.Add(
-                        "SO_SHIFT",
-                        OracleDbType.Varchar2)
-                        .Value = SO_SHIFT;
-
-                    VCOUNT = Convert.ToInt32(
-                        countCmd.ExecuteScalar());
-
-                    // ============================
-                    // UPDATE
-                    // ============================
-
+                    countCmd.Parameters.Add("SO_DATE",OracleDbType.Varchar2).Value = SO_DATE;
+                    countCmd.Parameters.Add("SO_SHIFT",OracleDbType.Varchar2).Value = SO_SHIFT;
+                    VCOUNT = Convert.ToInt32(countCmd.ExecuteScalar());                  
                     if (VCOUNT > 0)
                     {
-                        string updateQuery = @"
-                    UPDATE DEMO.T_BF_SIGNOFF
-                    SET SO_CHECK = :SO_CHECK,
-                        NAME     = :NAME,
-                        SO_TIME  = SYSDATE
-                    WHERE SO_DATE =
-                    TO_DATE(:SO_DATE,'YYYY-MM-DD')
-                    AND SO_SHIFT = :SO_SHIFT
-                    AND SO_PAGE = 'COKE_UNLOADING'";
-
-                        OracleCommand updateCmd =
-                            new OracleCommand(
-                                updateQuery,
-                                con);
-
+                        string updateQuery = @"UPDATE DEMO.T_BF_SIGNOFF SET SO_CHECK=:SO_CHECK,NAME=:NAME,SO_TIME=SYSDATE  WHERE SO_DATE=TO_DATE(:SO_DATE,'DD/MM/YYYY'') AND SO_SHIFT=:SO_SHIFT AND SO_PAGE='COKE_UNLOADING'";
+                        OracleCommand updateCmd =new OracleCommand(updateQuery,con);
                         updateCmd.Transaction = trans;
 
                         updateCmd.Parameters.Add(
@@ -216,7 +126,7 @@
                     VALUES
                     (
                         :NAME,
-                        TO_DATE(:SO_DATE,'YYYY-MM-DD'),
+                        TO_DATE(:SO_DATE,'DD/MM/YYYY''),
                         :SO_SHIFT,
                         :SO_CHECK,
                         SYSDATE,
@@ -280,4 +190,5 @@
                 }
             }
         }
+
 
