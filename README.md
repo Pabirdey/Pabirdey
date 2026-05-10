@@ -1,206 +1,206 @@
-[HttpPost]
-public JsonResult SaveFurnaceCokeUnloading(Furnace_High_line model)
-{
-    using (OracleConnection con =
-        new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
+ <script>
 
-        OracleTransaction trans = con.BeginTransaction();
+function LoadTonnageFromDB() {
 
-        try
-        {
-            // =========================================
-            // MAIN TABLE SAVE
-            // =========================================
+    var shift = $("#ddlshift").val();
 
-            foreach (var item in model.main)
-            {
-                if (string.IsNullOrWhiteSpace(item.Bunker))
-                    continue;
+    var date = lsSelectedFDate;
 
-                string query = @"
-MERGE INTO imtg.T_BF_CK_CONTROL_UNLOADING t
-USING dual
-ON (
-       t.TIMESTAMP = TO_DATE(:TDATE,'DD/MM/YYYY')
-   AND t.SHIFT = :SHIFT
-   AND t.BUNKER = :BUNKER
-)
-
-WHEN MATCHED THEN
-UPDATE SET
-    t.C = :C,
-    t.E = :E,
-    t.F = :F,
-    t.TOTAL = :TOTAL,
-    t.BUNKER_POSITION = :POSITION,
-    t.BALANCE = :BALANCE
-
-WHEN NOT MATCHED THEN
-INSERT
-(
-    TIMESTAMP,
-    SHIFT,
-    BUNKER,
-    C,
-    E,
-    F,
-    TOTAL,
-    BUNKER_POSITION,
-    BALANCE
-)
-VALUES
-(
-    TO_DATE(:TDATE,'DD/MM/YYYY'),
-    :SHIFT,
-    :BUNKER,
-    :C,
-    :E,
-    :F,
-    :TOTAL,
-    :POSITION,
-    :BALANCE
-)";
-
-                using (OracleCommand cmd = new OracleCommand(query, con))
-                {
-                    cmd.Transaction = trans;
-
-                    cmd.Parameters.Add(":TDATE", item.Date);
-                    cmd.Parameters.Add(":SHIFT", item.Shift);
-                    cmd.Parameters.Add(":BUNKER", item.Bunker);
-
-                    cmd.Parameters.Add(":C", item.C ?? "0");
-                    cmd.Parameters.Add(":E", item.E ?? "0");
-                    cmd.Parameters.Add(":F", item.F ?? "0");
-
-                    cmd.Parameters.Add(":TOTAL", item.Total ?? "0");
-
-                    cmd.Parameters.Add(":POSITION", item.Position ?? "0");
-                    cmd.Parameters.Add(":BALANCE", item.Balance ?? "0");
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            // =========================================
-            // COKE SAVE
-            // =========================================
-
-            foreach (var item in model.coke)
-            {
-                if (string.IsNullOrWhiteSpace(item.Bunker))
-                    continue;
-
-                string query = @"
-MERGE INTO imtg.T_BF_CK_CONTROL_UNLOADING t
-USING dual
-ON (t.BUNKER = :BUNKER)
-
-WHEN MATCHED THEN
-UPDATE SET
-    t.TON_C_SC = :TON_C_SC,
-    t.TON_E_SC = :TON_E_SC,
-    t.TON_F_SC = :TON_F_SC
-
-WHEN NOT MATCHED THEN
-INSERT
-(
-    BUNKER,
-    TON_C_SC,
-    TON_E_SC,
-    TON_F_SC
-)
-VALUES
-(
-    :BUNKER,
-    :TON_C_SC,
-    :TON_E_SC,
-    :TON_F_SC
-)";
-
-                using (OracleCommand cmd = new OracleCommand(query, con))
-                {
-                    cmd.Transaction = trans;
-
-                    cmd.Parameters.Add(":BUNKER", item.Bunker);
-
-                    cmd.Parameters.Add(":TON_C_SC", item.C ?? "0");
-                    cmd.Parameters.Add(":TON_E_SC", item.E ?? "0");
-                    cmd.Parameters.Add(":TON_F_SC", item.F ?? "0");
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            // =========================================
-            // NUT SAVE
-            // =========================================
-
-            foreach (var item in model.nut)
-            {
-                if (string.IsNullOrWhiteSpace(item.Bunker))
-                    continue;
-
-                string query = @"
-MERGE INTO imtg.T_BF_CK_CONTROL_UNLOADING t
-USING dual
-ON (t.BUNKER = :BUNKER)
-
-WHEN MATCHED THEN
-UPDATE SET
-    t.TON_C_NC = :TON_C_NC,
-    t.TON_E_NC = :TON_E_NC,
-    t.TON_F_NC = :TON_F_NC
-
-WHEN NOT MATCHED THEN
-INSERT
-(
-    BUNKER,
-    TON_C_NC,
-    TON_E_NC,
-    TON_F_NC
-)
-VALUES
-(
-    :BUNKER,
-    :TON_C_NC,
-    :TON_E_NC,
-    :TON_F_NC
-)";
-
-                using (OracleCommand cmd = new OracleCommand(query, con))
-                {
-                    cmd.Transaction = trans;
-
-                    cmd.Parameters.Add(":BUNKER", item.Bunker);
-
-                    cmd.Parameters.Add(":TON_C_NC", item.C ?? "0");
-                    cmd.Parameters.Add(":TON_E_NC", item.E ?? "0");
-                    cmd.Parameters.Add(":TON_F_NC", item.F ?? "0");
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            trans.Commit();
-
-            return Json(new
-            {
-                success = true,
-                message = "Data Saved Successfully"
-            });
-        }
-        catch (Exception ex)
-        {
-            trans.Rollback();
-
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
-        }
+    if (!date || !shift) {
+        return;
     }
+
+    var cokeBody = $("#cokeTable tbody");
+
+    var nutBody = $("#nutTable tbody");
+
+    cokeBody.empty();
+
+    nutBody.empty();
+
+    var TOTAL_TON_SC_S = 0;
+    var TOTAL_TON_NC_H = 0;
+    var TOTAL_TON_NC_BF_KO = 0;
+    var TOTAL_TON_NC_P25 = 0;
+
+    $("#tblBody tr").each(function () {
+
+        var row = $(this);
+
+        var bunker = row.find(".bunker").val();
+
+        if (!bunker)
+            return;
+
+        // ======================================
+        // GET VALUES FROM MAIN TABLE
+        // ======================================
+
+        var c = parseFloat(row.find(".c").val()) || 0;
+
+        var e = parseFloat(row.find(".e").val()) || 0;
+
+        var f = parseFloat(row.find(".f").val()) || 0;
+
+        var total = c + e + f;
+
+        row.find(".total").val(total);
+
+        // ======================================
+        // ST.COKE
+        // ======================================
+
+        if (bunker.substring(0, 7) === "ST.COKE") {
+
+            var cVal = c * 40;
+            var eVal = e * 40;
+            var fVal = f * 40;
+
+            var rowTotal = cVal + eVal + fVal;
+
+            TOTAL_TON_SC_S += rowTotal;
+
+            cokeBody.append(
+                "<tr>" +
+                "<td>" + bunker + "</td>" +
+
+                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
+
+                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
+
+                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
+
+                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
+
+                "</tr>"
+            );
+        }
+
+        // ======================================
+        // H/S NC
+        // ======================================
+
+        else if (bunker === "H/S NC") {
+
+            var cVal = c * 21;
+            var eVal = e * 21;
+            var fVal = f * 21;
+
+            var rowTotal = cVal + eVal + fVal;
+
+            TOTAL_TON_NC_H += rowTotal;
+
+            nutBody.append(
+                "<tr>" +
+                "<td>" + bunker + "</td>" +
+
+                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
+
+                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
+
+                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
+
+                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
+
+                "</tr>"
+            );
+        }
+
+        // ======================================
+        // NC BF KO
+        // ======================================
+
+        else if (bunker === "NC BF KO") {
+
+            var cVal = c * 12;
+            var eVal = e * 12;
+            var fVal = f * 12;
+
+            var rowTotal = cVal + eVal + fVal;
+
+            TOTAL_TON_NC_BF_KO += rowTotal;
+
+            nutBody.append(
+                "<tr>" +
+                "<td>" + bunker + "</td>" +
+
+                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
+
+                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
+
+                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
+
+                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
+
+                "</tr>"
+            );
+        }
+
+        // ======================================
+        // PLS_25MM_NC
+        // ======================================
+
+        else if (bunker === "PLS_25MM_NC") {
+
+            var cVal = c * 40;
+            var eVal = e * 40;
+            var fVal = f * 40;
+
+            var rowTotal = cVal + eVal + fVal;
+
+            TOTAL_TON_NC_P25 += rowTotal;
+
+            nutBody.append(
+                "<tr>" +
+                "<td>" + bunker + "</td>" +
+
+                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
+
+                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
+
+                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
+
+                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
+
+                "</tr>"
+            );
+        }
+
+        // ======================================
+        // OTHER
+        // ======================================
+
+        else {
+
+            cokeBody.append(
+                "<tr>" +
+                "<td>" + bunker + "</td>" +
+
+                "<td><input type='number' class='form-control c' readonly value='" + c + "'></td>" +
+
+                "<td><input type='number' class='form-control e' readonly value='" + e + "'></td>" +
+
+                "<td><input type='number' class='form-control f' readonly value='" + f + "'></td>" +
+
+                "<td><input type='number' class='form-control total' readonly value='" + total + "'></td>" +
+
+                "</tr>"
+            );
+        }
+
+    });
+
+    // ======================================
+    // DISPLAY TOTALS
+    // ======================================
+
+    $("#TOTAL_TON_SC_S").val(TOTAL_TON_SC_S || "");
+
+    $("#TOTAL_TON_NC_H").val(TOTAL_TON_NC_H || "");
+
+    $("#TOTAL_TON_NC_BF_KO").val(TOTAL_TON_NC_BF_KO || "");
+
+    $("#TOTAL_TON_NC_P25").val(TOTAL_TON_NC_P25 || "");
 }
+
+    </script>
