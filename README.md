@@ -1,206 +1,214 @@
-<script>
+ [HttpPost]
+        public JsonResult SaveFurnaceCokeUnloading(Furnace_High_line model)
+        {
+            using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+            {
+                con.Open();
+                OracleTransaction trans = con.BeginTransaction();
 
-function LoadTonnageFromDB() {
+                try
+                {
+                    
+                    foreach (var item in model.main)
+                    {
+                        if (string.IsNullOrWhiteSpace(item.Bunker))
+                            continue;
 
-    var shift = $("#ddlshift").val();
+                        string query = @"MERGE INTO imtg.T_BF_CK_CONTROL_UNLOADING t
+                                        USING dual
+                                        ON (t.TIMESTAMP = TO_DATE(:TDATE,'DD/MM/YYYY') 
+                                            AND t.SHIFT = :SHIFT 
+                                            AND t.BUNKER = :BUNKER)
+                                        WHEN MATCHED THEN
+                                        UPDATE SET 
+                                                t.C = :C,
+                                                t.E = :E,
+                                                t.F = :F,
+                                                t.TOTAL = :TOTAL,
+                                                t.BUNKER_POSITION = :POSITION,
+                                                t.BALANCE = :BALANCE
+                                        WHEN NOT MATCHED THEN
+                                        INSERT (TIMESTAMP, SHIFT, BUNKER, C, E, F, TOTAL, BUNKER_POSITION, BALANCE)
+                                        VALUES (TO_DATE(:TDATE,'DD/MM/YYYY'), :SHIFT, :BUNKER, :C, :E, :F, :TOTAL, :POSITION, :BALANCE)";
+                        using (OracleCommand cmd = new OracleCommand(query, con))
+                        {
+                            cmd.Transaction = trans;
+                            cmd.Parameters.Add("TIMESTAMP", item.Date);
+                            cmd.Parameters.Add("SHIFT", item.Shift);
+                            cmd.Parameters.Add("BUNKER", item.Bunker);
+                            cmd.Parameters.Add("C", item.C ?? "0");
+                            cmd.Parameters.Add("E", item.E ?? "0");
+                            cmd.Parameters.Add("F", item.F ?? "0");
+                            cmd.Parameters.Add("TOTAL", item.Total ?? "0");
+                            cmd.Parameters.Add("BUNKER_POSITION", item.Position ?? "0");
+                            cmd.Parameters.Add("BALANCE", item.Balance ?? "0");
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
 
-    var date = lsSelectedFDate;
+                   
+                    foreach (var item in model.coke)
+                    {
+                        if (string.IsNullOrWhiteSpace(item.Bunker))
+                            continue;
 
-    if (!date || !shift) {
-        return;
+                                    string query = @"MERGE INTO imtg.T_BF_CK_CONTROL_UNLOADING t
+                                                            USING dual
+                                                     ON (AND t.BUNKER = :BUNKER)
+                                                    WHEN MATCHED THEN
+                                                        UPDATE SET 
+                                                            t.TON_C_SC = :C,
+                                                            t.TON_E_SC = :E,
+                                                            t.TON_F_SC = :F                       
+                                                            WHEN NOT MATCHED THEN
+                                                            INSERT (BUNKER, TON_C_SC, TON_E_SC, TON_F_SC)
+                                                            VALUES (:BUNKER, :C, :E, :F)";
+                        using (OracleCommand cmd = new OracleCommand(query, con))
+                        {
+                            cmd.Transaction = trans;
+
+                            cmd.Parameters.Add("BUNKER", item.Bunker);
+                            cmd.Parameters.Add("TON_C_SC", item.C ?? "0");
+                            cmd.Parameters.Add("TON_E_SC", item.E ?? "0");
+                            cmd.Parameters.Add("TON_F_SC", item.F ?? "0");                           
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                   
+                    foreach (var item in model.nut)
+                    {
+                        if (string.IsNullOrWhiteSpace(item.Bunker))
+                            continue;
+
+                        string query = @"MERGE INTO imtg.T_BF_CK_CONTROL_UNLOADING t
+                                            USING dual
+                                                ON (t.BUNKER = :BUNKER)
+                                        WHEN MATCHED THEN
+                                            UPDATE SET 
+                                                t.TON_C_NC = :C,
+                                                t.TON_E_NC = :E,
+                                                t.TON_F_NC = :F                       
+                                            WHEN NOT MATCHED THEN
+                                        INSERT (BUNKER, TON_C_NC, TON_E_NC, TON_F_NC)
+                                        VALUES (:BUNKER, :C, :E, :F)";
+                        using (OracleCommand cmd = new OracleCommand(query, con))
+                        {
+                            cmd.Transaction = trans;
+                            cmd.Parameters.Add("BUNKER", item.Bunker);
+                            cmd.Parameters.Add("TON_C_NC", item.C ?? "0");
+                            cmd.Parameters.Add("TON_E_NC", item.E ?? "0");
+                            cmd.Parameters.Add("TON_F_NC", item.F ?? "0");                           
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    trans.Commit();
+                    return Json("Success");
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return Json("Error: " + ex.Message);
+                }
+            }
+        }
+
+        <script>
+    function SaveCokeUnloading() {
+        $("#loaderDiv").show();
+        var mainList = [];
+        var cokeList = [];
+        var nutList = [];    
+        var mainRows = document.querySelectorAll("#tblBody tr");
+        for (var i = 0; i < mainRows.length; i++) {
+            var row = mainRows[i];
+            var obj = {
+                Date: row.querySelector(".row-date").value,
+                Shift: row.querySelector(".row-shift").value,
+                Bunker: row.querySelector(".bunker").value,
+
+                C: row.querySelector(".c").value,
+                E: row.querySelector(".e").value,
+                F: row.querySelector(".f").value,
+
+                Total: row.querySelector(".total").value,
+                Position: row.querySelector(".position").value,
+                Balance: row.querySelector(".balance").value
+            };
+
+            mainList.push(obj);
+        }    
+        var cokeRows = document.querySelectorAll("#cokeTable tbody tr");
+        for (var j = 0; j < cokeRows.length; j++) {
+            var row = cokeRows[j];
+            var obj = {
+                Bunker: row.cells[0].innerText,
+                C: row.querySelector(".c").value,
+                E: row.querySelector(".e").value,
+                F: row.querySelector(".f").value,
+                Total: row.querySelector(".total").value
+            };
+
+            cokeList.push(obj);
+        }
+
+        var nutRows = document.querySelectorAll("#nutTable tbody tr");
+        for (var k = 0; k < nutRows.length; k++) {
+            var row = nutRows[k];
+            var obj = {
+                Bunker: row.cells[0].innerText,
+                C: row.querySelector(".c").value,
+                E: row.querySelector(".e").value,
+                F: row.querySelector(".f").value,
+                Total: row.querySelector(".total").value
+            };
+
+            nutList.push(obj);
+        }
+
+        console.log("MAIN:", mainList);
+        console.log("COKE:", cokeList);
+        console.log("NUT:", nutList); 
+        $.ajax({
+            url: '/Furnace_High_line/SaveFurnaceCokeUnloading',
+            type: 'POST',
+            data: JSON.stringify({
+                main: mainList,
+                coke: cokeList,
+                nut: nutList
+            }),
+            contentType: 'application/json',
+            success: function () {
+             alert(res.message);  
+                       $("#loaderDiv").hide();
+               // Furnace_Line_Coke_Unloading();
+               //SaveFurnaceCokeUnloading_ID();
+            },
+            error: function () {
+                alert("Error Saving Data");
+            }
+        });
     }
-
-    var cokeBody = $("#cokeTable tbody");
-
-    var nutBody = $("#nutTable tbody");
-
-    cokeBody.empty();
-
-    nutBody.empty();
-
-    var TOTAL_TON_SC_S = 0;
-    var TOTAL_TON_NC_H = 0;
-    var TOTAL_TON_NC_BF_KO = 0;
-    var TOTAL_TON_NC_P25 = 0;
-
-    $("#tblBody tr").each(function () {
-
-        var row = $(this);
-
-        var bunker = row.find(".bunker").val();
-
-        if (!bunker)
-            return;
-
-        // ======================================
-        // GET VALUES FROM MAIN TABLE
-        // ======================================
-
-        var c = parseFloat(row.find(".c").val()) || 0;
-
-        var e = parseFloat(row.find(".e").val()) || 0;
-
-        var f = parseFloat(row.find(".f").val()) || 0;
-
-        var total = c + e + f;
-
-        row.find(".total").val(total);
-
-        // ======================================
-        // ST.COKE
-        // ======================================
-
-        if (bunker.substring(0, 7) === "ST.COKE") {
-
-            var cVal = c * 40;
-            var eVal = e * 40;
-            var fVal = f * 40;
-
-            var rowTotal = cVal + eVal + fVal;
-
-            TOTAL_TON_SC_S += rowTotal;
-
-            cokeBody.append(
-                "<tr>" +
-                "<td>" + bunker + "</td>" +
-
-                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
-
-                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
-
-                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
-
-                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
-
-                "</tr>"
-            );
-        }
-
-        // ======================================
-        // H/S NC
-        // ======================================
-
-        else if (bunker === "H/S NC") {
-
-            var cVal = c * 21;
-            var eVal = e * 21;
-            var fVal = f * 21;
-
-            var rowTotal = cVal + eVal + fVal;
-
-            TOTAL_TON_NC_H += rowTotal;
-
-            nutBody.append(
-                "<tr>" +
-                "<td>" + bunker + "</td>" +
-
-                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
-
-                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
-
-                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
-
-                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
-
-                "</tr>"
-            );
-        }
-
-        // ======================================
-        // NC BF KO
-        // ======================================
-
-        else if (bunker === "NC BF KO") {
-
-            var cVal = c * 12;
-            var eVal = e * 12;
-            var fVal = f * 12;
-
-            var rowTotal = cVal + eVal + fVal;
-
-            TOTAL_TON_NC_BF_KO += rowTotal;
-
-            nutBody.append(
-                "<tr>" +
-                "<td>" + bunker + "</td>" +
-
-                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
-
-                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
-
-                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
-
-                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
-
-                "</tr>"
-            );
-        }
-
-        // ======================================
-        // PLS_25MM_NC
-        // ======================================
-
-        else if (bunker === "PLS_25MM_NC") {
-
-            var cVal = c * 40;
-            var eVal = e * 40;
-            var fVal = f * 40;
-
-            var rowTotal = cVal + eVal + fVal;
-
-            TOTAL_TON_NC_P25 += rowTotal;
-
-            nutBody.append(
-                "<tr>" +
-                "<td>" + bunker + "</td>" +
-
-                "<td><input type='number' class='form-control c' readonly value='" + cVal + "'></td>" +
-
-                "<td><input type='number' class='form-control e' readonly value='" + eVal + "'></td>" +
-
-                "<td><input type='number' class='form-control f' readonly value='" + fVal + "'></td>" +
-
-                "<td><input type='number' class='form-control total' readonly value='" + rowTotal + "'></td>" +
-
-                "</tr>"
-            );
-        }
-
-        // ======================================
-        // OTHER
-        // ======================================
-
-        else {
-
-            cokeBody.append(
-                "<tr>" +
-                "<td>" + bunker + "</td>" +
-
-                "<td><input type='number' class='form-control c' readonly value='" + c + "'></td>" +
-
-                "<td><input type='number' class='form-control e' readonly value='" + e + "'></td>" +
-
-                "<td><input type='number' class='form-control f' readonly value='" + f + "'></td>" +
-
-                "<td><input type='number' class='form-control total' readonly value='" + total + "'></td>" +
-
-                "</tr>"
-            );
-        }
-
-    });
-
-    // ======================================
-    // DISPLAY TOTALS
-    // ======================================
-
-    $("#TOTAL_TON_SC_S").val(TOTAL_TON_SC_S || "");
-
-    $("#TOTAL_TON_NC_H").val(TOTAL_TON_NC_H || "");
-
-    $("#TOTAL_TON_NC_BF_KO").val(TOTAL_TON_NC_BF_KO || "");
-
-    $("#TOTAL_TON_NC_P25").val(TOTAL_TON_NC_P25 || "");
-}
-
+    function Furnace_Line_Coke_Unloading() {          
+        var shift=$("#ddlshift").val();
+        var furnaces = ["C", "E", "F"];
+        $("#msg").text("Processing...");            
+        furnaces.forEach(function (furnace) {
+            $.ajax({
+                url: '/Furnace_High_line/CallProcedure_Coke_Distribution',
+                type: 'POST',
+                data: {
+                    p_date:lsSelectedFDate,
+                    p_furnace: furnace,
+                    P_shift:shift
+                },
+                success: function (res) {                   
+                },
+                error: function () {                    
+                }
+            });
+
+        });
+    }
 </script>
