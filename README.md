@@ -1,81 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
-    <title>Datalist Design</title>
+    <title>Small Datalist Design</title>
 
     <style>
 
         body{
             background:#f2f2f2;
-            padding:40px;
+            padding:25px;
         }
 
+        /* Small Box */
         .blue-box{
             background:#0066ff;
-            border-radius:35px;
-            padding:25px 35px;
+            border-radius:14px;
+            padding:10px 15px;
             display:flex;
             align-items:center;
             justify-content:space-between;
-            max-width:1200px;
+            width:430px;
             margin:auto;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+            box-shadow:0 3px 8px rgba(0,0,0,0.2);
         }
 
         .left-section{
-            width:65%;
+            width:58%;
         }
 
+        /* Small Input */
         .custom-input{
-            height:55px;
-            border:3px solid #999;
-            border-radius:4px;
-            font-size:22px;
+            height:34px;
+            border:2px solid #999;
+            border-radius:5px;
+            font-size:13px;
             font-family:Arial;
             font-weight:bold;
+            padding-left:10px;
         }
 
         .custom-input:focus{
             box-shadow:none;
-            border-color:#333;
+            border-color:#222;
         }
 
+        /* Small Right Section */
         .right-section{
             display:flex;
             align-items:center;
-            gap:12px;
+            gap:7px;
             color:white;
-            font-size:38px;
-            font-weight:500;
+            font-size:15px;
+            font-weight:600;
             font-family:Arial;
         }
 
+        /* Small Checkbox */
         .form-check-input{
-            width:28px;
-            height:28px;
+            width:17px;
+            height:17px;
             cursor:pointer;
-        }
-
-        @media(max-width:768px){
-
-            .blue-box{
-                flex-direction:column;
-                gap:20px;
-            }
-
-            .left-section{
-                width:100%;
-            }
-
-            .right-section{
-                font-size:24px;
-            }
+            margin-top:0;
         }
 
     </style>
@@ -123,14 +113,13 @@
 
     <script>
 
-        // Get selected value
-        document.getElementById("material").addEventListener("change", function () {
+        document.getElementById("material")
+        .addEventListener("change", function () {
 
             let value = this.value;
 
             console.log("Selected :", value);
 
-            // Example
             if(value === "AL203"){
                 alert("AL203 Selected");
             }
