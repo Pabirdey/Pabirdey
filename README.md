@@ -1,37 +1,20 @@
-function TotUL() {
-
-    var ids = [
-        "R61",
-        "R66",
-        "R71",
-        "R76",
-        "R81",
-        "R354",
-        "R91",
-        "R96",
-        "R101",
-        "R106",
-        "R111",
-        "R116",
-        "R274"
-    ];
-
-    var total = 0;
-
-    for (var i = 0; i < ids.length; i++) {
-
-        var val =
-            parseFloat(
-                document.getElementById(ids[i]).value
-            ) || 0;
-
-        total += val;
-    }
-
-    document.getElementById("txtTotul").value =
-        total.toFixed(2);
-}
-<input type="text"
-       id="txtTotul"
-       class="form-control"
-       readonly>
+ SELECT NVL(STOCK_COKE,0) INTO :TIMESTAMP.STOCK_COKE	FROM T_BF_CK_CONTROL_UNLOADING
+		 WHERE TIMESTAMP=:TIMESTAMP.NVL_DATE AND SHIFT=:TIMESTAMP.NVL_SHIFT AND BUNKER='WESTERN';
+		 EXCEPTION
+		 	WHEN NO_DATA_FOUND THEN :TIMESTAMP.STOCK_COKE:=0;
+		 	--MESSAGE (:TIMESTAMP.STOCK_COKE);
+		 END;
+     BEGIN
+	
+		 SELECT NVL(BEHIVE_COKE,0) INTO :TIMESTAMP.BEHIVE_COKE FROM T_BF_CK_CONTROL_UNLOADING
+		 WHERE TIMESTAMP=:TIMESTAMP.NVL_DATE AND SHIFT=:TIMESTAMP.NVL_SHIFT AND BUNKER='MIDDLE';
+		 EXCEPTION
+		 	WHEN NO_DATA_FOUND THEN :TIMESTAMP.BEHIVE_COKE:=0;
+		 END;
+		 
+		 BEGIN
+				 SELECT NVL(STOCK_COKE,0) INTO :TIMESTAMP.STOCK_EASTERN FROM T_BF_CK_CONTROL_UNLOADING
+				 WHERE TIMESTAMP=:TIMESTAMP.NVL_DATE AND SHIFT=:TIMESTAMP.NVL_SHIFT AND BUNKER='EASTERN';
+				 EXCEPTION
+				 	WHEN NO_DATA_FOUND THEN :TIMESTAMP.STOCK_EASTERN:=0;
+		 END;
