@@ -1,250 +1,538 @@
+// Models/BFProductionModel.cs
 
-		
-		V_TEMP:=0;
-		select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE ='G';    
- 		
- 		:CTL_BLK.TXT_TIMESTAMP_G:=:ctl_blk.ctl_date_time_prod;
-			:CTL_BLK.TXT_FURNACE_G:='G';
-			:CTL_BLK.TXT_ACTUAL_G:=NULL;
-			:CTL_BLK.TXT_RPT_G:=NULL;
-			:CTL_BLK.TXT_BAL_G:=NULL;
-			:CTL_BLK.DISPLAY_ACT_G:=NULL;
-			:CTL_BLK.DISPLAY_RPT_G:=NULL;
-			:CTL_BLK.DISPLAY_BAL_G:=NULL;
+namespace YourProject.Models
+{
+    public class BFProductionModel
+    {
+        public DateTime PROD_DATE { get; set; }
 
- 			IF V_TEMP>0 THEN 			
+        // =======================
+        // G FURNACE
+        // =======================
 
- 				SELECT ACTUAL,REPORTED,BALANCE INTO :CTL_BLK.TXT_ACTUAL_G ,:CTL_BLK.TXT_RPT_G,:CTL_BLK.TXT_BAL_G
-      		FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			WHERE TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
-      
-      					 --#####
-      			     SELECT sum(ACTUAL),sum(REPORTED) into :CTL_BLK.TXT_ACTUAL_G_TD ,:CTL_BLK.TXT_RPT_G_TD
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<=:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
-      			     --#####	
-       	SELECT BALANCE INTO :Global.vBalance FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			WHERE TIMESTAMP=(:CTL_BLK.TXT_TIMESTAMP_G)-1 AND FURNACE='G';	 
- 			ELSE					
+        public decimal? TXT_ACTUAL_G { get; set; }
+        public decimal? TXT_RPT_G { get; set; }
+        public decimal? TXT_BAL_G { get; set; }
 
-				Select SUM(NET_WT) into :CTL_BLK.TXT_ACTUAL_G  from  demo.t_ladle_details where
- 						LADLE_FLEND_TIME>=:CTL_BLK.TXT_TIMESTAMP_G+6/24 and LADLE_FLEND_TIME<:CTL_BLK.TXT_TIMESTAMP_G+1+6/24 
-							and DESTINATION<>'R' and fur_name='G';
-			
-				SELECT SUM(NVL(ACTUAL,0))-sum(NVL(REPORTED,0)) INTO :CTL_BLK.TXT_BAL_G
-					FROM DEMO.T_BF_PRODUCTION_TRACKING 
-						WHERE TIMESTAMP>=TRUNC(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G'; 			
-			
-		  	:CTL_BLK.TXT_RPT_G:=nvl(:CTL_BLK.TXT_ACTUAL_G,0)+nvl(:CTL_BLK.TXT_BAL_G,0);	
-		  	:Global.vBalance:=:CTL_BLK.TXT_BAL_G;
-				:CTL_BLK.TXT_BAL_G:=NVL(:CTL_BLK.TXT_ACTUAL_G,0)-NVL(:CTL_BLK.TXT_RPT_G,0)+NVL(:Global.vBalance,0);	
-				
-			         	--#####
-								 vActual_TD:=0;
-								 vReported_TD:=0;
-      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
-      			     :CTL_BLK.TXT_ACTUAL_G_TD:=nvl(vActual_TD,0)+ nvl(:CTL_BLK.TXT_ACTUAL_G ,0);
-      			     	:CTL_BLK.TXT_RPT_G_TD:=nvl(vReported_TD,0)+ nvl(:CTL_BLK.TXT_RPT_G ,0);      			     
-      			     --#####	   		  			
- 			END IF;
- 	
-		:CTL_BLK.DISPLAY_ACT_G:=nvl(:BLK_CONTROL.DISPLAY_ACTUAL,0)+nvl(:CTL_BLK.TXT_ACTUAL_G,0);
-		:CTL_BLK.DISPLAY_RPT_G:=nvl(:BLK_CONTROL.DISPLAY_REPORTED,0)+nvl(:CTL_BLK.TXT_RPT_G,0);
-		:CTL_BLK.DISPLAY_BAL_G:=nvl(:BLK_CONTROL.DISPLAY_BALANCE,0)+nvl(:CTL_BLK.TXT_BAL_G,0);
-							
-		--#####
-		:CTL_BLK.DISPLAY_ACT_G_TD:=nvl(:BLK_CONTROL.DISPLAY_ACTUAL_TD,0)+nvl(:CTL_BLK.TXT_ACTUAL_G_TD,0);
-		:CTL_BLK.DISPLAY_RPT_G_TD:=nvl(:BLK_CONTROL.DISPLAY_REPORTED_TD,0)+nvl(:CTL_BLK.TXT_RPT_G_TD,0);     			    
-		--#####
-		
-									If :CTL_BLK.TXT_ACTUAL_G_TD=0 Then
-      			     		:CTL_BLK.TXT_ACTUAL_G_TD:=Null;
-      			     	End If;   
-      			     	If :CTL_BLK.TXT_RPT_G_TD=0 Then
-      			     		 :CTL_BLK.TXT_RPT_G_TD:=Null;
-      			     	End If; 
-		
-		----------------------- For H Blast Furnace 
-		 V_TEMP:=0;
-		 select COUNT(*) INTO V_TEMP from DEMO.T_LADLE where DATE_TIME=:ctl_blk.ctl_date_time_prod and PLANT ='H';    
-		 IF V_TEMP>0 THEN 				
- 				select DATE_TIME,LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,LD3_TONS_ACTUAL,MRDTP_TONS_ACTUAL
-		                into :BLK_CONTROL.DATE_TIME, :BLK_CONTROL.LD1_TONS_ACTUAL_H,:BLK_CONTROL.LD2_TONS_ACTUAL_H,:BLK_CONTROL.LD3_TONS_ACTUAL_H,:BLK_CONTROL.MRDTP_TONS_ACTUAL_H		                      
-		                FROM demo.t_ladle where date_time=:ctl_blk.ctl_date_time_prod and Plant='H';
-		 Else
-		 		SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD1_TONS_ACTUAL_H from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-					 AND DESTINATION='LD1' and fur_name='H';
+        public decimal? TXT_ACTUAL_G_TD { get; set; }
+        public decimal? TXT_RPT_G_TD { get; set; }
 
-				SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD2_TONS_ACTUAL_H from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						AND DESTINATION='LD2' and fur_name ='H';
+        // =======================
+        // H FURNACE
+        // =======================
 
-        SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD3_TONS_ACTUAL_H from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						AND DESTINATION='LD3' and fur_name ='H';
-						
-				SELECT NVL(SUM(NET_WT),0) INTO 	:BLK_CONTROL.MRDTP_TONS_ACTUAL_H from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						AND DESTINATION='MRD' and fur_name ='H';
-		 End If;
-		 
-		 
-		 
-		 
-		 V_TEMP:=0;
-		 select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE ='H'; 
-		 
- 			:CTL_BLK.TXT_TIMESTAMP_H:=:ctl_blk.ctl_date_time_prod;
-			:CTL_BLK.TXT_FURNACE_H:='H';
-			:CTL_BLK.TXT_ACTUAL_H:=NULL;
-			:CTL_BLK.TXT_RPT_H:=NULL;
-			:CTL_BLK.TXT_BAL_H:=NULL;
-			:CTL_BLK.DISPLAY_ACT_H:=NULL;
-			:CTL_BLK.DISPLAY_RPT_H:=NULL;
-			:CTL_BLK.DISPLAY_BAL_H:=NULL;
+        public decimal? TXT_ACTUAL_H { get; set; }
+        public decimal? TXT_RPT_H { get; set; }
+        public decimal? TXT_BAL_H { get; set; }
 
- 			IF V_TEMP>0 THEN
- 				 			 		
- 				SELECT ACTUAL,REPORTED,BALANCE INTO :CTL_BLK.TXT_ACTUAL_H ,:CTL_BLK.TXT_RPT_H,:CTL_BLK.TXT_BAL_H
-      		FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			WHERE TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_H AND FURNACE='H'; 
-      					 --#####
-      			     SELECT sum(ACTUAL),sum(REPORTED) into :CTL_BLK.TXT_ACTUAL_H_TD ,:CTL_BLK.TXT_RPT_H_TD
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_H,'MON') AND TIMESTAMP<=:CTL_BLK.TXT_TIMESTAMP_H AND FURNACE='H';
-      			     --#####
-       SELECT BALANCE INTO :Global.vBalance_H FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			WHERE TIMESTAMP=(:CTL_BLK.TXT_TIMESTAMP_G)-1 AND FURNACE='H';	
- 			ELSE
- 				
-				Select SUM(NET_WT) into :CTL_BLK.TXT_ACTUAL_H  from  demo.t_ladle_details where
- 						LADLE_FLEND_TIME>=:CTL_BLK.TXT_TIMESTAMP_H+6/24 and LADLE_FLEND_TIME<:CTL_BLK.TXT_TIMESTAMP_H+1+6/24 
-							and DESTINATION<>'R' and fur_name='H';
-			
-				SELECT SUM(NVL(ACTUAL,0))-sum(NVL(REPORTED,0)) INTO :CTL_BLK.TXT_BAL_H FROM 
-					DEMO.T_BF_PRODUCTION_TRACKING 
-						WHERE TIMESTAMP>=TRUNC(:CTL_BLK.TXT_TIMESTAMP_H,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_H AND FURNACE='H'; 			
-			
-		  	:CTL_BLK.TXT_RPT_H:=nvl(:CTL_BLK.TXT_ACTUAL_H,0)+nvl(:CTL_BLK.TXT_BAL_H,0);	
-		  	:Global.vBalance_H:=:CTL_BLK.TXT_BAL_H;
-				:CTL_BLK.TXT_BAL_H:=NVL(:CTL_BLK.TXT_ACTUAL_H,0)-NVL(:CTL_BLK.TXT_RPT_H,0)+NVL(:Global.vBalance_H,0);		 
-				
-								--#####
-								 vActual_TD:=0;
-								 vReported_TD:=0;
-      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_H,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_H AND FURNACE='H';
-      			     :CTL_BLK.TXT_ACTUAL_H_TD:=nvl(vActual_TD,0)+ nvl(:CTL_BLK.TXT_ACTUAL_H ,0);
-      			     :CTL_BLK.TXT_RPT_H_TD:=nvl(vReported_TD,0)+ nvl(:CTL_BLK.TXT_RPT_H ,0); 
-      			     	 
-      			     --#####	   		  			
- 			END IF;
- 
-		:CTL_BLK.DISPLAY_ACT_H:=nvl(:CTL_BLK.DISPLAY_ACT_G,0)+nvl(:CTL_BLK.TXT_ACTUAL_H,0);
-		:CTL_BLK.DISPLAY_RPT_H:=nvl(:CTL_BLK.DISPLAY_RPT_G,0)+nvl(:CTL_BLK.TXT_RPT_H,0);
-		:CTL_BLK.DISPLAY_BAL_H:=nvl(:CTL_BLK.DISPLAY_BAL_G,0)+nvl(:CTL_BLK.TXT_BAL_H,0);
+        public decimal? TXT_ACTUAL_H_TD { get; set; }
+        public decimal? TXT_RPT_H_TD { get; set; }
 
-		--#####
-		:CTL_BLK.DISPLAY_ACT_H_TD:=nvl(:CTL_BLK.DISPLAY_ACT_G_TD,0)+nvl(:CTL_BLK.TXT_ACTUAL_H_TD,0);
-		:CTL_BLK.DISPLAY_RPT_H_TD:=nvl(:CTL_BLK.DISPLAY_RPT_G_TD,0)+nvl(:CTL_BLK.TXT_RPT_H_TD,0);     			    
-		--#####
-		
-									If :CTL_BLK.TXT_ACTUAL_H_TD=0 Then
-      			     		:CTL_BLK.TXT_ACTUAL_H_TD:=Null;
-      			     	End If;   
-      			     	If :CTL_BLK.TXT_RPT_H_TD=0 Then
-      			     		 :CTL_BLK.TXT_RPT_H_TD:=Null;
-      			     	End If;  
-      			     	
- --------------------------------------------------------------------------------------------------------------------
- 	----------------------- For I Blast Furnace 
-		 V_TEMP:=0;
-		 select COUNT(*) INTO V_TEMP from DEMO.T_LADLE where DATE_TIME=:ctl_blk.ctl_date_time_prod and PLANT ='I';    
-		 IF V_TEMP>0 THEN 				
- 				select DATE_TIME,LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,LD3_TONS_ACTUAL,MRDTP_TONS_ACTUAL
-		                into :BLK_CONTROL.DATE_TIME, :BLK_CONTROL.LD1_TONS_ACTUAL_I,:BLK_CONTROL.LD2_TONS_ACTUAL_I,:BLK_CONTROL.LD3_TONS_ACTUAL_I,:BLK_CONTROL.MRDTP_TONS_ACTUAL_I		                      
-		                FROM demo.t_ladle where date_time=:ctl_blk.ctl_date_time_prod and Plant='I';
-		 Else
-		 		SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD1_TONS_ACTUAL_I from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-					 AND DESTINATION='LD1' and fur_name='I';
+        // =======================
+        // I FURNACE
+        // =======================
 
-				SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD2_TONS_ACTUAL_I from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						AND DESTINATION='LD2' and fur_name ='I';
+        public decimal? TXT_ACTUAL_I { get; set; }
+        public decimal? TXT_RPT_I { get; set; }
+        public decimal? TXT_BAL_I { get; set; }
 
-        SELECT NVL(SUM(NET_WT),0) INTO :BLK_CONTROL.LD3_TONS_ACTUAL_I from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						AND DESTINATION='LD3' and fur_name ='I';
-						
-				SELECT NVL(SUM(NET_WT),0) INTO 	:BLK_CONTROL.MRDTP_TONS_ACTUAL_I from  demo.t_ladle_details where
-		 			LADLE_FLEND_TIME>=:BLK_CONTROL.DATE_TIME+6/24 and LADLE_FLEND_TIME< :BLK_CONTROL.DATE_TIME+1+6/24
-						AND DESTINATION='MRD' and fur_name ='I';
-		 End If;
-		 
-		 
-		 
-		 
-		 V_TEMP:=0;
-		 select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE ='I'; 
-		 
- 			:CTL_BLK.TXT_TIMESTAMP_I:=:ctl_blk.ctl_date_time_prod;
-			:CTL_BLK.TXT_FURNACE_I:='I';
-			:CTL_BLK.TXT_ACTUAL_I:=NULL;
-			:CTL_BLK.TXT_RPT_I:=NULL;
-			:CTL_BLK.TXT_BAL_I:=NULL;
-			:CTL_BLK.DISPLAY_ACT_I:=NULL;
-			:CTL_BLK.DISPLAY_RPT_I:=NULL;
-			:CTL_BLK.DISPLAY_BAL_I:=NULL;
+        public decimal? TXT_ACTUAL_I_TD { get; set; }
+        public decimal? TXT_RPT_I_TD { get; set; }
 
- 			IF V_TEMP>0 THEN
- 				 			 		
- 				SELECT ACTUAL,REPORTED,BALANCE INTO :CTL_BLK.TXT_ACTUAL_I ,:CTL_BLK.TXT_RPT_I,:CTL_BLK.TXT_BAL_I
-      		FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			WHERE TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_I AND FURNACE='I'; 
-      					 --#####
-      			     SELECT sum(ACTUAL),sum(REPORTED) into :CTL_BLK.TXT_ACTUAL_I_TD ,:CTL_BLK.TXT_RPT_I_TD
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_I,'MON') AND TIMESTAMP<=:CTL_BLK.TXT_TIMESTAMP_I AND FURNACE='I';
-      			     --#####
-       SELECT BALANCE INTO :Global.vBalance_I FROM DEMO.T_BF_PRODUCTION_TRACKING 
-      			WHERE TIMESTAMP=(:CTL_BLK.TXT_TIMESTAMP_H)-1 AND FURNACE='I';	
- 			ELSE
- 				
-				Select SUM(NET_WT) into :CTL_BLK.TXT_ACTUAL_I  from  demo.t_ladle_details where
- 						LADLE_FLEND_TIME>=:CTL_BLK.TXT_TIMESTAMP_I+6/24 and LADLE_FLEND_TIME<:CTL_BLK.TXT_TIMESTAMP_I+1+6/24 
-							and DESTINATION<>'R' and fur_name='I';
-			
-				SELECT SUM(NVL(ACTUAL,0))-sum(NVL(REPORTED,0)) INTO :CTL_BLK.TXT_BAL_I FROM 
-					DEMO.T_BF_PRODUCTION_TRACKING 
-						WHERE TIMESTAMP>=TRUNC(:CTL_BLK.TXT_TIMESTAMP_I,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_I AND FURNACE='I'; 			
-			
-		  	:CTL_BLK.TXT_RPT_I:=nvl(:CTL_BLK.TXT_ACTUAL_I,0)+nvl(:CTL_BLK.TXT_BAL_I,0);	
-		  	:Global.vBalance_I:=:CTL_BLK.TXT_BAL_I;
-				:CTL_BLK.TXT_BAL_I:=NVL(:CTL_BLK.TXT_ACTUAL_I,0)-NVL(:CTL_BLK.TXT_RPT_I,0)+NVL(:Global.vBalance_I,0);		 
-				
-								--#####
-								 vActual_TD:=0;
-								 vReported_TD:=0;
-      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
-      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_I,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_I AND FURNACE='I';
-      			     :CTL_BLK.TXT_ACTUAL_I_TD:=nvl(vActual_TD,0)+ nvl(:CTL_BLK.TXT_ACTUAL_I ,0);
-      			     :CTL_BLK.TXT_RPT_I_TD:=nvl(vReported_TD,0)+ nvl(:CTL_BLK.TXT_RPT_I ,0); 
-      			     	 
-      			     --#####	   		  			
- 			END IF;
- 
-		:CTL_BLK.DISPLAY_ACT_I:=nvl(:CTL_BLK.DISPLAY_ACT_G,0)+nvl(:CTL_BLK.TXT_ACTUAL_H,0)+nvl(:CTL_BLK.TXT_ACTUAL_I,0);
-		:CTL_BLK.DISPLAY_RPT_I:=nvl(:CTL_BLK.DISPLAY_RPT_G,0)+nvl(:CTL_BLK.TXT_RPT_H,0)+nvl(:CTL_BLK.TXT_RPT_I,0);
-		:CTL_BLK.DISPLAY_BAL_I:=nvl(:CTL_BLK.DISPLAY_BAL_G,0)+nvl(:CTL_BLK.TXT_BAL_H,0)+nvl(:CTL_BLK.TXT_BAL_I,0);
+        // =======================
+        // DISPLAY TOTAL
+        // =======================
 
-		--#####
-		:CTL_BLK.DISPLAY_ACT_I_TD:=nvl(:CTL_BLK.DISPLAY_ACT_G_TD,0)+nvl(:CTL_BLK.TXT_ACTUAL_H_TD,0)+nvl(:CTL_BLK.TXT_ACTUAL_I_TD,0);
-		:CTL_BLK.DISPLAY_RPT_I_TD:=nvl(:CTL_BLK.DISPLAY_RPT_G_TD,0)+nvl(:CTL_BLK.TXT_RPT_H_TD,0)+nvl(:CTL_BLK.TXT_RPT_I_TD,0);     			    
-		--#####
-		
-									If :CTL_BLK.TXT_ACTUAL_I_TD=0 Then
-      			     		:CTL_BLK.TXT_ACTUAL_I_TD:=Null;
-      			     	End If;   
-      			     	If :CTL_BLK.TXT_RPT_I_TD=0 Then
-      			     		 :CTL_BLK.TXT_RPT_I_TD:=Null;
-      			     	End If;
+        public decimal? DISPLAY_ACT_I { get; set; }
+        public decimal? DISPLAY_RPT_I { get; set; }
+        public decimal? DISPLAY_BAL_I { get; set; }
+
+        public decimal? DISPLAY_ACT_I_TD { get; set; }
+        public decimal? DISPLAY_RPT_I_TD { get; set; }
+    }
+}
+
+
+// CONTROLLER
+
+using Oracle.ManagedDataAccess.Client;
+using System;
+using System.Web.Mvc;
+using YourProject.Models;
+
+public class HomeController : Controller
+{
+    public JsonResult GetBFProductionTracking(DateTime ctl_date_time_prod)
+    {
+        BFProductionModel obj = new BFProductionModel();
+
+        decimal V_TEMP = 0;
+
+        decimal vActual_TD = 0;
+        decimal vReported_TD = 0;
+
+        using (OracleConnection con =
+            new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            con.Open();
+
+            // =========================================================
+            // G FURNACE
+            // =========================================================
+
+            string q1 = @"SELECT COUNT(*)
+                          FROM DEMO.T_BF_PRODUCTION_TRACKING
+                          WHERE TIMESTAMP=:P_DATE
+                          AND FURNACE='G'";
+
+            using (OracleCommand cmd = new OracleCommand(q1, con))
+            {
+                cmd.Parameters.Add("P_DATE",
+                    OracleDbType.Date).Value = ctl_date_time_prod;
+
+                V_TEMP = Convert.ToDecimal(cmd.ExecuteScalar());
+            }
+
+            if (V_TEMP > 0)
+            {
+                string q2 = @"SELECT NVL(ACTUAL,0),
+                                     NVL(REPORTED,0),
+                                     NVL(BALANCE,0)
+                              FROM DEMO.T_BF_PRODUCTION_TRACKING
+                              WHERE TIMESTAMP=:P_DATE
+                              AND FURNACE='G'";
+
+                using (OracleCommand cmd = new OracleCommand(q2, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    OracleDataReader dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        obj.TXT_ACTUAL_G =
+                            Convert.ToDecimal(dr[0]);
+
+                        obj.TXT_RPT_G =
+                            Convert.ToDecimal(dr[1]);
+
+                        obj.TXT_BAL_G =
+                            Convert.ToDecimal(dr[2]);
+                    }
+                }
+
+                string q3 = @"SELECT NVL(SUM(ACTUAL),0),
+                                     NVL(SUM(REPORTED),0)
+                              FROM DEMO.T_BF_PRODUCTION_TRACKING
+                              WHERE TIMESTAMP>=TRUNC(:P_DATE,'MON')
+                              AND TIMESTAMP<=:P_DATE
+                              AND FURNACE='G'";
+
+                using (OracleCommand cmd = new OracleCommand(q3, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    OracleDataReader dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        obj.TXT_ACTUAL_G_TD =
+                            Convert.ToDecimal(dr[0]);
+
+                        obj.TXT_RPT_G_TD =
+                            Convert.ToDecimal(dr[1]);
+                    }
+                }
+            }
+            else
+            {
+                string q4 = @"SELECT NVL(SUM(NET_WT),0)
+                              FROM demo.t_ladle_details
+                              WHERE LADLE_FLEND_TIME>=:P_DATE+6/24
+                              AND LADLE_FLEND_TIME<:P_DATE+1+6/24
+                              AND DESTINATION<>'R'
+                              AND fur_name='G'";
+
+                using (OracleCommand cmd = new OracleCommand(q4, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    obj.TXT_ACTUAL_G =
+                        Convert.ToDecimal(cmd.ExecuteScalar());
+                }
+
+                string q5 = @"SELECT NVL(SUM(NVL(ACTUAL,0))-
+                                         SUM(NVL(REPORTED,0)),0)
+                              FROM DEMO.T_BF_PRODUCTION_TRACKING
+                              WHERE TIMESTAMP>=TRUNC(:P_DATE,'MON')
+                              AND TIMESTAMP<:P_DATE
+                              AND FURNACE='G'";
+
+                using (OracleCommand cmd = new OracleCommand(q5, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    obj.TXT_BAL_G =
+                        Convert.ToDecimal(cmd.ExecuteScalar());
+                }
+
+                obj.TXT_RPT_G =
+                    obj.TXT_ACTUAL_G + obj.TXT_BAL_G;
+
+                obj.TXT_BAL_G =
+                    obj.TXT_ACTUAL_G -
+                    obj.TXT_RPT_G +
+                    obj.TXT_BAL_G;
+
+                string q6 = @"SELECT NVL(SUM(ACTUAL),0),
+                                     NVL(SUM(REPORTED),0)
+                              FROM DEMO.T_BF_PRODUCTION_TRACKING
+                              WHERE TIMESTAMP>=TRUNC(:P_DATE,'MON')
+                              AND TIMESTAMP<:P_DATE
+                              AND FURNACE='G'";
+
+                using (OracleCommand cmd = new OracleCommand(q6, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    OracleDataReader dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        vActual_TD =
+                            Convert.ToDecimal(dr[0]);
+
+                        vReported_TD =
+                            Convert.ToDecimal(dr[1]);
+                    }
+                }
+
+                obj.TXT_ACTUAL_G_TD =
+                    vActual_TD + obj.TXT_ACTUAL_G;
+
+                obj.TXT_RPT_G_TD =
+                    vReported_TD + obj.TXT_RPT_G;
+            }
+
+            // =========================================================
+            // H FURNACE
+            // =========================================================
+
+            V_TEMP = 0;
+
+            string h1 = @"SELECT COUNT(*)
+                          FROM DEMO.T_BF_PRODUCTION_TRACKING
+                          WHERE TIMESTAMP=:P_DATE
+                          AND FURNACE='H'";
+
+            using (OracleCommand cmd = new OracleCommand(h1, con))
+            {
+                cmd.Parameters.Add("P_DATE",
+                    OracleDbType.Date).Value = ctl_date_time_prod;
+
+                V_TEMP = Convert.ToDecimal(cmd.ExecuteScalar());
+            }
+
+            if (V_TEMP > 0)
+            {
+                string h2 = @"SELECT NVL(ACTUAL,0),
+                                     NVL(REPORTED,0),
+                                     NVL(BALANCE,0)
+                              FROM DEMO.T_BF_PRODUCTION_TRACKING
+                              WHERE TIMESTAMP=:P_DATE
+                              AND FURNACE='H'";
+
+                using (OracleCommand cmd = new OracleCommand(h2, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    OracleDataReader dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        obj.TXT_ACTUAL_H =
+                            Convert.ToDecimal(dr[0]);
+
+                        obj.TXT_RPT_H =
+                            Convert.ToDecimal(dr[1]);
+
+                        obj.TXT_BAL_H =
+                            Convert.ToDecimal(dr[2]);
+                    }
+                }
+            }
+            else
+            {
+                string h3 = @"SELECT NVL(SUM(NET_WT),0)
+                              FROM demo.t_ladle_details
+                              WHERE LADLE_FLEND_TIME>=:P_DATE+6/24
+                              AND LADLE_FLEND_TIME<:P_DATE+1+6/24
+                              AND DESTINATION<>'R'
+                              AND fur_name='H'";
+
+                using (OracleCommand cmd = new OracleCommand(h3, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    obj.TXT_ACTUAL_H =
+                        Convert.ToDecimal(cmd.ExecuteScalar());
+                }
+
+                obj.TXT_RPT_H = obj.TXT_ACTUAL_H;
+                obj.TXT_BAL_H = 0;
+            }
+
+            // =========================================================
+            // I FURNACE
+            // =========================================================
+
+            V_TEMP = 0;
+
+            string i1 = @"SELECT COUNT(*)
+                          FROM DEMO.T_BF_PRODUCTION_TRACKING
+                          WHERE TIMESTAMP=:P_DATE
+                          AND FURNACE='I'";
+
+            using (OracleCommand cmd = new OracleCommand(i1, con))
+            {
+                cmd.Parameters.Add("P_DATE",
+                    OracleDbType.Date).Value = ctl_date_time_prod;
+
+                V_TEMP = Convert.ToDecimal(cmd.ExecuteScalar());
+            }
+
+            if (V_TEMP > 0)
+            {
+                string i2 = @"SELECT NVL(ACTUAL,0),
+                                     NVL(REPORTED,0),
+                                     NVL(BALANCE,0)
+                              FROM DEMO.T_BF_PRODUCTION_TRACKING
+                              WHERE TIMESTAMP=:P_DATE
+                              AND FURNACE='I'";
+
+                using (OracleCommand cmd = new OracleCommand(i2, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    OracleDataReader dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        obj.TXT_ACTUAL_I =
+                            Convert.ToDecimal(dr[0]);
+
+                        obj.TXT_RPT_I =
+                            Convert.ToDecimal(dr[1]);
+
+                        obj.TXT_BAL_I =
+                            Convert.ToDecimal(dr[2]);
+                    }
+                }
+            }
+            else
+            {
+                string i3 = @"SELECT NVL(SUM(NET_WT),0)
+                              FROM demo.t_ladle_details
+                              WHERE LADLE_FLEND_TIME>=:P_DATE+6/24
+                              AND LADLE_FLEND_TIME<:P_DATE+1+6/24
+                              AND DESTINATION<>'R'
+                              AND fur_name='I'";
+
+                using (OracleCommand cmd = new OracleCommand(i3, con))
+                {
+                    cmd.Parameters.Add("P_DATE",
+                        OracleDbType.Date).Value = ctl_date_time_prod;
+
+                    obj.TXT_ACTUAL_I =
+                        Convert.ToDecimal(cmd.ExecuteScalar());
+                }
+
+                obj.TXT_RPT_I = obj.TXT_ACTUAL_I;
+                obj.TXT_BAL_I = 0;
+            }
+
+            // =========================================================
+            // TOTAL
+            // =========================================================
+
+            obj.DISPLAY_ACT_I =
+                (obj.TXT_ACTUAL_G ?? 0) +
+                (obj.TXT_ACTUAL_H ?? 0) +
+                (obj.TXT_ACTUAL_I ?? 0);
+
+            obj.DISPLAY_RPT_I =
+                (obj.TXT_RPT_G ?? 0) +
+                (obj.TXT_RPT_H ?? 0) +
+                (obj.TXT_RPT_I ?? 0);
+
+            obj.DISPLAY_BAL_I =
+                (obj.TXT_BAL_G ?? 0) +
+                (obj.TXT_BAL_H ?? 0) +
+                (obj.TXT_BAL_I ?? 0);
+        }
+
+        return Json(obj,
+            JsonRequestBehavior.AllowGet);
+    }
+}
+
+
+@model YourProject.Models.BFProductionModel
+
+<div class="container mt-3">
+
+    <div class="row mb-3">
+
+        <div class="col-md-3">
+            <input type="date"
+                   id="txtDate"
+                   class="form-control">
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary"
+                    onclick="LoadData()">
+
+                Load Data
+
+            </button>
+        </div>
+
+    </div>
+
+
+    <table class="table table-bordered text-center">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>Furnace</th>
+                <th>Actual</th>
+                <th>Reported</th>
+                <th>Balance</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td>G</td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_ACTUAL_G"
+                           class="form-control">
+                </td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_RPT_G"
+                           class="form-control">
+                </td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_BAL_G"
+                           class="form-control">
+                </td>
+            </tr>
+
+            <tr>
+                <td>H</td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_ACTUAL_H"
+                           class="form-control">
+                </td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_RPT_H"
+                           class="form-control">
+                </td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_BAL_H"
+                           class="form-control">
+                </td>
+            </tr>
+
+            <tr>
+                <td>I</td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_ACTUAL_I"
+                           class="form-control">
+                </td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_RPT_I"
+                           class="form-control">
+                </td>
+
+                <td>
+                    <input type="text"
+                           id="TXT_BAL_I"
+                           class="form-control">
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+
+    function LoadData() {
+
+        $.ajax({
+
+            url: '/Home/GetBFProductionTracking',
+
+            type: 'GET',
+
+            data: {
+                ctl_date_time_prod:
+                    $("#txtDate").val()
+            },
+
+            success: function (res) {
+
+                $("#TXT_ACTUAL_G").val(res.TXT_ACTUAL_G);
+                $("#TXT_RPT_G").val(res.TXT_RPT_G);
+                $("#TXT_BAL_G").val(res.TXT_BAL_G);
+
+                $("#TXT_ACTUAL_H").val(res.TXT_ACTUAL_H);
+                $("#TXT_RPT_H").val(res.TXT_RPT_H);
+                $("#TXT_BAL_H").val(res.TXT_BAL_H);
+
+                $("#TXT_ACTUAL_I").val(res.TXT_ACTUAL_I);
+                $("#TXT_RPT_I").val(res.TXT_RPT_I);
+                $("#TXT_BAL_I").val(res.TXT_BAL_I);
+
+            }
+
+        });
+
+    }
+
+</script>
+
