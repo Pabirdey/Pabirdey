@@ -1,221 +1,63 @@
-<table class="table table-bordered text-center bg-white text-dark">
+	V_TEMP:=0;
+		select COUNT(*) INTO V_TEMP from DEMO.T_BF_PRODUCTION_TRACKING where timestamp=:ctl_blk.ctl_date_time_prod AND FURNACE ='G';    
+ 		
+ 		:CTL_BLK.TXT_TIMESTAMP_G:=:ctl_blk.ctl_date_time_prod;
+			:CTL_BLK.TXT_FURNACE_G:='G';
+			:CTL_BLK.TXT_ACTUAL_G:=NULL;
+			:CTL_BLK.TXT_RPT_G:=NULL;
+			:CTL_BLK.TXT_BAL_G:=NULL;
+			:CTL_BLK.DISPLAY_ACT_G:=NULL;
+			:CTL_BLK.DISPLAY_RPT_G:=NULL;
+			:CTL_BLK.DISPLAY_BAL_G:=NULL;
 
-    <thead>
-        <tr>
-            <th>Material</th>
-            <th>Recd.</th>
-            <th>Retd.</th>
-            <th style="width:250px;">Reason</th>
-            <th>U/L</th>
-            <th style="width:80px;">Balance</th>
-        </tr>
-    </thead>
+ 			IF V_TEMP>0 THEN 			
 
-    <tbody>
+ 				SELECT ACTUAL,REPORTED,BALANCE INTO :CTL_BLK.TXT_ACTUAL_G ,:CTL_BLK.TXT_RPT_G,:CTL_BLK.TXT_BAL_G
+      		FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			WHERE TIMESTAMP=:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
+      
+      					 --#####
+      			     SELECT sum(ACTUAL),sum(REPORTED) into :CTL_BLK.TXT_ACTUAL_G_TD ,:CTL_BLK.TXT_RPT_G_TD
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<=:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
+      			     --#####	
+       	SELECT BALANCE INTO :Global.vBalance FROM DEMO.T_BF_PRODUCTION_TRACKING 
+      			WHERE TIMESTAMP=(:CTL_BLK.TXT_TIMESTAMP_G)-1 AND FURNACE='G';	 
+ 			ELSE					
 
-        <tr>
-            <td class="text-start ps-1 fw-bold">LRP(FLB)</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">LRP(IN)</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">JODA(FLB)</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">JODA(IN)</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">TFO</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">PELLET</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">SCRAP</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">L/STONE</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">PYROXINITE</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">QUARTZ</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">NUT COKE</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">STOCK SINTER</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-        <tr>
-            <td class="text-start ps-1 fw-bold">SINTER(FLB)</td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell"></td>
-            <td><input type="text" class="form-control cell ul"></td>
-            <td><input type="text" class="form-control cell bal"></td>
-        </tr>
-
-    </tbody>
-
-</table>
-
-<div class="text-end mt-2">
-
-    <strong style="margin-right:20px;">Total</strong>
-
-    <input type="text"
-           id="txtTotul"
-           class="form-control d-inline-block text-center"
-           style="width:100px;"
-           readonly />
-
-    <input type="text"
-           id="txtTotBal"
-           class="form-control d-inline-block text-center"
-           style="width:100px;"
-           readonly />
-
-</div>
-
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-
-    $(document).ready(function () {
-
-        // ============================
-        // AUTO TOTAL
-        // ============================
-
-        $(document).on("input", ".ul, .bal", function () {
-
-            calculateULTotal();
-
-            calculateBalanceTotal();
-
-        });
-
-    });
-
-
-
-    // ==================================
-    // U/L TOTAL
-    // ==================================
-
-    function calculateULTotal() {
-
-        let total = 0;
-
-        $(".ul").each(function () {
-
-            let val = parseFloat($(this).val()) || 0;
-
-            total += val;
-
-        });
-
-        $("#txtTotul").val(total.toFixed(2));
-
-    }
-
-
-
-    // ==================================
-    // BALANCE TOTAL
-    // ==================================
-
-    function calculateBalanceTotal() {
-
-        let total = 0;
-
-        $(".bal").each(function () {
-
-            let val = parseFloat($(this).val()) || 0;
-
-            total += val;
-
-        });
-
-        $("#txtTotBal").val(total.toFixed(2));
-
-    }
-
-</script>
+				Select SUM(NET_WT) into :CTL_BLK.TXT_ACTUAL_G  from  demo.t_ladle_details where
+ 						LADLE_FLEND_TIME>=:CTL_BLK.TXT_TIMESTAMP_G+6/24 and LADLE_FLEND_TIME<:CTL_BLK.TXT_TIMESTAMP_G+1+6/24 
+							and DESTINATION<>'R' and fur_name='G';
+			
+				SELECT SUM(NVL(ACTUAL,0))-sum(NVL(REPORTED,0)) INTO :CTL_BLK.TXT_BAL_G
+					FROM DEMO.T_BF_PRODUCTION_TRACKING 
+						WHERE TIMESTAMP>=TRUNC(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G'; 			
+			
+		  	:CTL_BLK.TXT_RPT_G:=nvl(:CTL_BLK.TXT_ACTUAL_G,0)+nvl(:CTL_BLK.TXT_BAL_G,0);	
+		  	:Global.vBalance:=:CTL_BLK.TXT_BAL_G;
+				:CTL_BLK.TXT_BAL_G:=NVL(:CTL_BLK.TXT_ACTUAL_G,0)-NVL(:CTL_BLK.TXT_RPT_G,0)+NVL(:Global.vBalance,0);	
+				
+			         	--#####
+								 vActual_TD:=0;
+								 vReported_TD:=0;
+      			     SELECT sum(ACTUAL),sum(REPORTED) into vActual_TD,vReported_TD 
+      			     FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP>=trunc(:CTL_BLK.TXT_TIMESTAMP_G,'MON') AND TIMESTAMP<:CTL_BLK.TXT_TIMESTAMP_G AND FURNACE='G';
+      			     :CTL_BLK.TXT_ACTUAL_G_TD:=nvl(vActual_TD,0)+ nvl(:CTL_BLK.TXT_ACTUAL_G ,0);
+      			     	:CTL_BLK.TXT_RPT_G_TD:=nvl(vReported_TD,0)+ nvl(:CTL_BLK.TXT_RPT_G ,0);      			     
+      			     --#####	   		  			
+ 			END IF;
+ 	
+		:CTL_BLK.DISPLAY_ACT_G:=nvl(:BLK_CONTROL.DISPLAY_ACTUAL,0)+nvl(:CTL_BLK.TXT_ACTUAL_G,0);
+		:CTL_BLK.DISPLAY_RPT_G:=nvl(:BLK_CONTROL.DISPLAY_REPORTED,0)+nvl(:CTL_BLK.TXT_RPT_G,0);
+		:CTL_BLK.DISPLAY_BAL_G:=nvl(:BLK_CONTROL.DISPLAY_BALANCE,0)+nvl(:CTL_BLK.TXT_BAL_G,0);
+							
+		--#####
+		:CTL_BLK.DISPLAY_ACT_G_TD:=nvl(:BLK_CONTROL.DISPLAY_ACTUAL_TD,0)+nvl(:CTL_BLK.TXT_ACTUAL_G_TD,0);
+		:CTL_BLK.DISPLAY_RPT_G_TD:=nvl(:BLK_CONTROL.DISPLAY_REPORTED_TD,0)+nvl(:CTL_BLK.TXT_RPT_G_TD,0);     			    
+		--#####
+		
+									If :CTL_BLK.TXT_ACTUAL_G_TD=0 Then
+      			     		:CTL_BLK.TXT_ACTUAL_G_TD:=Null;
+      			     	End If;   
+      			     	If :CTL_BLK.TXT_RPT_G_TD=0 Then
+      			     		 :CTL_BLK.TXT_RPT_G_TD:=Null;
+      			     	End If; 
