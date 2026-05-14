@@ -29,7 +29,7 @@
             <div class="card-header bg-primary text-white">
 
                 <h4>
-                    G & H Furnace Production
+                    G H I Furnace Production
                 </h4>
 
             </div>
@@ -75,49 +75,27 @@
 
                             <tr>
 
-                                <th>
-                                    Furnace
-                                </th>
+                                <th>Furnace</th>
 
-                                <th>
-                                    Actual
-                                </th>
+                                <th>Actual</th>
 
-                                <th>
-                                    Reported
-                                </th>
+                                <th>Reported</th>
 
-                                <th>
-                                    Balance
-                                </th>
+                                <th>Balance</th>
 
-                                <th>
-                                    Actual TD
-                                </th>
+                                <th>Actual TD</th>
 
-                                <th>
-                                    Reported TD
-                                </th>
+                                <th>Reported TD</th>
 
-                                <th>
-                                    LD1
-                                </th>
+                                <th>LD1</th>
 
-                                <th>
-                                    LD2
-                                </th>
+                                <th>LD2</th>
 
-                                <th>
-                                    LD3
-                                </th>
+                                <th>LD3</th>
 
-                                <th>
-                                    MRD
-                                </th>
+                                <th>MRD</th>
 
-                                <th>
-                                    TP
-                                </th>
+                                <th>TP</th>
 
                             </tr>
 
@@ -125,7 +103,7 @@
 
                         <tbody>
 
-                            <!-- G FURNACE -->
+                            <!-- G -->
 
                             <tr>
 
@@ -133,69 +111,29 @@
                                     G
                                 </td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtActualG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdActualG"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtReportedG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdReportedG"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtBalanceG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdBalanceG"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtActualTDG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdActualTDG"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtReportedTDG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdReportedTDG"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtLD1G"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdLD1G"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtLD2G"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdLD2G"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtLD3G"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdLD3G"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtMRDG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdMRDG"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtTPG"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdTPG"></td>
 
                             </tr>
 
-                            <!-- H FURNACE -->
+                            <!-- H -->
 
                             <tr>
 
@@ -203,65 +141,77 @@
                                     H
                                 </td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtActualH"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdActualH"></td>
+
+                                <td id="tdReportedH"></td>
+
+                                <td id="tdBalanceH"></td>
+
+                                <td id="tdActualTDH"></td>
+
+                                <td id="tdReportedTDH"></td>
+
+                                <td id="tdLD1H"></td>
+
+                                <td id="tdLD2H"></td>
+
+                                <td id="tdLD3H"></td>
+
+                                <td id="tdMRDH"></td>
+
+                                <td id="tdTPH"></td>
+
+                            </tr>
+
+                            <!-- I -->
+
+                            <tr>
 
                                 <td>
-                                    <input type="text"
-                                           id="txtReportedH"
-                                           class="form-control text-center">
+                                    I
                                 </td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtBalanceH"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdActualI"></td>
+
+                                <td id="tdReportedI"></td>
+
+                                <td id="tdBalanceI"></td>
+
+                                <td id="tdActualTDI"></td>
+
+                                <td id="tdReportedTDI"></td>
+
+                                <td id="tdLD1I"></td>
+
+                                <td id="tdLD2I"></td>
+
+                                <td id="tdLD3I"></td>
+
+                                <td id="tdMRDI"></td>
+
+                                <td id="tdTPI"></td>
+
+                            </tr>
+
+                            <!-- TOTAL -->
+
+                            <tr class="table-warning fw-bold">
 
                                 <td>
-                                    <input type="text"
-                                           id="txtActualTDH"
-                                           class="form-control text-center">
+                                    TOTAL
                                 </td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtReportedTDH"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdDisplayActual"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtLD1H"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdDisplayReported"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtLD2H"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdDisplayBalance"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtLD3H"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdDisplayActualTD"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtMRDH"
-                                           class="form-control text-center">
-                                </td>
+                                <td id="tdDisplayReportedTD"></td>
 
-                                <td>
-                                    <input type="text"
-                                           id="txtTPH"
-                                           class="form-control text-center">
-                                </td>
+                                <td colspan="5"></td>
 
                             </tr>
 
@@ -277,13 +227,15 @@
 
     </div>
 
+    <!-- JQUERY -->
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script>
 
-        //--------------------------------------
+        //------------------------------------------------
         // LOAD DATA
-        //--------------------------------------
+        //------------------------------------------------
 
         function LoadData() {
 
@@ -311,85 +263,144 @@
 
                     console.log(res);
 
+                    //-------------------------------------
+                    // G H I
+                    //-------------------------------------
+
                     $.each(res.Furnaces,
                     function (i, row) {
 
-                        //----------------------------------
-                        // G FURNACE
-                        //----------------------------------
+                        //---------------------------------
+                        // G
+                        //---------------------------------
 
                         if (row.FURNACE == "G") {
 
-                            $("#txtActualG")
-                                .val(row.ACTUAL);
+                            $("#tdActualG")
+                                .html(row.ACTUAL);
 
-                            $("#txtReportedG")
-                                .val(row.REPORTED);
+                            $("#tdReportedG")
+                                .html(row.REPORTED);
 
-                            $("#txtBalanceG")
-                                .val(row.BALANCE);
+                            $("#tdBalanceG")
+                                .html(row.BALANCE);
 
-                            $("#txtActualTDG")
-                                .val(row.ACTUAL_TD);
+                            $("#tdActualTDG")
+                                .html(row.ACTUAL_TD);
 
-                            $("#txtReportedTDG")
-                                .val(row.REPORTED_TD);
+                            $("#tdReportedTDG")
+                                .html(row.REPORTED_TD);
 
-                            $("#txtLD1G")
-                                .val(row.LD1_TONS);
+                            $("#tdLD1G")
+                                .html(row.LD1_TONS);
 
-                            $("#txtLD2G")
-                                .val(row.LD2_TONS);
+                            $("#tdLD2G")
+                                .html(row.LD2_TONS);
 
-                            $("#txtLD3G")
-                                .val(row.LD3_TONS);
+                            $("#tdLD3G")
+                                .html(row.LD3_TONS);
 
-                            $("#txtMRDG")
-                                .val(row.MRDTP_TONS);
+                            $("#tdMRDG")
+                                .html(row.MRDTP_TONS);
 
-                            $("#txtTPG")
-                                .val(row.NOOFTP);
+                            $("#tdTPG")
+                                .html(row.NOOFTP);
                         }
 
-                        //----------------------------------
-                        // H FURNACE
-                        //----------------------------------
+                        //---------------------------------
+                        // H
+                        //---------------------------------
 
                         if (row.FURNACE == "H") {
 
-                            $("#txtActualH")
-                                .val(row.ACTUAL);
+                            $("#tdActualH")
+                                .html(row.ACTUAL);
 
-                            $("#txtReportedH")
-                                .val(row.REPORTED);
+                            $("#tdReportedH")
+                                .html(row.REPORTED);
 
-                            $("#txtBalanceH")
-                                .val(row.BALANCE);
+                            $("#tdBalanceH")
+                                .html(row.BALANCE);
 
-                            $("#txtActualTDH")
-                                .val(row.ACTUAL_TD);
+                            $("#tdActualTDH")
+                                .html(row.ACTUAL_TD);
 
-                            $("#txtReportedTDH")
-                                .val(row.REPORTED_TD);
+                            $("#tdReportedTDH")
+                                .html(row.REPORTED_TD);
 
-                            $("#txtLD1H")
-                                .val(row.LD1_TONS);
+                            $("#tdLD1H")
+                                .html(row.LD1_TONS);
 
-                            $("#txtLD2H")
-                                .val(row.LD2_TONS);
+                            $("#tdLD2H")
+                                .html(row.LD2_TONS);
 
-                            $("#txtLD3H")
-                                .val(row.LD3_TONS);
+                            $("#tdLD3H")
+                                .html(row.LD3_TONS);
 
-                            $("#txtMRDH")
-                                .val(row.MRDTP_TONS);
+                            $("#tdMRDH")
+                                .html(row.MRDTP_TONS);
 
-                            $("#txtTPH")
-                                .val(row.NOOFTP);
+                            $("#tdTPH")
+                                .html(row.NOOFTP);
+                        }
+
+                        //---------------------------------
+                        // I
+                        //---------------------------------
+
+                        if (row.FURNACE == "I") {
+
+                            $("#tdActualI")
+                                .html(row.ACTUAL);
+
+                            $("#tdReportedI")
+                                .html(row.REPORTED);
+
+                            $("#tdBalanceI")
+                                .html(row.BALANCE);
+
+                            $("#tdActualTDI")
+                                .html(row.ACTUAL_TD);
+
+                            $("#tdReportedTDI")
+                                .html(row.REPORTED_TD);
+
+                            $("#tdLD1I")
+                                .html(row.LD1_TONS);
+
+                            $("#tdLD2I")
+                                .html(row.LD2_TONS);
+
+                            $("#tdLD3I")
+                                .html(row.LD3_TONS);
+
+                            $("#tdMRDI")
+                                .html(row.MRDTP_TONS);
+
+                            $("#tdTPI")
+                                .html(row.NOOFTP);
                         }
 
                     });
 
+                    //-------------------------------------
+                    // TOTAL
+                    //-------------------------------------
+
+                    $("#tdDisplayActual")
+                        .html(res.DISPLAY_ACTUAL);
+
+                    $("#tdDisplayReported")
+                        .html(res.DISPLAY_REPORTED);
+
+                    $("#tdDisplayBalance")
+                        .html(res.DISPLAY_BALANCE);
+
+                    $("#tdDisplayActualTD")
+                        .html(res.DISPLAY_ACTUAL_TD);
+
+                    $("#tdDisplayReportedTD")
+                        .html(res.DISPLAY_REPORTED_TD);
                 },
 
                 error: function (err) {
@@ -409,554 +420,3 @@
 </body>
 
 </html>
-
-// STEP 4
-// CONTROLLER
-// FILE: Controllers/BFController.cs
-
-using Oracle.ManagedDataAccess.Client;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Web.Mvc;
-using YourProject.Models;
-
-namespace YourProject.Controllers
-{
-    public class BFController : Controller
-    {
-        string conStr =
-            ConfigurationManager
-            .ConnectionStrings["OracleCon"]
-            .ConnectionString;
-
-        //------------------------------------------------
-        // PAGE LOAD
-        //------------------------------------------------
-
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        //------------------------------------------------
-        // AJAX LOAD
-        //------------------------------------------------
-
-        public JsonResult LoadData(string prodDate)
-        {
-            BFViewModel model =
-                new BFViewModel();
-
-            model.Furnaces =
-                new List<FurnaceModel>();
-
-            DateTime dt =
-                Convert.ToDateTime(prodDate);
-
-            string[] furnaces =
-                { "G", "H" };
-
-            using (OracleConnection con =
-                   new OracleConnection(conStr))
-            {
-                con.Open();
-
-                foreach (string furnace
-                         in furnaces)
-                {
-                    FurnaceModel row =
-                        new FurnaceModel();
-
-                    row.FURNACE =
-                        furnace;
-
-                    //----------------------------------------
-                    // CHECK TRACKING RECORD
-                    //----------------------------------------
-
-                    string chkQry = @"
-
-                    SELECT COUNT(*)
-
-                    FROM DEMO.T_BF_PRODUCTION_TRACKING
-
-                    WHERE TIMESTAMP=:PDATE
-
-                    AND FURNACE=:FURNACE";
-
-                    OracleCommand chkCmd =
-                        new OracleCommand(
-                            chkQry, con);
-
-                    chkCmd.Parameters.Add(
-                        "PDATE",
-                        OracleDbType.Date)
-                        .Value = dt;
-
-                    chkCmd.Parameters.Add(
-                        "FURNACE",
-                        OracleDbType.Varchar2)
-                        .Value = furnace;
-
-                    int count =
-                        Convert.ToInt32(
-                        chkCmd.ExecuteScalar());
-
-                    //----------------------------------------
-                    // IF RECORD EXISTS
-                    //----------------------------------------
-
-                    if (count > 0)
-                    {
-                        string qry = @"
-
-                        SELECT
-
-                        NVL(ACTUAL,0),
-
-                        NVL(REPORTED,0),
-
-                        NVL(BALANCE,0)
-
-                        FROM DEMO.T_BF_PRODUCTION_TRACKING
-
-                        WHERE TIMESTAMP=:PDATE
-
-                        AND FURNACE=:FURNACE";
-
-                        OracleCommand cmd =
-                            new OracleCommand(
-                                qry, con);
-
-                        cmd.Parameters.Add(
-                            "PDATE",
-                            OracleDbType.Date)
-                            .Value = dt;
-
-                        cmd.Parameters.Add(
-                            "FURNACE",
-                            OracleDbType.Varchar2)
-                            .Value = furnace;
-
-                        OracleDataReader dr =
-                            cmd.ExecuteReader();
-
-                        if (dr.Read())
-                        {
-                            row.ACTUAL =
-                                Convert.ToDecimal(
-                                    dr[0]);
-
-                            row.REPORTED =
-                                Convert.ToDecimal(
-                                    dr[1]);
-
-                            row.BALANCE =
-                                Convert.ToDecimal(
-                                    dr[2]);
-                        }
-                    }
-
-                    //----------------------------------------
-                    // ELSE CALCULATE
-                    //----------------------------------------
-
-                    else
-                    {
-                        string actualQry = @"
-
-                        SELECT
-                        NVL(SUM(NET_WT),0)
-
-                        FROM DEMO.T_LADLE_DETAILS
-
-                        WHERE LADLE_FLEND_TIME
-                        >= :FROMDATE
-
-                        AND LADLE_FLEND_TIME
-                        < :TODATE
-
-                        AND DESTINATION<>'R'
-
-                        AND FUR_NAME=:FURNACE";
-
-                        OracleCommand actualCmd =
-                            new OracleCommand(
-                                actualQry, con);
-
-                        actualCmd.Parameters.Add(
-                            "FROMDATE",
-                            OracleDbType.Date)
-                            .Value =
-                            dt.AddHours(6);
-
-                        actualCmd.Parameters.Add(
-                            "TODATE",
-                            OracleDbType.Date)
-                            .Value =
-                            dt.AddDays(1)
-                            .AddHours(6);
-
-                        actualCmd.Parameters.Add(
-                            "FURNACE",
-                            OracleDbType.Varchar2)
-                            .Value = furnace;
-
-                        row.ACTUAL =
-                            Convert.ToDecimal(
-                            actualCmd.ExecuteScalar());
-
-                        //------------------------------------
-                        // BALANCE
-                        //------------------------------------
-
-                        string balQry = @"
-
-                        SELECT
-
-                        NVL(
-                        SUM(
-                        NVL(ACTUAL,0)
-                        -
-                        NVL(REPORTED,0)
-                        ),0)
-
-                        FROM DEMO.T_BF_PRODUCTION_TRACKING
-
-                        WHERE TIMESTAMP >=
-                        TRUNC(:PDATE,'MON')
-
-                        AND TIMESTAMP < :PDATE
-
-                        AND FURNACE=:FURNACE";
-
-                        OracleCommand balCmd =
-                            new OracleCommand(
-                                balQry, con);
-
-                        balCmd.Parameters.Add(
-                            "PDATE",
-                            OracleDbType.Date)
-                            .Value = dt;
-
-                        balCmd.Parameters.Add(
-                            "FURNACE",
-                            OracleDbType.Varchar2)
-                            .Value = furnace;
-
-                        row.BALANCE =
-                            Convert.ToDecimal(
-                            balCmd.ExecuteScalar());
-
-                        //------------------------------------
-                        // REPORTED
-                        //------------------------------------
-
-                        row.REPORTED =
-                            row.ACTUAL
-                            +
-                            row.BALANCE;
-
-                        //------------------------------------
-                        // FINAL BALANCE
-                        //------------------------------------
-
-                        row.BALANCE =
-                            row.ACTUAL
-                            -
-                            row.REPORTED
-                            +
-                            row.BALANCE;
-                    }
-
-                    //----------------------------------------
-                    // TD TOTAL
-                    //----------------------------------------
-
-                    string tdQry = @"
-
-                    SELECT
-
-                    NVL(SUM(ACTUAL),0),
-
-                    NVL(SUM(REPORTED),0)
-
-                    FROM DEMO.T_BF_PRODUCTION_TRACKING
-
-                    WHERE TIMESTAMP >=
-                    TRUNC(:PDATE,'MON')
-
-                    AND TIMESTAMP <= :PDATE
-
-                    AND FURNACE=:FURNACE";
-
-                    OracleCommand tdCmd =
-                        new OracleCommand(
-                            tdQry, con);
-
-                    tdCmd.Parameters.Add(
-                        "PDATE",
-                        OracleDbType.Date)
-                        .Value = dt;
-
-                    tdCmd.Parameters.Add(
-                        "FURNACE",
-                        OracleDbType.Varchar2)
-                        .Value = furnace;
-
-                    OracleDataReader tdDr =
-                        tdCmd.ExecuteReader();
-
-                    if (tdDr.Read())
-                    {
-                        row.ACTUAL_TD =
-                            Convert.ToDecimal(
-                            tdDr[0]);
-
-                        row.REPORTED_TD =
-                            Convert.ToDecimal(
-                            tdDr[1]);
-                    }
-
-                    //----------------------------------------
-                    // LD1
-                    //----------------------------------------
-
-                    row.LD1_TONS =
-                        GetDestinationTotal(
-                        con, dt,
-                        furnace,
-                        "LD1");
-
-                    //----------------------------------------
-                    // LD2
-                    //----------------------------------------
-
-                    row.LD2_TONS =
-                        GetDestinationTotal(
-                        con, dt,
-                        furnace,
-                        "LD2");
-
-                    //----------------------------------------
-                    // LD3
-                    //----------------------------------------
-
-                    row.LD3_TONS =
-                        GetDestinationTotal(
-                        con, dt,
-                        furnace,
-                        "LD3");
-
-                    //----------------------------------------
-                    // MRD
-                    //----------------------------------------
-
-                    row.MRDTP_TONS =
-                        GetDestinationTotal(
-                        con, dt,
-                        furnace,
-                        "MRD");
-
-                    //----------------------------------------
-                    // TP
-                    //----------------------------------------
-
-                    row.NOOFTP =
-                        GetTP(
-                        con, dt,
-                        furnace);
-
-                    //----------------------------------------
-                    // DISPLAY TOTALS
-                    //----------------------------------------
-
-                    model.DISPLAY_ACTUAL +=
-                        row.ACTUAL;
-
-                    model.DISPLAY_REPORTED +=
-                        row.REPORTED;
-
-                    model.DISPLAY_BALANCE +=
-                        row.BALANCE;
-
-                    model.DISPLAY_ACTUAL_TD +=
-                        row.ACTUAL_TD;
-
-                    model.DISPLAY_REPORTED_TD +=
-                        row.REPORTED_TD;
-
-                    model.Furnaces.Add(row);
-                }
-            }
-
-            return Json(
-                model,
-                JsonRequestBehavior.AllowGet);
-        }
-
-        //------------------------------------------------
-        // COMMON METHOD
-        //------------------------------------------------
-
-        public decimal GetDestinationTotal(
-            OracleConnection con,
-            DateTime dt,
-            string furnace,
-            string destination)
-        {
-            string qry = @"
-
-            SELECT
-            NVL(SUM(NET_WT),0)
-
-            FROM DEMO.T_LADLE_DETAILS
-
-            WHERE LADLE_FLEND_TIME
-            >= :FROMDATE
-
-            AND LADLE_FLEND_TIME
-            < :TODATE
-
-            AND DESTINATION=:DEST
-
-            AND FUR_NAME=:FURNACE";
-
-            OracleCommand cmd =
-                new OracleCommand(
-                    qry, con);
-
-            cmd.Parameters.Add(
-                "FROMDATE",
-                OracleDbType.Date)
-                .Value =
-                dt.AddHours(6);
-
-            cmd.Parameters.Add(
-                "TODATE",
-                OracleDbType.Date)
-                .Value =
-                dt.AddDays(1)
-                .AddHours(6);
-
-            cmd.Parameters.Add(
-                "DEST",
-                OracleDbType.Varchar2)
-                .Value =
-                destination;
-
-            cmd.Parameters.Add(
-                "FURNACE",
-                OracleDbType.Varchar2)
-                .Value =
-                furnace;
-
-            return Convert.ToDecimal(
-                cmd.ExecuteScalar());
-        }
-
-        //------------------------------------------------
-        // TP
-        //------------------------------------------------
-
-        public decimal GetTP(
-            OracleConnection con,
-            DateTime dt,
-            string furnace)
-        {
-            string qry = @"
-
-            SELECT
-            NVL(SUM(FILL_STATUS),0)
-
-            FROM DEMO.T_LADLE_DETAILS
-
-            WHERE LADLE_FLEND_TIME
-            >= :FROMDATE
-
-            AND LADLE_FLEND_TIME
-            < :TODATE
-
-            AND TRP_NO<=50
-
-            AND RET_FLAG='N'
-
-            AND FUR_NAME=:FURNACE";
-
-            OracleCommand cmd =
-                new OracleCommand(
-                    qry, con);
-
-            cmd.Parameters.Add(
-                "FROMDATE",
-                OracleDbType.Date)
-                .Value =
-                dt.AddHours(6);
-
-            cmd.Parameters.Add(
-                "TODATE",
-                OracleDbType.Date)
-                .Value =
-                dt.AddDays(1)
-                .AddHours(6);
-
-            cmd.Parameters.Add(
-                "FURNACE",
-                OracleDbType.Varchar2)
-                .Value =
-                furnace;
-
-            return Convert.ToDecimal(
-                cmd.ExecuteScalar());
-        }
-    }
-}
-// STEP 3
-// MODEL
-// FILE: Models/BFModel.cs
-
-using System.Collections.Generic;
-
-namespace YourProject.Models
-{
-    public class FurnaceModel
-    {
-        public string FURNACE { get; set; }
-
-        public decimal ACTUAL { get; set; }
-
-        public decimal REPORTED { get; set; }
-
-        public decimal BALANCE { get; set; }
-
-        public decimal ACTUAL_TD { get; set; }
-
-        public decimal REPORTED_TD { get; set; }
-
-        public decimal LD1_TONS { get; set; }
-
-        public decimal LD2_TONS { get; set; }
-
-        public decimal LD3_TONS { get; set; }
-
-        public decimal MRDTP_TONS { get; set; }
-
-        public decimal NOOFTP { get; set; }
-    }
-
-    public class BFViewModel
-    {
-        public List<FurnaceModel> Furnaces { get; set; }
-
-        public decimal DISPLAY_ACTUAL { get; set; }
-
-        public decimal DISPLAY_REPORTED { get; set; }
-
-        public decimal DISPLAY_BALANCE { get; set; }
-
-        public decimal DISPLAY_ACTUAL_TD { get; set; }
-
-        public decimal DISPLAY_REPORTED_TD { get; set; }
-    }
-}
