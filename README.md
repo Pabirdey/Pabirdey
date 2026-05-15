@@ -1,130 +1,89 @@
-function Display_BFReportData(fDate)
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace iMonitor_Web.Models
 {
-    $.ajax({
 
-        url: '@Url.Action("GET_GBF_IBF_ACTUAL_REPORT", "BF")',
-
-        type: 'GET',
-
-        data: { prodDate: fDate },
-
-        success: function (res)
+    public class BFViewModel
+    {
+        public BFViewModel()
         {
-            if (!res.success)
-            {
-                alert(res.message);
-                return;
-            }
-
-            res.data.Furnaces.forEach(function (item)
-            {
-
-                // G FURNACE
-
-                if (item.FURNACE === "G")
-                {
-                    $("#GBF_Furnace").val(item.FURNACE);
-
-                    $("#GBF_ActOnDate").val(item.ACTUAL);
-
-                    $("#GBF_ActToDate").val(item.ACTUAL_TD);
-
-                    $("#GBF_ReportOnDate").val(item.REPORTED);
-
-                    $("#GBF_ReportToDate").val(item.REPORTED_TD);
-
-                    $("#GBF_Balance").val(item.BALANCE);
-                }
-
-
-                // H FURNACE
-
-                if (item.FURNACE === "H")
-                {
-                    $("#HBF_Furnace").val(item.FURNACE);
-
-                    $("#HBF_ActOnDate").val(item.ACTUAL);
-
-                    $("#HBF_ActToDate").val(item.ACTUAL_TD);
-
-                    $("#HBF_ReportOnDate").val(item.REPORTED);
-
-                    $("#HBF_ReportToDate").val(item.REPORTED_TD);
-
-                    $("#HBF_Balance").val(item.BALANCE);
-                }
-
-
-                // I FURNACE
-
-                if (item.FURNACE === "I")
-                {
-                    $("#IBF_Furnace").val(item.FURNACE);
-
-                    $("#IBF_ActOnDate").val(item.ACTUAL);
-
-                    $("#IBF_ActToDate").val(item.ACTUAL_TD);
-
-                    $("#IBF_ReportOnDate").val(item.REPORTED);
-
-                    $("#IBF_ReportToDate").val(item.REPORTED_TD);
-
-                    $("#IBF_Balance").val(item.BALANCE);
-                }
-
-            });
-
-        },
-
-        error: function ()
-        {
-            alert("Error Loading Data");
+            Furnaces = new List<GBFTOIBFPRODUCTION>();
         }
 
-    });
+        public List<GBFTOIBFPRODUCTION> Furnaces { get; set; }
+
+        public decimal DISPLAY_ACTUAL { get; set; }
+
+        public decimal DISPLAY_REPORTED { get; set; }
+
+        public decimal DISPLAY_BALANCE { get; set; }
+
+        public decimal DISPLAY_ACTUAL_TD { get; set; }
+
+        public decimal DISPLAY_REPORTED_TD { get; set; }
+    }
+
+
+
+    public class GBFTOIBFPRODUCTION
+    {
+        #region BASIC DETAILS
+
+        public string FURNACE { get; set; }
+
+        public DateTime TIMESTAMP { get; set; }
+
+        public decimal ACTUAL { get; set; }
+
+        public decimal REPORTED { get; set; }
+
+        public decimal BALANCE { get; set; }
+
+        public decimal ACTUAL_TD { get; set; }
+
+        public decimal REPORTED_TD { get; set; }
+
+
+
+        public decimal LD1_TONS { get; set; }
+
+        public decimal LD2_TONS { get; set; }
+
+        public decimal LD3_TONS { get; set; }
+
+        public decimal MRDTP_TONS { get; set; }
+
+        public decimal NOOFTP { get; set; }
+
+
+
+
+        public decimal LD1_TONS_ACTUAL { get; set; }
+
+        public decimal LD2_TONS_ACTUAL { get; set; }
+
+        public decimal LD3_TONS_ACTUAL { get; set; }
+
+        public decimal MRDTP_TONS_ACTUAL { get; set; }
+
+
+
+        public decimal DISPLAY_ACTUAL { get; set; }
+
+        public decimal DISPLAY_REPORTED { get; set; }
+
+        public decimal DISPLAY_BALANCE { get; set; }
+
+        public decimal DISPLAY_ACTUAL_TD { get; set; }
+
+        public decimal DISPLAY_REPORTED_TD { get; set; }
+
+
+    }
+
+
 }
-
-<tr>
-
-    <td>
-        <input class="form-control"
-               type="text"
-               readonly
-               id="GBF_Furnace" />
-    </td>
-
-    <td>
-        <input class="form-control"
-               type="text"
-               readonly
-               id="GBF_ActOnDate" />
-    </td>
-
-    <td>
-        <input class="form-control"
-               type="text"
-               readonly
-               id="GBF_ActToDate" />
-    </td>
-
-    <td>
-        <input class="form-control"
-               type="text"
-               id="GBF_ReportOnDate" />
-    </td>
-
-    <td>
-        <input class="form-control"
-               type="text"
-               readonly
-               id="GBF_ReportToDate" />
-    </td>
-
-    <td>
-        <input class="form-control"
-               type="text"
-               readonly
-               id="GBF_Balance" />
-    </td>
-
-</tr>
+}
