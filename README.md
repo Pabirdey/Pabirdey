@@ -1,108 +1,314 @@
- function Display_CTOFBFReportData(fDate) {
-        $.ajax({
-            url: '@Url.Action("GetCTOFBFReportDataByFurnace", "HML")',
-            type: 'GET',
-            data: { fDate: fDate },
-            success: function (data) {
-                if (data.message) {
-                    alert(data.message);
-                    return;
+  public JsonResult GET_GBF_IBF_ACTUAL_REPORT(string prodDate)
+        {
+            BFViewModel model = new BFViewModel();
+            model.Furnaces = new List<GBFTOIBFPRODUCTION>();
+            try
+            {
+                DateTime dt = Convert.ToDateTime(prodDate);
+                string[] furnaces = { "G", "H", "I" };
+                using (OracleConnection con =new OracleConnection(iMonitorWebUtils.msConRWString))
+                {
+                    con.Open();
+                    foreach (string furnace in furnaces)
+                    {
+                        try
+                        {
+                            GBFTOIBFPRODUCTION row =new GBFTOIBFPRODUCTION();
+                            row.FURNACE = furnace;
+                            int count = 0;                            
+                            string chkQry = @"SELECT COUNT(*) FROM DEMO.T_BF_PRODUCTION_TRACKING  WHERE TIMESTAMP=:PDATE  AND FURNACE=:FURNACE";
+                            using (OracleCommand chkCmd =new OracleCommand(chkQry, con))
+                            {
+                                chkCmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
+                                chkCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value = furnace;
+                                count = Convert.ToInt32(chkCmd.ExecuteScalar());
+                            }                          
+                            
+                            if (count > 0)
+                            {
+                                string qry = @"SELECT NVL(ACTUAL,0),NVL(REPORTED,0),NVL(BALANCE,0)  FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP=:PDATE  AND FURNACE=:FURNACE";
+                                using (OracleCommand cmd =new OracleCommand(qry, con))
+                                {
+                                    cmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
+                                    cmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value = furnace;
+                                    OracleDataReader dr =cmd.ExecuteReader();
+                                    if (dr.Read())
+                                    {
+                                        row.ACTUAL=Convert.ToDecimal(dr[0] == DBNull.Value ? 0 : dr[0]);
+                                        row.REPORTED =Convert.ToDecimal(dr[1] == DBNull.Value ? 0 : dr[1]);
+                                        row.BALANCE =Convert.ToDecimal(dr[2] == DBNull.Value ? 0 : dr[2]);
+                                    }
+                                    dr.Close();
+                                }
+                            }
+                            
+                            else
+                            {
+                                string actualQry = @"SELECT NVL(SUM(NET_WT),0) FROM DEMO.T_LADLE_DETAILS  
+                                                     WHERE LADLE_FLEND_TIME>=:FROMDATE AND LADLE_FLEND_TIME<:TODATE
+                                                     AND DESTINATION <> 'R' AND FUR_NAME = :FURNACE";
+                                using (OracleCommand actualCmd =new OracleCommand(actualQry, con))
+                                {
+                                    actualCmd.Parameters.Add("FROMDATE",OracleDbType.Date).Value =dt.AddHours(6);
+                                    actualCmd.Parameters.Add("TODATE",OracleDbType.Date).Value =dt.AddDays(1).AddHours(6);
+                                    actualCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value =furnace;
+                                    row.ACTUAL = Convert.ToDecimal(actualCmd.ExecuteScalar());
+                                }
+
+                                string balQry = @"SELECT NVL(SUM(NVL(ACTUAL,0)-NVL(REPORTED,0)),0)  FROM DEMO.T_BF_PRODUCTION_TRACKING
+                                                WHERE TIMESTAMP>=TRUNC(:PDATE,'MON') AND TIMESTAMP <:PDATE  AND FURNACE=:FURNACE";
+                                using (OracleCommand balCmd =new OracleCommand(balQry, con))
+                                {
+                                    balCmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
+                                    balCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value =furnace;
+                                    row.BALANCE =Convert.ToDecimal(balCmd.ExecuteScalar());
+                                }
+                                row.REPORTED=row.ACTUAL + row.BALANCE;
+                                row.BALANCE =row.ACTUAL -row.REPORTED +row.BALANCE;
+                            }
+                            
+                            string tdQry = @"SELECT   NVL(SUM(ACTUAL),0),NVL(SUM(REPORTED),0) FROM DEMO.T_BF_PRODUCTION_TRACKING
+                                            WHERE TIMESTAMP>=TRUNC(:PDATE,'MON') AND TIMESTAMP<:PDATE  AND FURNACE=:FURNACE";
+                            decimal prevActual = 0;
+                            decimal prevReported = 0;
+                            using (OracleCommand tdCmd =new OracleCommand(tdQry, con))
+                            {
+                                tdCmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
+                                tdCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value=furnace;
+                                OracleDataReader tdDr =tdCmd.ExecuteReader();
+                                if (tdDr.Read())
+                                {
+                                    prevActual=Convert.ToDecimal(tdDr[0] == DBNull.Value ? 0 : tdDr[0]);
+                                    prevReported=Convert.ToDecimal(tdDr[1] == DBNull.Value ? 0 : tdDr[1]);
+                                }
+
+                                tdDr.Close();
+                            }
+
+                            row.ACTUAL_TD =prevActual + row.ACTUAL;
+                            row.REPORTED_TD=prevReported + row.REPORTED;                            
+                            LoadLadleData(con, dt, furnace, row);                            
+                            model.DISPLAY_ACTUAL += row.ACTUAL;
+                            model.DISPLAY_REPORTED += row.REPORTED;
+                            model.DISPLAY_BALANCE += row.BALANCE;
+                            model.DISPLAY_ACTUAL_TD += row.ACTUAL_TD;
+                            model.DISPLAY_REPORTED_TD += row.REPORTED_TD;
+                            model.Furnaces.Add(row);
+                        }
+                        catch (Exception ex)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                message = "Error in Furnace : "
+                                          + furnace +
+                                          " -> " +
+                                          ex.Message
+                            },
+                            JsonRequestBehavior.AllowGet);
+                        }
+                    }
                 }
-                data.forEach(function (item) {
-                    if (item.FURNACE === "C") {
-                        $("#CBF_Furnace").val(item.FURNACE);
-                        $("#CBF_ActOnDate").val(item.ACT_ONDT);
-                        $("#CBF_ActToDate").val(item.ACT_TODT);
-                        $("#CBF_ReportOnDate").val(item.REPORT_ONDT);
-                        $("#CBF_ReportToDate").val(item.REPORT_TODT);
-                        $("#CBF_Balance").val(item.BALANCE);
-                    }
-                    if (item.FURNACE === "E") {
-                        $("#EBF_Furnace").val(item.FURNACE);
-                        $("#EBF_ActOnDate").val(item.ACT_ONDT);
-                        $("#EBF_ActToDate").val(item.ACT_TODT);
-                        $("#EBF_ReportOnDate").val(item.REPORT_ONDT);
-                        $("#EBF_ReportToDate").val(item.REPORT_TODT);
-                        $("#EBF_Balance").val(item.BALANCE);
-                    }
-                    if (item.FURNACE === "F") {
-                        $("#FBF_Furnace").val(item.FURNACE);
-                        $("#FBF_ActOnDate").val(item.ACT_ONDT);
-                        $("#FBF_ActToDate").val(item.ACT_TODT);
-                        $("#FBF_ReportOnDate").val(item.REPORT_ONDT);
-                        $("#FBF_ReportToDate").val(item.REPORT_TODT);
-                        $("#FBF_Balance").val(item.BALANCE);
-                    }
-                    if (item.FURNACE === "G") {
-                        $("#GBF_Furnace").val(item.FURNACE);
-                        $("#GBF_ActOnDate").val(item.ACT_ONDT);
-                        $("#GBF_ActToDate").val(item.ACT_TODT);
-                        $("#GBF_ReportOnDate").val(item.REPORT_ONDT);
-                        $("#GBF_ReportToDate").val(item.REPORT_TODT);
-                        $("#GBF_Balance").val(item.BALANCE);
-                    }
-                    if (item.FURNACE === "H") {
-                        $("#HBF_Furnace").val(item.FURNACE);
-                        $("#HBF_ActOnDate").val(item.ACT_ONDT);
-                        $("#HBF_ActToDate").val(item.ACT_TODT);
-                        $("#HBF_ReportOnDate").val(item.REPORT_ONDT);
-                        $("#HBF_ReportToDate").val(item.REPORT_TODT);
-                        $("#HBF_Balance").val(item.BALANCE);
-                    }
-                    if (item.FURNACE === "I") {
-                        $("#IBF_Furnace").val(item.FURNACE);
-                        $("#IBF_ActOnDate").val(item.ACT_ONDT);
-                        $("#IBF_ActToDate").val(item.ACT_TODT);
-                        $("#IBF_ReportOnDate").val(item.REPORT_ONDT);
-                        $("#IBF_ReportToDate").val(item.REPORT_TODT);
-                        $("#IBF_Balance").val(item.BALANCE);
-                    }
-                });
-<tr>
-                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="CBF_Furnace" id="CBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AF_ActOnDate()" name="CBF_ActOnDate" id="CBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AF_ActToDate()" name="CBF_ActToDate" id="CBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AF_ReportOnDate(); Calc_CBF_ReportOnDate();" name="CBF_ReportOnDate" id="CBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AF_ReportToDate(); Calc_CBF_ReportOnDate();" name="CBF_ReportToDate" id="CBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AF_Balance()" name="CBF_Balance" id="CBF_Balance" /></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="EBF_Furnace" id="EBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AF_ActOnDate()" name="EBF_ActOnDate" id="EBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AF_ActToDate()" name="EBF_ActToDate" id="EBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AF_ReportOnDate()"  name="EBF_ReportOnDate" id="EBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AF_ReportToDate()"  name="EBF_ReportToDate" id="EBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AF_Balance()" name="EBF_Balance" id="EBF_Balance" /></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="FBF_Furnace" id="FBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AF_ActOnDate()" name="FBF_ActOnDate" id="FBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AF_ActTDate()" name="FBF_ActToDate" id="FBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AF_ReportOnDate()"   name="FBF_ReportOnDate" id="FBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AF_ReportToDate()" name="FBF_ReportToDate" id="FBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AF_Balance()" name="FBF_Balance" id="FBF_Balance" /></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="GBF_Furnace" id="GBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AG_ActOnDate()" name="GBF_ActOnDate" id="GBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AG_ActToDate()"name="GBF_ActToDate" id="GBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AG_ReportOnDate()"  name="GBF_ReportOnDate" id="GBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AG_ReportToDate()" name="GBF_ReportToDate" id="GBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AG_Balance()" name="GBF_Balance" id="GBF_Balance" /></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="HBF_Furnace" id="HBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AH_ActOnDate()" name="HBF_ActOnDate" id="HBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AH_ActToDate()" name="HBF_ActToDate" id="HBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AH_ReportOnDate()"  name="HBF_ReportOnDate" id="HBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AH_ReportToDate()" name="HBF_ReportToDate" id="HBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AH_Balance()" name="HBF_Balance" id="HBF_Balance" /></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-control" type="text" readonly value="@Model.FURNACE" name="IBF_Furnace" id="IBF_Furnace" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_ONDT" onblur="Calc_AI_ActOnDate()" name="IBF_ActOnDate" id="IBF_ActOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.ACT_TODT" onblur="Calc_AI_ActToDate()" name="IBF_ActToDate" id="IBF_ActToDate" /></td>
-                            <td><input class="form-control" type="text" value="@Model.REPORT_ONDT" onblur="Calc_AI_ReportOnDate()"  name="IBF_ReportOnDate" id="IBF_ReportOnDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.REPORT_TODT" onblur="Calc_AI_ReportToDate()" name="IBF_ReportToDate" id="IBF_ReportToDate" /></td>
-                            <td><input class="form-control" type="text" readonly value="@Model.BALANCE" onblur="Calc_AI_Balance()" name="IBF_Balance" id="IBF_Balance" /></td>
-                        </tr>
+
+                return Json(new
+                {
+                    success = true,
+                    data = model
+                },
+                JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                },
+                JsonRequestBehavior.AllowGet);
+            }
+        }
+        using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace iMonitor_Web.Models
+{
+
+    public class BFViewModel
+    {
+        public BFViewModel()
+        {
+            Furnaces = new List<GBFTOIBFPRODUCTION>();
+        }
+
+        public List<GBFTOIBFPRODUCTION> Furnaces { get; set; }
+
+        public decimal DISPLAY_ACTUAL { get; set; }
+
+        public decimal DISPLAY_REPORTED { get; set; }
+
+        public decimal DISPLAY_BALANCE { get; set; }
+
+        public decimal DISPLAY_ACTUAL_TD { get; set; }
+
+        public decimal DISPLAY_REPORTED_TD { get; set; }
+    }
+
+
+
+    public class GBFTOIBFPRODUCTION
+    {
+        #region BASIC DETAILS
+
+        public string FURNACE { get; set; }
+
+        public DateTime TIMESTAMP { get; set; }
+
+        #endregion
+
+        #region DAILY PRODUCTION
+
+        public decimal ACTUAL { get; set; }
+
+        public decimal REPORTED { get; set; }
+
+        public decimal BALANCE { get; set; }
+
+        #endregion
+
+        #region MONTH TD
+
+        public decimal ACTUAL_TD { get; set; }
+
+        public decimal REPORTED_TD { get; set; }
+
+        #endregion
+
+        #region LADLE TONS
+
+        public decimal LD1_TONS { get; set; }
+
+        public decimal LD2_TONS { get; set; }
+
+        public decimal LD3_TONS { get; set; }
+
+        public decimal MRDTP_TONS { get; set; }
+
+        public decimal NOOFTP { get; set; }
+
+        #endregion
+
+        #region ACTUAL LADLE TONS
+
+        public decimal LD1_TONS_ACTUAL { get; set; }
+
+        public decimal LD2_TONS_ACTUAL { get; set; }
+
+        public decimal LD3_TONS_ACTUAL { get; set; }
+
+        public decimal MRDTP_TONS_ACTUAL { get; set; }
+
+        #endregion
+
+        #region OPTIONAL DISPLAY FIELDS
+
+        public decimal DISPLAY_ACTUAL { get; set; }
+
+        public decimal DISPLAY_REPORTED { get; set; }
+
+        public decimal DISPLAY_BALANCE { get; set; }
+
+        public decimal DISPLAY_ACTUAL_TD { get; set; }
+
+        public decimal DISPLAY_REPORTED_TD { get; set; }
+
+        
+    }
+
+}
+
+ <div class="col-md-5">
+                        <div class="section-box">
+                            <div class="section-title">Production Breakup</></div>
+                            <div class="table-responsive" style="font-family:'Courier New', Courier, monospace;font-weight:bold;font-size:15px;">
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:35px;">Furnace</th>
+                                            <th>Actual OnDate</th>
+                                            <th>Actual ToDate</th>
+                                            <th>Reported OnDate</th>
+                                            <th>Reported ToDate</th>
+                                            <th>Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input class="form-control" type="text" readonly ></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly  /></td>
+                                            <td><input class="form-control" type="text" readonly  /></td>
+                                            <td><input class="form-control" type="text" /></td>
+                                            <td><input class="form-control" type="text" readonly  /></td>
+                                            <td><input class="form-control" type="text" readonly  /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                            <td><input class="form-control" type="text" readonly /></td>
+                                        </tr>                                      
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    <!-- ================= RIGHT TABLE ================= -->               
+                    <div class="btn-box-wrapper">
+                        <div class="btn-box">
+                            <button type="button" class="btn btn-success" onclick="SaveBFData()">
+                                Save
+                            </button>
+                            <button type="button" disabled class="btn btn-primary" onclick="BFProdProcedure()">
+                                Calculate
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="RawMatCons()">
+                                Raw Mat Cons
+                            </button>
+                        </div>
+                    </div>
+                 </div>
