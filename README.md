@@ -1,1 +1,6 @@
-  lsSelectedFDate = '@DateTime.Today.AddDays(-0).ToString("dd/MMM/yyyy", new System.Globalization.CultureInfo("en-GB"))';
+string prodDate = "15/05/2026";
+
+DateTime dt = DateTime.ParseExact(
+                  prodDate,
+                  "dd/MM/yyyy",
+                  System.Globalization.CultureInfo.InvariantCulture);
