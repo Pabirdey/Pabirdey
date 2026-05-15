@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace iMonitor_Web.Models
 {
-
     public class BFViewModel
     {
         public BFViewModel()
@@ -27,7 +24,6 @@ namespace iMonitor_Web.Models
     }
 
 
-
     public class GBFTOIBFPRODUCTION
     {
         #region BASIC DETAILS
@@ -36,17 +32,30 @@ namespace iMonitor_Web.Models
 
         public DateTime TIMESTAMP { get; set; }
 
+        #endregion
+
+
+        #region DAILY PRODUCTION
+
         public decimal ACTUAL { get; set; }
 
         public decimal REPORTED { get; set; }
 
         public decimal BALANCE { get; set; }
 
+        #endregion
+
+
+        #region TOTAL TO DATE
+
         public decimal ACTUAL_TD { get; set; }
 
         public decimal REPORTED_TD { get; set; }
 
+        #endregion
 
+
+        #region LADLE TONS
 
         public decimal LD1_TONS { get; set; }
 
@@ -58,8 +67,10 @@ namespace iMonitor_Web.Models
 
         public decimal NOOFTP { get; set; }
 
+        #endregion
 
 
+        #region ACTUAL LADLE TONS
 
         public decimal LD1_TONS_ACTUAL { get; set; }
 
@@ -69,7 +80,10 @@ namespace iMonitor_Web.Models
 
         public decimal MRDTP_TONS_ACTUAL { get; set; }
 
+        #endregion
 
+
+        #region DISPLAY TOTAL
 
         public decimal DISPLAY_ACTUAL { get; set; }
 
@@ -81,9 +95,6 @@ namespace iMonitor_Web.Models
 
         public decimal DISPLAY_REPORTED_TD { get; set; }
 
-
+        #endregion
     }
-
-
-}
 }
