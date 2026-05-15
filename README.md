@@ -1,1 +1,1 @@
-DateTime dt = Convert.ToDateTime(prodDate);
+DateTime dt = DateTime.ParseExact(prodDate, "DD/MM/YYYY", System.Globalization.CultureInfo.InvariantCulture);
