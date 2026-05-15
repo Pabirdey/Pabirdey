@@ -5,7 +5,6 @@
             try
             {
                 DateTime dt = DateTime.ParseExact(prodDate, "dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                string formattedDate = dt.ToString("dd/MMM/yyyy").ToUpper();
                 string[] furnaces = { "G", "H", "I" };
                 using (OracleConnection con =new OracleConnection(iMonitorWebUtils.msConRWString))
                 {
@@ -17,20 +16,20 @@
                             GBFTOIBFPRODUCTION row =new GBFTOIBFPRODUCTION();
                             row.FURNACE = furnace;
                             int count = 0;                            
-                            string chkQry = @"SELECT COUNT(*) FROM DEMO.T_BF_PRODUCTION_TRACKING  WHERE TIMESTAMP=TO_DATE(:PDATE,'DD/MM/YYYY')  AND FURNACE=:FURNACE";
+                            string chkQry = @"SELECT COUNT(*) FROM DEMO.T_BF_PRODUCTION_TRACKING  WHERE TIMESTAMP=:PDATE  AND FURNACE=:FURNACE";
                             using (OracleCommand chkCmd =new OracleCommand(chkQry, con))
                             {
-                                chkCmd.Parameters.Add("PDATE",OracleDbType.Varchar2).Value = formattedDate;
+                                chkCmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
                                 chkCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value = furnace;
                                 count = Convert.ToInt32(chkCmd.ExecuteScalar());
                             }                          
                             
                             if (count > 0)
                             {
-                                string qry = @"SELECT NVL(ACTUAL,0),NVL(REPORTED,0),NVL(BALANCE,0)  FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP=TO_DATE(:PDATE,'DD/MM/YYYY')  AND FURNACE=:FURNACE";
+                                string qry = @"SELECT NVL(ACTUAL,0),NVL(REPORTED,0),NVL(BALANCE,0)  FROM DEMO.T_BF_PRODUCTION_TRACKING WHERE TIMESTAMP=:PDATE  AND FURNACE=:FURNACE";
                                 using (OracleCommand cmd =new OracleCommand(qry, con))
                                 {
-                                    cmd.Parameters.Add("PDATE",OracleDbType.Varchar2).Value = formattedDate;
+                                    cmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
                                     cmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value = furnace;
                                     OracleDataReader dr =cmd.ExecuteReader();
                                     if (dr.Read())
@@ -50,8 +49,8 @@
                                                      AND DESTINATION <> 'R' AND FUR_NAME = :FURNACE";
                                 using (OracleCommand actualCmd =new OracleCommand(actualQry, con))
                                 {
-                                    actualCmd.Parameters.Add("FROMDATE",OracleDbType.Varchar2).Value = formattedDate.AddHours(6);
-                                    actualCmd.Parameters.Add("TODATE",OracleDbType.Varchar2).Value = formattedDate.AddDays(1).AddHours(6);
+                                    actualCmd.Parameters.Add("FROMDATE",OracleDbType.Date).Value =dt.AddHours(6);
+                                    actualCmd.Parameters.Add("TODATE",OracleDbType.Date).Value =dt.AddDays(1).AddHours(6);
                                     actualCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value =furnace;
                                     row.ACTUAL = Convert.ToDecimal(actualCmd.ExecuteScalar());
                                 }
@@ -60,7 +59,7 @@
                                                 WHERE TIMESTAMP>=TRUNC(:PDATE,'MON') AND TIMESTAMP <:PDATE  AND FURNACE=:FURNACE";
                                 using (OracleCommand balCmd =new OracleCommand(balQry, con))
                                 {
-                                    balCmd.Parameters.Add("PDATE",OracleDbType.Varchar2).Value = formattedDate;
+                                    balCmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
                                     balCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value =furnace;
                                     row.BALANCE =Convert.ToDecimal(balCmd.ExecuteScalar());
                                 }
@@ -74,7 +73,7 @@
                             decimal prevReported = 0;
                             using (OracleCommand tdCmd =new OracleCommand(tdQry, con))
                             {
-                                tdCmd.Parameters.Add("PDATE",OracleDbType.Varchar2).Value = formattedDate;
+                                tdCmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
                                 tdCmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value=furnace;
                                 OracleDataReader tdDr =tdCmd.ExecuteReader();
                                 if (tdDr.Read())
@@ -88,7 +87,7 @@
 
                             row.ACTUAL_TD =prevActual + row.ACTUAL;
                             row.REPORTED_TD=prevReported + row.REPORTED;                            
-                            LoadLadleData(con, formattedDate, furnace, row);                            
+                            LoadLadleData(con, dt, furnace, row);                            
                             model.DISPLAY_ACTUAL += row.ACTUAL;
                             model.DISPLAY_REPORTED += row.REPORTED;
                             model.DISPLAY_BALANCE += row.BALANCE;
@@ -129,7 +128,7 @@
             }
         }
         
-        private void LoadLadleData(OracleConnection con,DateTime formattedDate, string furnace,GBFTOIBFPRODUCTION row)
+        private void LoadLadleData(OracleConnection con,DateTime dt,string furnace,GBFTOIBFPRODUCTION row)
         {
             try
             {
@@ -137,7 +136,7 @@
                 string chkQry = @"SELECT COUNT(*) FROM DEMO.T_LADLE  WHERE DATE_TIME=:PDATE  AND PLANT=:PLANT";
                 using (OracleCommand cmd = new OracleCommand(chkQry, con))
                 {
-                    cmd.Parameters.Add("PDATE",OracleDbType.Varchar2).Value = formattedDate;
+                    cmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
                     cmd.Parameters.Add("PLANT",OracleDbType.Varchar2).Value = furnace;
                     count = Convert.ToInt32(cmd.ExecuteScalar());
                 }
@@ -148,7 +147,7 @@
                                    FROM DEMO.T_LADLE WHERE DATE_TIME=:PDATE   AND PLANT=:PLANT";
                     using (OracleCommand cmd =new OracleCommand(qry, con))
                     {
-                        cmd.Parameters.Add("PDATE",OracleDbType.Varchar2).Value = formattedDate;
+                        cmd.Parameters.Add("PDATE",OracleDbType.Date).Value = dt;
                         cmd.Parameters.Add("PLANT",OracleDbType.Varchar2).Value = furnace;
                         OracleDataReader dr =cmd.ExecuteReader();
                         if (dr.Read())
@@ -169,15 +168,15 @@
                 
                 else
                 {
-                    row.LD1_TONS=GetDestinationTotal(con, formattedDate, furnace, "LD1");
-                    row.LD2_TONS=GetDestinationTotal(con, formattedDate, furnace, "LD2");
-                    row.LD3_TONS=GetDestinationTotal(con, formattedDate, furnace, "LD3");
-                    row.MRDTP_TONS=GetDestinationTotal(con, formattedDate, furnace, "MRD");
+                    row.LD1_TONS=GetDestinationTotal(con, dt, furnace, "LD1");
+                    row.LD2_TONS=GetDestinationTotal(con, dt, furnace, "LD2");
+                    row.LD3_TONS=GetDestinationTotal(con, dt, furnace, "LD3");
+                    row.MRDTP_TONS=GetDestinationTotal(con, dt, furnace, "MRD");
                     row.LD1_TONS_ACTUAL=row.LD1_TONS;
                     row.LD2_TONS_ACTUAL=row.LD2_TONS;
                     row.LD3_TONS_ACTUAL=row.LD3_TONS;
                     row.MRDTP_TONS_ACTUAL=row.MRDTP_TONS;
-                    row.NOOFTP=GetTP(con, formattedDate, furnace);
+                    row.NOOFTP=GetTP(con, dt, furnace);
                 }
             }
             catch (Exception ex)
@@ -187,7 +186,7 @@
             }
         }
         
-        private decimal GetDestinationTotal(OracleConnection con,DateTime formattedDate, string furnace,string destination)
+        private decimal GetDestinationTotal(OracleConnection con,DateTime dt,string furnace,string destination)
         {
             try
             {
@@ -195,8 +194,8 @@
                                 AND LADLE_FLEND_TIME<:TODATE  AND DESTINATION=:DESTINATION  AND FUR_NAME=:FURNACE";
                 using (OracleCommand cmd = new OracleCommand(qry, con))
                 {
-                    cmd.Parameters.Add("FROMDATE",OracleDbType.Varchar2).Value= formattedDate.AddHours(6);
-                    cmd.Parameters.Add("TODATE",OracleDbType.Varchar2).Value= formattedDate.AddDays(1).AddHours(6);
+                    cmd.Parameters.Add("FROMDATE",OracleDbType.Date).Value=dt.AddHours(6);
+                    cmd.Parameters.Add("TODATE",OracleDbType.Date).Value=dt.AddDays(1).AddHours(6);
                     cmd.Parameters.Add("DESTINATION",OracleDbType.Varchar2).Value=destination;
                     cmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value=furnace;
                     return Convert.ToDecimal(cmd.ExecuteScalar());
@@ -208,7 +207,7 @@
             }
         }
 
-         private decimal GetTP(OracleConnection con,DateTime formattedDate, string furnace)
+         private decimal GetTP(OracleConnection con,DateTime dt,string furnace)
         {
             try
             {
@@ -216,8 +215,8 @@
                             AND LADLE_FLEND_TIME<:TODATE  AND TRP_NO<=50  AND RET_FLAG = 'N'  AND FUR_NAME=:FURNACE";
                 using (OracleCommand cmd = new OracleCommand(qry, con))
                 {
-                    cmd.Parameters.Add("FROMDATE",OracleDbType.Varchar2).Value = formattedDate.AddHours(6);
-                    cmd.Parameters.Add("TODATE",OracleDbType.Varchar2).Value = formattedDate.AddDays(1).AddHours(6);
+                    cmd.Parameters.Add("FROMDATE",OracleDbType.Date).Value =dt.AddHours(6);
+                    cmd.Parameters.Add("TODATE",OracleDbType.Date).Value =dt.AddDays(1).AddHours(6);
                     cmd.Parameters.Add("FURNACE",OracleDbType.Varchar2).Value=furnace;
                     return Convert.ToDecimal(cmd.ExecuteScalar());
                 }
@@ -227,4 +226,5 @@
                 return 0;
             }
         }
+
 
