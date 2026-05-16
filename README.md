@@ -174,3 +174,26 @@
             }
         }
 
+  <tr>
+                                            <td><input type="text" class="form-control" id="FURNACE_C" readonly /></td>                                            <td><input type="text" class="form-control" id="ACTUAL_C" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_C_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_C" /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_C_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="BALANCE_C" readonly /></td>                                           
+                                        </tr>
+                                        <tr>
+                                            <td><input type="text" class="form-control" id="FURNACE_E" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_E" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_E_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_E" /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_E_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="BALANCE_E" readonly /></td> 
+                                        </tr>
+                                        <tr>
+                                            <td><input type="text" class="form-control" id="FURNACE_F" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_F" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_F_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_F" /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_F_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="BALANCE_F" readonly /></td> 
+                                        </tr>
