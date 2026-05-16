@@ -1,109 +1,82 @@
-public class ProductionController : Controller
+private void LoadFurnaceData(
+    OracleConnection con,
+    DateTime prodDate,
+    string furnace,
+    BlastFurnaceViewModel model)
 {
-    private readonly string conString =
-        ConfigurationManager.ConnectionStrings["OracleDb"].ConnectionString;
-
-    [HttpGet]
-    public JsonResult Index(DateTime prodDate)
+    try
     {
-        BlastFurnaceViewModel model = new BlastFurnaceViewModel();
+        string query = @"
+            SELECT ACTUAL, REPORTED, BALANCE
+            FROM DEMO.T_BF_PRODUCTION_TRACKING
+            WHERE TIMESTAMP = :prodDate
+            AND FURNACE = :furnace";
 
-        try
+        using (OracleCommand cmd = new OracleCommand(query, con))
         {
-            model.ControlDateTimeProd = prodDate;
+            cmd.Parameters.Add("prodDate", OracleDbType.Date).Value = prodDate;
+            cmd.Parameters.Add("furnace", OracleDbType.Varchar2).Value = furnace;
 
-            using (OracleConnection con = new OracleConnection(conString))
+            using (OracleDataReader dr = cmd.ExecuteReader())
             {
-                con.Open();
-
-                int vTemp = 0;
-
-                string countQuery = @"
-                    SELECT COUNT(*)
-                    FROM DEMO.T_BF_PRODUCTION_TRACKING
-                    WHERE TIMESTAMP = :prodDate
-                    AND FURNACE IN ('C','D','E','F')";
-
-                using (OracleCommand cmd = new OracleCommand(countQuery, con))
+                if (dr.Read())
                 {
-                    cmd.Parameters.Add("prodDate", OracleDbType.Date).Value = prodDate;
+                    decimal actual = dr["ACTUAL"] == DBNull.Value
+                        ? 0
+                        : Convert.ToDecimal(dr["ACTUAL"]);
 
-                    vTemp = Convert.ToInt32(cmd.ExecuteScalar());
+                    decimal reported = dr["REPORTED"] == DBNull.Value
+                        ? 0
+                        : Convert.ToDecimal(dr["REPORTED"]);
+
+                    decimal balance = dr["BALANCE"] == DBNull.Value
+                        ? 0
+                        : Convert.ToDecimal(dr["BALANCE"]);
+
+                    switch (furnace)
+                    {
+                        case "C":
+                            model.ActualC = actual;
+                            model.ReportedC = reported;
+                            model.BalanceC = balance;
+                            break;
+
+                        case "D":
+                            model.ActualD = actual;
+                            model.ReportedD = reported;
+                            model.BalanceD = balance;
+                            break;
+
+                        case "E":
+                            model.ActualE = actual;
+                            model.ReportedE = reported;
+                            model.BalanceE = balance;
+                            break;
+
+                        case "F":
+                            model.ActualF = actual;
+                            model.ReportedF = reported;
+                            model.BalanceF = balance;
+                            break;
+                    }
                 }
-
-                // If record exists in production tracking table
-                if (vTemp > 0)
-                {
-                    LoadFurnaceData(con, prodDate, "C", model);
-                    LoadFurnaceData(con, prodDate, "D", model);
-                    LoadFurnaceData(con, prodDate, "E", model);
-                    LoadFurnaceData(con, prodDate, "F", model);
-                }
-                else
-                {
-                    // Load from ladle details table
-                    LoadActualFromLadle(con, prodDate, "C", model);
-                    LoadActualFromLadle(con, prodDate, "D", model);
-                    LoadActualFromLadle(con, prodDate, "E", model);
-                    LoadActualFromLadle(con, prodDate, "F", model);
-                }
-
-                // Load Summary
-                LoadLadleSummary(con, prodDate, model);
-
-                // Total Actual
-                model.DisplayActual =
-                    (model.ActualC ?? 0) +
-                    (model.ActualD ?? 0) +
-                    (model.ActualE ?? 0) +
-                    (model.ActualF ?? 0);
-
-                // Total Reported
-                model.DisplayReported =
-                    (model.ReportedC ?? 0) +
-                    (model.ReportedD ?? 0) +
-                    (model.ReportedE ?? 0) +
-                    (model.ReportedF ?? 0);
-
-                // Total Balance
-                model.DisplayBalance =
-                    (model.BalanceC ?? 0) +
-                    (model.BalanceD ?? 0) +
-                    (model.BalanceE ?? 0) +
-                    (model.BalanceF ?? 0);
             }
-
-            // Success Response
-            return Json(new
-            {
-                success = true,
-                message = "Data loaded successfully.",
-                data = model
-            }, JsonRequestBehavior.AllowGet);
         }
-        catch (OracleException ex)
-        {
-            // Oracle DB Exception
-            return Json(new
-            {
-                success = false,
-                message = "Oracle database error occurred.",
-                error = ex.Message
-            }, JsonRequestBehavior.AllowGet);
-        }
-        catch (Exception ex)
-        {
-            // General Exception
-            return Json(new
-            {
-                success = false,
-                message = "Unexpected error occurred.",
-                error = ex.Message
-            }, JsonRequestBehavior.AllowGet);
-        }
-        finally
-        {
-            // Optional cleanup or logging
-        }
+    }
+    catch (OracleException ex)
+    {
+        // Oracle specific exception
+        throw new Exception(
+            $"Oracle DB Error while loading furnace {furnace}: {ex.Message}");
+    }
+    catch (Exception ex)
+    {
+        // General exception
+        throw new Exception(
+            $"Error while loading furnace {furnace}: {ex.Message}");
+    }
+    finally
+    {
+        // Optional logging / cleanup
     }
 }
