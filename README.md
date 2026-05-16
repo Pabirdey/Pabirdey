@@ -1,82 +1,51 @@
-private void LoadFurnaceData(
+private void LoadActualFromLadle(
     OracleConnection con,
     DateTime prodDate,
     string furnace,
     BlastFurnaceViewModel model)
 {
-    try
+    string query = @"
+        SELECT SUM(NET_WT)
+        FROM DEMO.T_LADLE_DETAILS
+        WHERE LADLE_FLEND_TIME >= :fromDate
+        AND LADLE_FLEND_TIME < :toDate
+        AND DESTINATION <> 'R'
+        AND FUR_NAME = :furnace";
+
+    decimal actual = 0;
+
+    using (OracleCommand cmd = new OracleCommand(query, con))
     {
-        string query = @"
-            SELECT ACTUAL, REPORTED, BALANCE
-            FROM DEMO.T_BF_PRODUCTION_TRACKING
-            WHERE TIMESTAMP = :prodDate
-            AND FURNACE = :furnace";
+        cmd.Parameters.Add("fromDate", OracleDbType.Date)
+            .Value = prodDate.AddHours(6);
 
-        using (OracleCommand cmd = new OracleCommand(query, con))
-        {
-            cmd.Parameters.Add("prodDate", OracleDbType.Date).Value = prodDate;
-            cmd.Parameters.Add("furnace", OracleDbType.Varchar2).Value = furnace;
+        cmd.Parameters.Add("toDate", OracleDbType.Date)
+            .Value = prodDate.AddDays(1).AddHours(6);
 
-            using (OracleDataReader dr = cmd.ExecuteReader())
-            {
-                if (dr.Read())
-                {
-                    decimal actual = dr["ACTUAL"] == DBNull.Value
-                        ? 0
-                        : Convert.ToDecimal(dr["ACTUAL"]);
+        cmd.Parameters.Add("furnace", OracleDbType.Varchar2)
+            .Value = furnace;
 
-                    decimal reported = dr["REPORTED"] == DBNull.Value
-                        ? 0
-                        : Convert.ToDecimal(dr["REPORTED"]);
+        object result = cmd.ExecuteScalar();
 
-                    decimal balance = dr["BALANCE"] == DBNull.Value
-                        ? 0
-                        : Convert.ToDecimal(dr["BALANCE"]);
-
-                    switch (furnace)
-                    {
-                        case "C":
-                            model.ActualC = actual;
-                            model.ReportedC = reported;
-                            model.BalanceC = balance;
-                            break;
-
-                        case "D":
-                            model.ActualD = actual;
-                            model.ReportedD = reported;
-                            model.BalanceD = balance;
-                            break;
-
-                        case "E":
-                            model.ActualE = actual;
-                            model.ReportedE = reported;
-                            model.BalanceE = balance;
-                            break;
-
-                        case "F":
-                            model.ActualF = actual;
-                            model.ReportedF = reported;
-                            model.BalanceF = balance;
-                            break;
-                    }
-                }
-            }
-        }
+        actual = result == DBNull.Value ? 0 : Convert.ToDecimal(result);
     }
-    catch (OracleException ex)
+
+    switch (furnace)
     {
-        // Oracle specific exception
-        throw new Exception(
-            $"Oracle DB Error while loading furnace {furnace}: {ex.Message}");
-    }
-    catch (Exception ex)
-    {
-        // General exception
-        throw new Exception(
-            $"Error while loading furnace {furnace}: {ex.Message}");
-    }
-    finally
-    {
-        // Optional logging / cleanup
+        case "C":
+            model.ActualC = actual;
+            break;
+
+        case "D":
+            model.ActualD = actual;
+            break;
+
+        case "E":
+            model.ActualE = actual;
+            break;
+
+        case "F":
+            model.ActualF = actual;
+            break;
     }
 }
