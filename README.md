@@ -1,38 +1,26 @@
-private void LoadLadleSummary(
-    OracleConnection con,
-    DateTime prodDate,
-    BlastFurnaceViewModel model)
-{
-    string query = @"
-        SELECT
-            NVL(SUM(CASE WHEN DESTINATION='LD1' THEN NET_WT END),0) LD1,
-            NVL(SUM(CASE WHEN DESTINATION='LD2' THEN NET_WT END),0) LD2,
-            NVL(SUM(CASE WHEN DESTINATION='LD3' THEN NET_WT END),0) LD3,
-            NVL(SUM(CASE WHEN DESTINATION='MRD' THEN NET_WT END),0) MRD,
-            NVL(SUM(FILL_STATUS),0) TP
-        FROM DEMO.T_LADLE_DETAILS
-        WHERE LADLE_FLEND_TIME >= :fromDate
-        AND LADLE_FLEND_TIME < :toDate
-        AND FUR_NAME IN ('C','D','E','F')";
+ public decimal? ActualC { get; set; }
+    public decimal? ReportedC { get; set; }
+    public decimal? BalanceC { get; set; }
 
-    using (OracleCommand cmd = new OracleCommand(query, con))
-    {
-        cmd.Parameters.Add("fromDate", OracleDbType.Date)
-            .Value = prodDate.AddHours(6);
+    public decimal? ActualD { get; set; }
+    public decimal? ReportedD { get; set; }
+    public decimal? BalanceD { get; set; }
 
-        cmd.Parameters.Add("toDate", OracleDbType.Date)
-            .Value = prodDate.AddDays(1).AddHours(6);
+    public decimal? ActualE { get; set; }
+    public decimal? ReportedE { get; set; }
+    public decimal? BalanceE { get; set; }
 
-        using (OracleDataReader dr = cmd.ExecuteReader())
-        {
-            if (dr.Read())
-            {
-                model.LD1Tons = Convert.ToDecimal(dr["LD1"]);
-                model.LD2Tons = Convert.ToDecimal(dr["LD2"]);
-                model.LD3Tons = Convert.ToDecimal(dr["LD3"]);
-                model.MRDTPTons = Convert.ToDecimal(dr["MRD"]);
-                model.NoOfTP = Convert.ToInt32(dr["TP"]);
-            }
-        }
-    }
-}
+    public decimal? ActualF { get; set; }
+    public decimal? ReportedF { get; set; }
+    public decimal? BalanceF { get; set; }
+
+    public decimal? DisplayActual { get; set; }
+    public decimal? DisplayReported { get; set; }
+    public decimal? DisplayBalance { get; set; }
+
+    public decimal? LD1Tons { get; set; }
+    public decimal? LD2Tons { get; set; }
+    public decimal? LD3Tons { get; set; }
+    public decimal? MRDTPTons { get; set; }
+
+    public int? NoOfTP { get; set; }
