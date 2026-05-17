@@ -1,50 +1,28 @@
+ <td>
+        <input type="text"
+               class="form-control reported"
+               id="REPORTED_E"
+               value="@Model.ReportedE"
+               data-original="@Model.ReportedE" />
+    </td>
+    $(document).on("blur", ".reported", function () {
 
-<tr>
-                                            <td><input type="text" class="form-control" id="FURNACE_E" readonly value="E" /></td>
-                                            <td><input type="text" class="form-control" id="ACTUAL_E" readonly /></td>
-                                            <td><input type="text" class="form-control" id="ACTUAL_E_TD" readonly /></td>
-                                            <td><input type="text" class="form-control" data-original="@model.ReportedC" id="REPORTED_E" /></td>
-                                            <td><input type="text" class="form-control" id="REPORTED_E_TD" readonly /></td>
-                                            <td><input type="text" class="form-control" id="BALANCE_E" readonly /></td> 
-                                        </tr>
-$(document).ready(function () {
+    let row = $(this).closest("tr");
 
-    // store server value as ORIGINAL reference
-    $("#REPORTED_C").attr(
-        "data-original",
-        $("#REPORTED_C").val()
-    );
+    let current = parseFloat($(this).val()) || 0;
 
-});
+    let old = parseFloat($(this).attr("data-old")) || 0;
 
-$("#REPORTED_C").on("blur", function () {
+    let diff = current - old;
 
-    // current value (user input)
-    let inputVal = parseFloat($(this).val()) || 0;
+    // update ToDate
+    let td = row.find("td:eq(4) input");
+    td.val((parseFloat(td.val()) || 0) + diff);
 
-    // original server value
-    let originalInput =
-        parseFloat($(this).attr("data-original")) || 0;
+    // update Balance
+    let bal = row.find("td:eq(5) input");
+    bal.val((parseFloat(bal.val()) || 0) - diff);
 
-    // difference
-    let diff = inputVal - originalInput;
-
-    // base values (fixed from DB)
-    let baseToDate =
-        parseFloat($("#REPORTED_C_TD").attr("data-base")) || 0;
-
-    let baseBalance =
-        parseFloat($("#BALANCE_C").attr("data-base")) || 0;
-
-    // update values
-    $("#REPORTED_C_TD").val(
-        Math.round(baseToDate + diff)
-    );
-
-    $("#BALANCE_C").val(
-        Math.round(baseBalance - diff)
-    );
-
-    // update new original (important for next edit)
-    $(this).attr("data-original", inputVal);
+    // update stored value
+    $(this).attr("data-old", current);
 });
