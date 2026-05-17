@@ -1,55 +1,31 @@
-<input type="text"
-       id="REPORTED_C"
-       class="form-control"
-       value="@Model.REPORTED_C"
-       data-original="@Model.REPORTED_C" />
-       <input type="text"
-       id="REPORTED_C_TD"
-       class="form-control"
-       value="@Model.REPORTED_C_TD"
-       data-base="@Model.REPORTED_C_TD"
-       readonly />
-       <input type="text"
-       id="REPORTED_C_TD"
-       class="form-control"
-       value="@Model.REPORTED_C_TD"
-       data-base="@Model.REPORTED_C_TD"
-       readonly />
+$("#REPORTED_C").on("blur", function () {
+            debugger;
+            // current value
+            let inputVal = parseFloat($(this).val()) || 0;
+            // original server value
+            let originalInput = parseFloat($(this).attr("data-original")) || 0;
 
-<input type="text"
-       id="BALANCE_C"
-       class="form-control"
-       value="@Model.BALANCE_C"
-       data-base="@Model.BALANCE_C"
-       readonly />
+            // difference
+            let diff = inputVal - originalInput;
 
-<input type="text"
-       id="BALANCE_C"
-       class="form-control"
-       value="@Model.BALANCE_C"
-       data-base="@Model.BALANCE_C"
-       readonly />
+            // base values
+            let baseToDate = parseFloat($("#REPORTED_C_TD").attr("data-base")) || 0;
 
-       $("#REPORTED_C").on("blur", function () {
+            let baseBalance = parseFloat($("#BALANCE_C").attr("data-base")) || 0;
 
-    // current value
-    let inputVal = parseFloat($(this).val()) || 0;
+            // update values
+            $("#REPORTED_C_TD").val(Math.round(baseToDate + diff));
+            $("#BALANCE_C").val(Math.round(baseBalance - diff));
 
-    // original server value
-    let originalInput = parseFloat($(this).attr("data-original")) || 0;
+            // update original for next edit
+            $(this).attr("data-original", inputVal);
+        });
 
-    // difference
-    let diff = inputVal - originalInput;
-
-    // base values
-    let baseToDate = parseFloat($("#REPORTED_C_TD").attr("data-base")) || 0;
-
-    let baseBalance = parseFloat($("#BALANCE_C").attr("data-base")) || 0;
-
-    // update values
-    $("#REPORTED_C_TD").val(Math.round(baseToDate + diff));
-    $("#BALANCE_C").val(Math.round(baseBalance - diff));
-
-    // update original for next edit
-    $(this).attr("data-original", inputVal);
-});
+         <tr>
+                                            <td><input type="text" class="form-control" id="FURNACE_C" readonly value="C" /></td>                                           
+                                            <td><input type="text" class="form-control" id="ACTUAL_C" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_C_TD" readonly /></td>
+                                            <td><input type="text" id="REPORTED_C" class="form-control" value="@Model.ReportedC"  data-original="@Model.ReportedC" />
+                                            <td><input type="text" id="REPORTED_C_TD" class="form-control" value="@Model.REPORTED_C_TD" data-base="@Model.REPORTED_C_TD" readonly /></td>                                           
+                                            <td><input type="text" id="BALANCE_C" class="form-control" value="@Model.BalanceC"  data-base="@Model.BalanceC"  readonly /></td>                                           
+                                        </tr>
