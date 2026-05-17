@@ -1,17 +1,48 @@
-$("#ACTUAL_C").val(Math.round(data.ActualC || 0));
-$("#ACTUAL_C_TD").val(Math.round(data.ACTUAL_C_TD || 0));
-$("#REPORTED_C").val(Math.round(data.ReportedC || 0));
-$("#REPORTED_C_TD").val(Math.round(data.REPORTED_C_TD || 0));
-$("#BALANCE_C").val(Math.round(data.BalanceC || 0));
+<script>
+       function Dis_GBF_TO_IBF_ReportData(lsSelectedFDate) {
+           $.ajax({
+               url:'@Url.Action("GET_GBF_IBF_ACTUAL_REPORT", "HML")',
+               type: 'GET',
+               data: { prodDate: lsSelectedFDate },
+               success: function (res) {
+                   if (!res.success) {
+                       alert(res.message);
+                       return;
+                   }
+                   res.data.Furnaces.forEach(function (item){                       
+                       if (item.FURNACE === "G") {
+                           $("#TXT_FURNACE_G").val(item.FURNACE);
+                           $("#TXT_ACTUAL_G").val(item.ACTUAL);
+                           $("#TXT_ACTUAL_G_TD").val(item.ACTUAL_TD);
+                           $("#TXT_RPT_G").val(item.REPORTED);
+                           $("#TXT_RPT_G_TD").val(item.REPORTED_TD);
+                           $("#TXT_BAL_G").val(item.BALANCE);
+                       }
+                       if (item.FURNACE === "H") {
+                           $("#TXT_FURNACE_H").val(item.FURNACE);
+                           $("#TXT_ACTUAL_H").val(item.ACTUAL);
+                           $("#TXT_ACTUAL_H_TD").val(item.ACTUAL_TD);
+                           $("#TXT_RPT_H").val(item.REPORTED);
+                           $("#TXT_RPT_H_TD").val(item.REPORTED_TD);
+                           $("#TXT_BAL_H").val(item.BALANCE);
+                       }
+                       if (item.FURNACE === "I") {
+                           $("#TXT_FURNACE_I").val(item.FURNACE);
+                           $("#TXT_ACTUAL_I").val(item.ACTUAL);
+                           $("#TXT_ACTUAL_I_TD").val(item.ACTUAL_TD);
+                           $("#TXT_RPT_I").val(item.REPORTED);
+                           $("#TXT_RPT_I_TD").val(item.REPORTED_TD);
+                           $("#TXT_BAL_I").val(item.BALANCE);
+                       }
 
-$("#ACTUAL_E").val(Math.round(data.ActualE || 0));
-$("#ACTUAL_E_TD").val(Math.round(data.ACTUAL_E_TD || 0));
-$("#REPORTED_E").val(Math.round(data.ReportedE || 0));
-$("#REPORTED_E_TD").val(Math.round(data.REPORTED_E_TD || 0));
-$("#BALANCE_E").val(Math.round(data.BalanceE || 0));
+                   });
 
-$("#ACTUAL_F").val(Math.round(data.ActualF || 0));
-$("#ACTUAL_F_TD").val(Math.round(data.ACTUAL_F_TD || 0));
-$("#REPORTED_F").val(Math.round(data.ReportedF || 0));
-$("#REPORTED_F_TD").val(Math.round(data.REPORTED_F_TD || 0));
-$("#BALANCE_F").val(Math.round(data.BalanceF || 0));
+               },
+
+               error: function () {
+                   alert("Error Loading Data");
+               }
+
+           });
+       }
+   </script>
