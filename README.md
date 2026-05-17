@@ -1,158 +1,218 @@
-[HttpPost]
-public JsonResult SaveBFProdData(List<BFViewModel> modelList)
-{
-    try
-    {
-        using (OracleConnection con =
-            new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
+<!DOCTYPE html>
+<html>
+<head>
 
-            for (int i = 0; i < modelList.Count; i++)
-            {
-                BFViewModel model = modelList[i];
+    <title>Production Breakup</title>
 
-                // ===== CHECK RECORD EXISTS =====
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
 
-                string checkQuery = @"
-                SELECT COUNT(*)
-                FROM TEST.T_BF_PRODUCTION_TRACKING
-                WHERE FURNACE = :FURNACE
-                AND TIMESTAMP = :TIMESTAMP";
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-                int count = 0;
+    <style>
 
-                using (OracleCommand cmd =
-                    new OracleCommand(checkQuery, con))
-                {
-                    cmd.BindByName = true;
-
-                    cmd.Parameters.Add("FURNACE",
-                        OracleDbType.Varchar2).Value =
-                        model.FURNACE;
-
-                    cmd.Parameters.Add("TIMESTAMP",
-                        OracleDbType.Date).Value =
-                        Convert.ToDateTime(model.PROD_DATE);
-
-                    count = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-
-                // ===== UPDATE =====
-
-                if (count > 0)
-                {
-                    string updateQuery = @"
-
-                    UPDATE TEST.T_BF_PRODUCTION_TRACKING
-
-                    SET
-
-                        ACTUAL = :ACTUAL,
-                        REPORTED = :REPORTED,
-                        BALANCE = :BALANCE
-
-                    WHERE
-
-                        FURNACE = :FURNACE
-                        AND TIMESTAMP = :TIMESTAMP";
-
-                    using (OracleCommand cmd =
-                        new OracleCommand(updateQuery, con))
-                    {
-                        cmd.BindByName = true;
-
-                        cmd.Parameters.Add("ACTUAL",
-                            OracleDbType.Decimal).Value =
-                            model.ACTUAL;
-
-                        cmd.Parameters.Add("REPORTED",
-                            OracleDbType.Decimal).Value =
-                            model.REPORTED;
-
-                        cmd.Parameters.Add("BALANCE",
-                            OracleDbType.Decimal).Value =
-                            model.BALANCE;
-
-                        cmd.Parameters.Add("FURNACE",
-                            OracleDbType.Varchar2).Value =
-                            model.FURNACE;
-
-                        cmd.Parameters.Add("TIMESTAMP",
-                            OracleDbType.Date).Value =
-                            Convert.ToDateTime(model.PROD_DATE);
-
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-
-                // ===== INSERT =====
-
-                else
-                {
-                    string insertQuery = @"
-
-                    INSERT INTO TEST.T_BF_PRODUCTION_TRACKING
-                    (
-                        FURNACE,
-                        TIMESTAMP,
-                        ACTUAL,
-                        REPORTED,
-                        BALANCE
-                    )
-
-                    VALUES
-                    (
-                        :FURNACE,
-                        :TIMESTAMP,
-                        :ACTUAL,
-                        :REPORTED,
-                        :BALANCE
-                    )";
-
-                    using (OracleCommand cmd =
-                        new OracleCommand(insertQuery, con))
-                    {
-                        cmd.BindByName = true;
-
-                        cmd.Parameters.Add("FURNACE",
-                            OracleDbType.Varchar2).Value =
-                            model.FURNACE;
-
-                        cmd.Parameters.Add("TIMESTAMP",
-                            OracleDbType.Date).Value =
-                            Convert.ToDateTime(model.PROD_DATE);
-
-                        cmd.Parameters.Add("ACTUAL",
-                            OracleDbType.Decimal).Value =
-                            model.ACTUAL;
-
-                        cmd.Parameters.Add("REPORTED",
-                            OracleDbType.Decimal).Value =
-                            model.REPORTED;
-
-                        cmd.Parameters.Add("BALANCE",
-                            OracleDbType.Decimal).Value =
-                            model.BALANCE;
-
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-            }
+        body {
+            background: #f4f7fb;
         }
 
-        return Json(new
-        {
-            success = true,
-            message = "Data Saved Successfully"
+        .main-box {
+            background: linear-gradient(to bottom,#003399,#00bfff);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .title {
+            color: white;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        table {
+            background: white;
+        }
+
+        th {
+            background: #003399 !important;
+            color: white !important;
+            vertical-align: middle;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        .reportedOnDate {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .reportedToDate,
+        .balance {
+            font-weight: bold;
+        }
+
+        .balance-negative {
+            color: red;
+        }
+
+        .balance-positive {
+            color: green;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="main-box">
+
+            <div class="title">
+                Production Breakup
+            </div>
+
+            <table class="table table-bordered text-center">
+
+                <thead>
+                    <tr>
+                        <th>Furnace</th>
+                        <th>Actual OnDate</th>
+                        <th>Actual ToDate</th>
+                        <th>Reported OnDate</th>
+                        <th>Reported ToDate</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <!-- Row 1 -->
+                    <tr>
+
+                        <td><b>C</b></td>
+
+                        <td>1698</td>
+
+                        <td class="actualToDate">
+                            5792
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   class="form-control reportedOnDate"
+                                   value="0" />
+                        </td>
+
+                        <td class="reportedToDate"
+                            data-old="5600">
+                            5600
+                        </td>
+
+                        <td class="balance balance-positive"
+                            data-old="192">
+                            192
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Row 2 -->
+                    <tr>
+
+                        <td><b>E</b></td>
+
+                        <td>1220</td>
+
+                        <td class="actualToDate">
+                            19698
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   class="form-control reportedOnDate"
+                                   value="0" />
+                        </td>
+
+                        <td class="reportedToDate"
+                            data-old="19700">
+                            19700
+                        </td>
+
+                        <td class="balance balance-negative"
+                            data-old="-2">
+                            -2
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        $(document).on("input", ".reportedOnDate", function () {
+
+            let row = $(this).closest("tr");
+
+            // User entered value
+            let enteredValue =
+                parseFloat($(this).val()) || 0;
+
+            // Original Reported ToDate
+            let originalReportedToDate =
+                parseFloat(
+                    row.find(".reportedToDate").attr("data-old")
+                ) || 0;
+
+            // Original Balance
+            let originalBalance =
+                parseFloat(
+                    row.find(".balance").attr("data-old")
+                ) || 0;
+
+            // Add entered value to Reported ToDate
+            let newReportedToDate =
+                originalReportedToDate + enteredValue;
+
+            // Subtract entered value from Balance
+            let newBalance =
+                originalBalance - enteredValue;
+
+            // Set new Reported ToDate
+            row.find(".reportedToDate")
+                .text(newReportedToDate);
+
+            // Set new Balance
+            row.find(".balance")
+                .text(newBalance);
+
+            // Balance color change
+            row.find(".balance")
+                .removeClass("balance-positive balance-negative");
+
+            if (newBalance < 0) {
+                row.find(".balance")
+                    .addClass("balance-negative");
+            }
+            else {
+                row.find(".balance")
+                    .addClass("balance-positive");
+            }
+
         });
-    }
-    catch (Exception ex)
-    {
-        return Json(new
-        {
-            success = false,
-            message = ex.Message
-        });
-    }
-}
+
+    </script>
+
+</body>
+</html>
