@@ -1,3 +1,12 @@
+
+<tr>
+                                            <td><input type="text" class="form-control" id="FURNACE_E" readonly value="E" /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_E" readonly /></td>
+                                            <td><input type="text" class="form-control" id="ACTUAL_E_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" data-original="@model.ReportedC" id="REPORTED_E" /></td>
+                                            <td><input type="text" class="form-control" id="REPORTED_E_TD" readonly /></td>
+                                            <td><input type="text" class="form-control" id="BALANCE_E" readonly /></td> 
+                                        </tr>
 $(document).ready(function () {
 
     // store server value as ORIGINAL reference
