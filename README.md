@@ -1,93 +1,127 @@
-function SaveBFProdData() {
+[HttpPost]
+public JsonResult SaveBFProdData(List<BFViewModel> modelList)
+{
+    try
+    {
+        using (OracleConnection con =
+            new OracleConnection(iMonitorWebUtils.msConRWString))
+        {
+            con.Open();
 
-    var modelList = [];
+            for (int i = 0; i < modelList.Count; i++)
+            {
+                BFViewModel model = modelList[i];
 
-    var furnaces1 = ["C", "E", "F"];
+                string query = @"
 
-    for (var i = 0; i < furnaces1.length; i++) {
+                MERGE INTO TEST.T_BF_PRODUCTION t
 
-        var f = furnaces1[i];
+                USING
+                (
+                    SELECT
+                        :FURNACE AS FURNACE,
+                        :PROD_DATE AS PROD_DATE
+                    FROM dual
+                ) s
 
-        var model = {
+                ON
+                (
+                    t.FURNACE = s.FURNACE
+                    AND t.PROD_DATE = s.PROD_DATE
+                )
 
-            FURNACE: $("#FURNACE_" + f).val(),
+                WHEN MATCHED THEN
 
-            ACTUAL: Math.round(parseFloat($("#ACTUAL_" + f).val()) || 0),
+                    UPDATE SET
 
-            ACTUAL_TD: Math.round(parseFloat($("#ACTUAL_" + f + "_TD").val()) || 0),
+                        ACTUAL         = :ACTUAL,
+                        ACTUAL_TD      = :ACTUAL_TD,
 
-            REPORTED: Math.round(parseFloat($("#REPORTED_" + f).val()) || 0),
+                        REPORTED       = :REPORTED,
+                        REPORTED_TD    = :REPORTED_TD,
 
-            REPORTED_TD: Math.round(parseFloat($("#REPORTED_" + f + "_TD").val()) || 0),
+                        BALANCE        = :BALANCE
 
-            BALANCE: Math.round(parseFloat($("#BALANCE_" + f).val()) || 0),
+                WHEN NOT MATCHED THEN
 
-            PROD_DATE: lsSelectedFDate
-        };
+                    INSERT
+                    (
+                        FURNACE,
+                        PROD_DATE,
 
-        modelList.push(model);
-    }
+                        ACTUAL,
+                        ACTUAL_TD,
 
-    // ===== G H I =====
+                        REPORTED,
+                        REPORTED_TD,
 
-    var furnaces2 = ["G", "H", "I"];
+                        BALANCE
+                    )
 
-    for (var j = 0; j < furnaces2.length; j++) {
+                    VALUES
+                    (
+                        :FURNACE,
+                        :PROD_DATE,
 
-        var f = furnaces2[j];
+                        :ACTUAL,
+                        :ACTUAL_TD,
 
-        var model = {
+                        :REPORTED,
+                        :REPORTED_TD,
 
-            FURNACE: $("#TXT_FURNACE_" + f).val(),
+                        :BALANCE
+                    )";
 
-            ACTUAL: Math.round(parseFloat($("#TXT_ACTUAL_" + f).val()) || 0),
+                using (OracleCommand cmd =
+                    new OracleCommand(query, con))
+                {
+                    cmd.BindByName = true;
 
-            ACTUAL_TD: Math.round(parseFloat($("#TXT_ACTUAL_" + f + "_TD").val()) || 0),
+                    cmd.Parameters.Add("FURNACE",
+                        OracleDbType.Varchar2).Value =
+                        model.FURNACE;
 
-            REPORTED: Math.round(parseFloat($("#TXT_RPT_" + f).val()) || 0),
+                    cmd.Parameters.Add("PROD_DATE",
+                        OracleDbType.Date).Value =
+                        Convert.ToDateTime(model.PROD_DATE);
 
-            REPORTED_TD: Math.round(parseFloat($("#TXT_RPT_" + f + "_TD").val()) || 0),
+                    cmd.Parameters.Add("ACTUAL",
+                        OracleDbType.Decimal).Value =
+                        model.ACTUAL;
 
-            BALANCE: Math.round(parseFloat($("#TXT_BAL_" + f).val()) || 0),
+                    cmd.Parameters.Add("ACTUAL_TD",
+                        OracleDbType.Decimal).Value =
+                        model.ACTUAL_TD;
 
-            PROD_DATE: lsSelectedFDate
-        };
+                    cmd.Parameters.Add("REPORTED",
+                        OracleDbType.Decimal).Value =
+                        model.REPORTED;
 
-        modelList.push(model);
-    }
+                    cmd.Parameters.Add("REPORTED_TD",
+                        OracleDbType.Decimal).Value =
+                        model.REPORTED_TD;
 
-    console.log(modelList);
+                    cmd.Parameters.Add("BALANCE",
+                        OracleDbType.Decimal).Value =
+                        model.BALANCE;
 
-    $.ajax({
-
-        url: '/HML/SaveBFProdData',
-
-        type: 'POST',
-
-        data: JSON.stringify(modelList),
-
-        contentType: 'application/json; charset=utf-8',
-
-        dataType: 'json',
-
-        success: function (res) {
-
-            if (res.success) {
-
-                alert("Saved Successfully");
-
+                    cmd.ExecuteNonQuery();
+                }
             }
-            else {
-
-                alert(res.message);
-            }
-        },
-
-        error: function (xhr) {
-
-            alert("Server Error");
-
-            console.log(xhr.responseText);
         }
-    });
+
+        return Json(new
+        {
+            success = true,
+            message = "Data Saved Successfully"
+        });
+    }
+    catch (Exception ex)
+    {
+        return Json(new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
 }
