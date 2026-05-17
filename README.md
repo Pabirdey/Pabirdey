@@ -9,6 +9,19 @@
        value="@Model.REPORTED_C_TD"
        data-base="@Model.REPORTED_C_TD"
        readonly />
+       <input type="text"
+       id="REPORTED_C_TD"
+       class="form-control"
+       value="@Model.REPORTED_C_TD"
+       data-base="@Model.REPORTED_C_TD"
+       readonly />
+
+<input type="text"
+       id="BALANCE_C"
+       class="form-control"
+       value="@Model.BALANCE_C"
+       data-base="@Model.BALANCE_C"
+       readonly />
 
 <input type="text"
        id="BALANCE_C"
