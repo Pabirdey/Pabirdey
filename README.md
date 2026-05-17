@@ -1,1 +1,1 @@
-data-original="@(Model.ReportedC.HasValue ? Model.ReportedC.Value : 0)"
+let originalInput = Number($(this).attr("data-original"));
