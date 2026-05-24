@@ -1,14 +1,1 @@
-.small-arrow {
-    font-size: 7px !important;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.mgClaybutton {
-    width: 18px !important;
-    height: 18px !important;
-    padding: 0 !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+  @Html.ActionLink("Back", "BF_Prod ", "BF_Production", new { bf = @urlBF }, new { @class = "btn btn-primary Back" })
