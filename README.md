@@ -1,13 +1,72 @@
-	select count(*) into VCount from DEMO.T_LADLE Where DATE_TIME=:BLK_CONTROL.DATE_TIME_PROD_F and Plant='G';
-			if VCount>0 then
-				 UPDATE DEMO.T_LADLE SET DATE_TIME=:BLK_CONTROL.DATE_TIME,
-				        LD1_TONS=NULL,LD2_TONS=NULL,LD3_TONS=NULL,
-				        MRDTP_TONS=NULL,NOOFTP=:BLK_CONTROL.NOOFTP_G
-				  WHERE DATE_TIME=:BLK_CONTROL.DATE_TIME_PROD_F and Plant='G';
-			ELSE
-				  INSERT INTO DEMO.T_LADLE(DATE_TIME,LD1_TONS,LD2_TONS,LD3_TONS,MRDTP_TONS,NOOFTP,LD1_TONS_ACTUAL,LD2_TONS_ACTUAL,LD3_TONS_ACTUAL,
-				         MRDTP_TONS_ACTUAL,PLANT)
-				         VALUES(:BLK_CONTROL.DATE_TIME,NULL,NULL,NULL,NULL,
-				                :BLK_CONTROL.NOOFTP_G,:BLK_CONTROL.LD1_TONS_ACTUAL_G,:BLK_CONTROL.LD2_TONS_ACTUAL_G,:BLK_CONTROL.LD3_TONS_ACTUAL_G,
-					              :BLK_CONTROL.MRDTP_TONS_ACTUAL_G,'G');
-			END IF;
+  [HttpPost]
+        public JsonResult SaveBFProdData(List<BFViewModel> modelList)
+        {
+            try
+            {
+                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+                {
+                    con.Open();
+                    for (int i = 0; i < modelList.Count; i++)
+                    {
+                        BFViewModel model = modelList[i];
+                        string checkQuery = @"SELECT COUNT(*) FROM DEMO.T_BF_PRODUCTION_TRACKING  WHERE FURNACE=:FURNACE  AND TIMESTAMP=:TIMESTAMP";
+                        int count = 0;
+                        using (OracleCommand cmd = new OracleCommand(checkQuery, con))
+                        {
+                            cmd.BindByName = true;
+                            cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = model.FURNACE;
+                            cmd.Parameters.Add("TIMESTAMP", OracleDbType.Date).Value = Convert.ToDateTime(model.PROD_DATE);
+                            count = Convert.ToInt32(cmd.ExecuteScalar());
+                        }
+                        if (count > 0)
+                        {
+                            string updateQuery = @"UPDATE DEMO.T_BF_PRODUCTION_TRACKING
+                                    SET
+                                        ACTUAL = :ACTUAL,
+                                        REPORTED = :REPORTED,
+                                        BALANCE = :BALANCE
+                                    WHERE  FURNACE=:FURNACE AND TIMESTAMP=:TIMESTAMP";
+                            using (OracleCommand cmd = new OracleCommand(updateQuery, con))
+                            {
+                                cmd.BindByName = true;
+                                cmd.Parameters.Add("ACTUAL", OracleDbType.Decimal).Value = model.ACTUAL;
+                                cmd.Parameters.Add("REPORTED", OracleDbType.Decimal).Value = model.REPORTED;
+                                cmd.Parameters.Add("BALANCE", OracleDbType.Decimal).Value = model.BALANCE;
+                                cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = model.FURNACE;
+                                cmd.Parameters.Add("TIMESTAMP", OracleDbType.Date).Value = Convert.ToDateTime(model.PROD_DATE);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            string insertQuery = @"INSERT INTO DEMO.T_BF_PRODUCTION_TRACKING(FURNACE,TIMESTAMP,ACTUAL,REPORTED,BALANCE)
+                                                VALUES(:FURNACE,:TIMESTAMP,:ACTUAL,:REPORTED,:BALANCE)";
+                            using (OracleCommand cmd = new OracleCommand(insertQuery, con))
+                            {
+                                cmd.BindByName = true;
+                                cmd.Parameters.Add("FURNACE", OracleDbType.Varchar2).Value = model.FURNACE;
+                                cmd.Parameters.Add("TIMESTAMP", OracleDbType.Date).Value = Convert.ToDateTime(model.PROD_DATE);
+                                cmd.Parameters.Add("ACTUAL", OracleDbType.Decimal).Value = model.ACTUAL;
+                                cmd.Parameters.Add("REPORTED", OracleDbType.Decimal).Value = model.REPORTED;
+                                cmd.Parameters.Add("BALANCE", OracleDbType.Decimal).Value = model.BALANCE;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Data Saved Successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
