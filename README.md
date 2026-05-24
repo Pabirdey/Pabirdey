@@ -1,13 +1,5 @@
- let urlBF = '@urlBF';
-    var bf = '@ViewBag.bf';
-    if (bf !== "") {
-        switch (bf) {
-            case 'BFCTRL':               
-                $(".reported_G").prop("readonly", true);
-                $(".reported_H").prop("readonly", true);
-                $(".reported_I").prop("readonly", true);
-                $(".btn-box-wrapper").show();
-                $(".CallProcedure").show();
-                $(".RawMatCons").show();
-                break;
-@Html.ActionLink("Back", "BF_Prod ", "BF_Production", new { bf = @urlBF }, new { @class = "btn btn-primary Back" })
+ .form-control:not(.reported_C):not(.reported_E):not(.reported_F):not(.reported_G):not(.reported_H):not(.reported_I) {
+        background-color: #f4f4f4;        
+        color: #6c757d;
+        font-weight: bold;
+        }
