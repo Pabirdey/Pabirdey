@@ -1,2 +1,2 @@
- CAST_ST_TIME = dr["CAST_ST_TIME"].ToString(),
-                        CAST_END_TIME = dr["CAST_END_TIME"].ToString(),
+CAST_ST_TIME = Convert.ToDateTime(dr["CAST_ST_TIME"]).ToString("HH:mm");
+CAST_END_TIME = Convert.ToDateTime(dr["CAST_END_TIME"]).ToString("HH:mm");
