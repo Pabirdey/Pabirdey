@@ -1,13 +1,21 @@
-function BindTable(data) {
-
-    $("#tblBody").empty();
-
-    // Data found
-    if (data.length > 0) {
-
-        $.each(data, function (i, item) {
-
-            var row = `<tr>
+ <script>
+        function Display_Granshot_Details() {
+            var shift = $("#ddlshift").val();
+            $.ajax({
+                url: '/Get_Granshot_Details/Granshot',
+                type: 'GET',
+                data: { pdate: lsSelectedFDate, pshift: shift },
+                success: function (result) {
+                    BindTable(result);
+                }
+            });
+        }
+        function BindTable(data) {
+            $("#tblBody").empty();
+            // Data found
+            if (data.length > 0) {
+                $.each(data, function (i, item) {
+                    var row = `<tr>
                 <td><input type="text" class="form-control castno" value="${item.CAST_NO || ''}"></td>
                 <td><input type="text" class="form-control" value="${item.CAST_ST_TIME || ''}"></td>
                 <td><input type="text" class="form-control" value="${item.CAST_END_TIME || ''}"></td>
@@ -25,15 +33,15 @@ function BindTable(data) {
                 <td><button type="button">Delete</button></td>
             </tr>`;
 
-            $("#tblBody").append(row);
-        });
-    }
-    else {
+                    $("#tblBody").append(row);
+                });
+            }
+            else {
 
-        // No data found - show 8 blank rows
-        for (var i = 1; i <= 8; i++) {
+                // No data found - show 8 blank rows
+                for (var i = 1; i <= 8; i++) {
 
-            var row = `<tr>
+                    var row = `<tr>
                 <td><input type="text" class="form-control"></td>
                 <td><input type="text" class="form-control"></td>
                 <td><input type="text" class="form-control"></td>
@@ -51,7 +59,10 @@ function BindTable(data) {
                 <td><button type="button">Delete</button></td>
             </tr>`;
 
-            $("#tblBody").append(row);
+                    $("#tblBody").append(row);
+                }
+            }
         }
-    }
-}
+
+
+    </script>
