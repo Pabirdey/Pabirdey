@@ -1,14 +1,8 @@
 .table-input {
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 0 3px !important;
+    font-size: 12px !important;
     border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent;
-    width: 100%;
-    padding: 2px;
-}
-
-.table-input:focus {
-    border: none !important;
-    outline: none !important;
     box-shadow: none !important;
 }
