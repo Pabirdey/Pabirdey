@@ -1,47 +1,57 @@
-[HttpGet]
-public JsonResult GetGranShotDetails(string txtdt, string txtshift, string txtfur)
-{
-    List<LadleDetailsModel> list = new List<LadleDetailsModel>();
+function BindTable(data) {
 
-    using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-    {
-        con.Open();
+    $("#tblBody").empty();
 
-        string sql = @"SELECT *
-                       FROM IMTG.T_GRANSHOT_DETAILS
-                       WHERE TIMESTAMP = TO_DATE(:txtdt,'DD-MM-YYYY')
-                       AND SHIFT = :txtshift
-                       AND AREA = :txtfur
-                       ORDER BY CAST_NO";
+    // Data found
+    if (data.length > 0) {
 
-        OracleCommand cmd = new OracleCommand(sql, con);
-        cmd.Parameters.Add(":txtdt", txtdt);
-        cmd.Parameters.Add(":txtshift", txtshift);
-        cmd.Parameters.Add(":txtfur", txtfur);
+        $.each(data, function (i, item) {
 
-        OracleDataReader dr = cmd.ExecuteReader();
+            var row = `<tr>
+                <td><input type="text" class="form-control castno" value="${item.CAST_NO || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.CAST_ST_TIME || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.CAST_END_TIME || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.TRP_NO || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.LADLE_FLST_TIME || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.LADLE_FLEND_TIME || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.ARRIVED_FROM || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.GROSS_WT || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.TARE_WT || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.NET_WT || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.POURING_RATE || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.HMT || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.REASON_POURING || ''}"></td>
+                <td><input type="text" class="form-control" value="${item.SEQ_NO || ''}"></td>
+                <td><button type="button">Delete</button></td>
+            </tr>`;
 
-        while (dr.Read())
-        {
-            list.Add(new LadleDetailsModel
-            {
-                CAST_NO = Convert.ToDecimal(dr["CAST_NO"]),
-                CAST_ST_TIME = dr["CAST_ST_TIME"].ToString(),
-                CAST_END_TIME = dr["CAST_END_TIME"].ToString(),
-                TRP_NO = dr["TRP_NO"].ToString(),
-                LADLE_FLST_TIME = dr["LADLE_FLST_TIME"].ToString(),
-                LADLE_FLEND_TIME = dr["LADLE_FLEND_TIME"].ToString(),
-                ARRIVED_FROM = dr["ARRIVED_FROM"].ToString(),
-                GROSS_WT = dr["GROSS_WT"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["GROSS_WT"]),
-                TARE_WT = dr["TARE_WT"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["TARE_WT"]),
-                NET_WT = dr["NET_WT"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NET_WT"]),
-                POURING_RATE = dr["POURING_RATE"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["POURING_RATE"]),
-                HMT = dr["HMT"].ToString(),
-                REASON_POURING = dr["REASON_POURING"].ToString(),
-                SEQ_NO = dr["SEQ_NO"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["SEQ_NO"])
-            });
+            $("#tblBody").append(row);
+        });
+    }
+    else {
+
+        // No data found - show 8 blank rows
+        for (var i = 1; i <= 8; i++) {
+
+            var row = `<tr>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><button type="button">Delete</button></td>
+            </tr>`;
+
+            $("#tblBody").append(row);
         }
     }
-
-    return Json(list, JsonRequestBehavior.AllowGet);
 }
