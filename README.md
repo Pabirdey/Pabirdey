@@ -1,9 +1,16 @@
- function BindTable(data) {
-            $("#tblBody").empty();
-            // Data found
-            if (data.length > 0) {
-                $.each(data, function (i, item) {
-                    var row = `<tr>
+function BindTable(data) {
+
+    $("#tblBody").empty();
+
+    var totalRows = 15;
+    var dataCount = data.length;
+
+    // Bind existing data
+    if (dataCount > 0) {
+
+        $.each(data, function (i, item) {
+
+            var row = `<tr>
                 <td><input type="text" class="table-input" value="${item.CAST_NO || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.CAST_ST_TIME || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.CAST_END_TIME || ''}"></td>
@@ -21,31 +28,42 @@
                 <td><button type="button">Delete</button></td>
             </tr>`;
 
-                    $("#tblBody").append(row);
-                });
-            }
-            else {             
-                for (var i = 1; i <= 8; i++) {
+            $("#tblBody").append(row);
+        });
 
-                    var row = `<tr>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><input type="text" class="table-input"></td>
-                <td><button type="button">Delete</button></td>
-            </tr>`;
-
-                    $("#tblBody").append(row);
-                }
-            }
+        // Add blank rows up to 15
+        for (var i = dataCount; i < totalRows; i++) {
+            AddBlankRow();
         }
+    }
+    else {
+
+        // No data, create 15 blank rows
+        for (var i = 0; i < totalRows; i++) {
+            AddBlankRow();
+        }
+    }
+}
+
+function AddBlankRow() {
+
+    var row = `<tr>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><input type="text" class="table-input"></td>
+        <td><button type="button">Delete</button></td>
+    </tr>`;
+
+    $("#tblBody").append(row);
+}
