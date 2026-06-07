@@ -5,7 +5,6 @@ function BindTable(data) {
     var totalRows = 15;
     var dataCount = data.length;
 
-    // Bind existing data
     if (dataCount > 0) {
 
         $.each(data, function (i, item) {
@@ -17,7 +16,16 @@ function BindTable(data) {
                 <td><input type="text" class="table-input" value="${item.TRP_NO || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.LADLE_FLST_TIME || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.LADLE_FLEND_TIME || ''}"></td>
-                <td><input type="text" class="table-input" value="${item.ARRIVED_FROM || ''}"></td>
+
+                <td>
+                    <select class="table-input arrivedFrom">
+                        <option value="">Select</option>
+                        <option value="C" ${item.ARRIVED_FROM == 'C' ? 'selected' : ''}>C</option>
+                        <option value="E" ${item.ARRIVED_FROM == 'E' ? 'selected' : ''}>E</option>
+                        <option value="F" ${item.ARRIVED_FROM == 'F' ? 'selected' : ''}>F</option>
+                    </select>
+                </td>
+
                 <td><input type="text" class="table-input" value="${item.GROSS_WT || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.TARE_WT || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.NET_WT || ''}"></td>
@@ -25,7 +33,7 @@ function BindTable(data) {
                 <td><input type="text" class="table-input" value="${item.HMT || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.REASON_POURING || ''}"></td>
                 <td><input type="text" class="table-input" value="${item.SEQ_NO || ''}"></td>
-                <td><button type="button">Delete</button></td>
+                <td><button type="button" class="btnDelete">Delete</button></td>
             </tr>`;
 
             $("#tblBody").append(row);
@@ -33,37 +41,75 @@ function BindTable(data) {
 
         // Add blank rows up to 15
         for (var i = dataCount; i < totalRows; i++) {
-            AddBlankRow();
+
+            var blankRow = `<tr>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+
+                <td>
+                    <select class="table-input arrivedFrom">
+                        <option value="">Select</option>
+                        <option value="C">C</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                    </select>
+                </td>
+
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><button type="button" class="btnDelete">Delete</button></td>
+            </tr>`;
+
+            $("#tblBody").append(blankRow);
         }
     }
     else {
 
         // No data, create 15 blank rows
         for (var i = 0; i < totalRows; i++) {
-            AddBlankRow();
+
+            var blankRow = `<tr>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+
+                <td>
+                    <select class="table-input arrivedFrom">
+                        <option value="">Select</option>
+                        <option value="C">C</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                    </select>
+                </td>
+
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><button type="button" class="btnDelete">Delete</button></td>
+            </tr>`;
+
+            $("#tblBody").append(blankRow);
         }
     }
 }
 
-function AddBlankRow() {
-
-    var row = `<tr>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><input type="text" class="table-input"></td>
-        <td><button type="button">Delete</button></td>
-    </tr>`;
-
-    $("#tblBody").append(row);
-}
+// Delete row
+$(document).on("click", ".btnDelete", function () {
+    $(this).closest("tr").remove();
+});
