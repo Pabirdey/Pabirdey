@@ -1,18 +1,15 @@
-$.ajax({
-    url: '/HML/GetProductionSummary',
-    type: 'GET',
-    data: { txtdt: $("#txtDate").val() },
-    success: function (data) {
+$(document).ready(function () {
 
-        $("#txtLD1C").val(data.LD1C);
-        $("#txtLD2C").val(data.LD2C);
-        $("#txtLD3C").val(data.LD3C);
+    var now = new Date();
+    var hour = now.getHours();
 
-        $("#txtLD1E").val(data.LD1E);
-        $("#txtLD2E").val(data.LD2E);
+    $("#ddlshift").val(
+        hour >= 22 || hour < 6 ? "C" :
+        hour >= 14 ? "B" : "A"
+    );
 
-        $("#txtLD1TOT").val(data.LD1TOT);
-        $("#txtLD2TOT").val(data.LD2TOT);
-        $("#txtLD3TOT").val(data.LD3TOT);
-    }
+    if (hour < 6)
+        now.setDate(now.getDate() - 1);
+
+    $("#txtDate").val(now.toLocaleDateString('en-GB'));
 });
