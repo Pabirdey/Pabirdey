@@ -1,47 +1,40 @@
-let lsSelectedFDate;
+[HttpGet]
+public JsonResult GetNextCastNo()
+{
+    string castNo = "";
 
-$(document).ready(function () {
+    using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
+    {
+        con.Open();
 
-    var now = new Date();
-    var hour = now.getHours();
+        string sql = @"SELECT NVL(MAX(CAST_NO),0) + 1 AS NEXT_CAST_NO
+                       FROM T_GRANSHOT_DETAILS";
 
-    $("#ddlshift").val(
-        hour >= 22 || hour < 6 ? "C" :
-        hour >= 14 ? "B" : "A"
-    );
+        OracleCommand cmd = new OracleCommand(sql, con);
 
-    if (hour < 6)
-        now.setDate(now.getDate() - 1);
+        castNo = cmd.ExecuteScalar().ToString();
+    }
 
-    // Set selected date
-    lsSelectedFDate = now.toLocaleDateString('en-GB');
+    return Json(castNo, JsonRequestBehavior.AllowGet);
+}
 
-    $("#currDate-value").text(lsSelectedFDate);
+function GenerateRow() {
 
-    $('#hiddenDate').datepicker({
-        format: "dd/mm/yyyy",
-        autoclose: true,
-        todayHighlight: true
-    }).datepicker('setDate', lsSelectedFDate);
+    $.ajax({
+        url: '/Granshot/GetNextCastNo',
+        type: 'GET',
+        success: function (castNo) {
 
-    $('#tbFDatePick').on('click', function (e) {
-        e.preventDefault();
-        $('#hiddenDate').datepicker('show');
+            var row = `
+            <tr>
+                <td class="castno">${castNo}</td>
+                <td><input type="time" class="form-control" /></td>
+                <td><input type="time" class="form-control" /></td>
+                <td><input type="text" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger">Delete</button></td>
+            </tr>`;
+
+            $("#tblBody").append(row);
+        }
     });
-
-    $('#hiddenDate').on('changeDate', function (e) {
-        lsSelectedFDate = e.format('dd/MM/yyyy');
-        $('#currDate-value').text(lsSelectedFDate);
-
-        Display_Granshot_Details();
-        DisplayProductionSummary();
-    });
-
-    $('#ddlshift').on('change', function () {
-        Display_Granshot_Details();
-        DisplayProductionSummary();
-    });
-
-    Display_Granshot_Details();
-    DisplayProductionSummary();
-});
+}
