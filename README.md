@@ -1,44 +1,89 @@
- <td>
-                    <select class ="table-input arrivedFrom">
-                        <option value=""></option>
-                        <option value="C" ${item.ARRIVED_FROM === 'C' ? 'selected': ''}>C</option>
-                        <option value="E" ${item.ARRIVED_FROM === 'E' ? 'selected': ''}>E</option>
-                        <option value="F" ${item.ARRIVED_FROM === 'F' ? 'selected': ''}>F</option>
-                        <option value="C" ${item.ARRIVED_FROM === 'G' ? 'selected': ''}>G</option>
-                        <option value="E" ${item.ARRIVED_FROM === 'H' ? 'selected': ''}>H</option>
-                        <option value="F" ${item.ARRIVED_FROM === 'I' ? 'selected': ''}>I</option>
-                    </select>
-               </td>
-                 $(document).on("change", ".arrivedFrom", function () {
-        var row = $(this).closest("tr");
-        var arrivedFrom = $(this).val();               
-        debugger;
-        $.ajax({
-            url: '/Granshot/CalculateLadle',
-            type: 'POST',
-            data: {
-                txtdate: $("#hiddenDate").val(),
-                ddlshift: $("#ddlshift").val(),
-                TRP_NO: row.find("td:eq(3) input").val(),
-                LADLE_FLST_TIME: row.find("td:eq(4) input").val(),
-                LADLE_FLEND_TIME: row.find("td:eq(5) input").val(),
-                ARRIVED_FROM: arrivedFrom
-            },
-            success: function (response) {
-                if (response.success) {
-                    row.find("td:eq(7) input").val(response.data.GROSS_WT);
-                    row.find("td:eq(8) input").val(response.data.TARE_WT);
-                    row.find("td:eq(9) input").val(response.data.NET_WT);
-                    row.find("td:eq(10) input").val(response.data.POURING_RATE);
-                    row.find("td:eq(11) input").val(response.data.HMT);
-                }
-                else {
-                    alert(response.message);
-                }
-            },
-            error: function () {
-                alert("Error occurred");
-            }
-        });
+$("#tblBody tr").each(function () {
 
+    var castStart  = $(this).find(".castStart").val();
+    var castEnd    = $(this).find(".castEnd").val();
+    var ladleStart = $(this).find(".ladleStart").val();
+    var ladleEnd   = $(this).find(".ladleEnd").val();
+
+    var castStartDT  = castStart  ? GetDateTime(castStart) : null;
+    var castEndDT    = castEnd    ? GetDateTime(castEnd) : null;
+    var ladleStartDT = ladleStart ? GetDateTime(ladleStart) : null;
+    var ladleEndDT   = ladleEnd   ? GetDateTime(ladleEnd) : null;
+
+    console.log(castStartDT);
+    console.log(castEndDT);
+    console.log(ladleStartDT);
+    console.log(ladleEndDT);
+
+});
+
+<tr>
+    <td><input type="time" class="castStart"></td>
+    <td><input type="time" class="castEnd"></td>
+    <td><input type="time" class="ladleStart"></td>
+    <td><input type="time" class="ladleEnd"></td>
+</tr>
+$("#btnSave").click(function () {
+
+    var data = [];
+
+    $("#tblBody tr").each(function () {
+
+        var row = {
+
+            CAST_NO: $(this).find(".castNo").val(),
+
+            CAST_START_DT: GetDateTime(
+                $(this).find(".castStart").val()
+            ),
+
+            CAST_END_DT: GetDateTime(
+                $(this).find(".castEnd").val()
+            ),
+
+            LADLE_START_DT: GetDateTime(
+                $(this).find(".ladleStart").val()
+            ),
+
+            LADLE_END_DT: GetDateTime(
+                $(this).find(".ladleEnd").val()
+            )
+        };
+
+        data.push(row);
     });
+
+    $.ajax({
+        url: '/Granshot/SaveData',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function () {
+            alert("Saved Successfully");
+        }
+    });
+
+});
+var rows = [];
+
+$("#tblBody tr").each(function () {
+
+    rows.push({
+        CAST_NO: $(this).find(".castNo").val(),
+        CAST_START_DT: castStartDateTime,
+        CAST_END_DT: castEndDateTime,
+        LADLE_START_DT: ladleStartDateTime,
+        LADLE_END_DT: ladleEndDateTime,
+        ARRIVED_FROM: $(this).find(".arrivedFrom").val(),
+        GROSS: $(this).find(".gross").val(),
+        TARE: $(this).find(".tare").val(),
+        NET: $(this).find(".net").val()
+    });
+});
+
+$.ajax({
+    url: '/Granshot/SaveData',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(rows)
+});
