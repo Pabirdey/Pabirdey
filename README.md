@@ -98,20 +98,45 @@ public JsonResult CheckPassword(string password)
 }
 $("#btnYesDelete").click(function () {
 
-    var castNo = selectedRow.find(".castNo").val();
+    var seqNo = selectedRow.find(".seqNo").val();  // or .text() if not input
 
     $.ajax({
         url: '/Granshot/DeleteCast',
         type: 'POST',
-        data: { castNo: castNo },
+        data: { seqNo: seqNo },
         success: function () {
 
             selectedRow.remove();
-
             $("#deleteModal").modal("hide");
-
             alert("Deleted Successfully");
+        },
+        error: function () {
+            alert("Delete failed");
         }
     });
 
 });
+[HttpPost]
+public JsonResult DeleteCast(int seqNo)
+{
+    string connStr = ConfigurationManager.ConnectionStrings["OracleCon"].ConnectionString;
+
+    using (OracleConnection con = new OracleConnection(connStr))
+    {
+        con.Open();
+
+        string query = "DELETE FROM YOUR_TABLE_NAME WHERE SEQNO = :seqNo";
+
+        using (OracleCommand cmd = new OracleCommand(query, con))
+        {
+            cmd.Parameters.Add(new OracleParameter("seqNo", seqNo));
+
+            int rows = cmd.ExecuteNonQuery();
+
+            if (rows > 0)
+                return Json(new { success = true });
+            else
+                return Json(new { success = false });
+        }
+    }
+}
