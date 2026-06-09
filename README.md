@@ -1,119 +1,79 @@
-public class LadleModel
-{
-    public string LADLE_FLST_TIME { get; set; }   // "14:30"
-    public string LADLE_FLEND_TIME { get; set; }  // "15:45"
-    public string TXTDT { get; set; }             // "2026-06-08"
-    public string TXTSHIFT { get; set; }
-
-    public string TRP_NO { get; set; }
-    public string ARRIVED_FROM { get; set; }
-
-    public decimal GROSS_WT { get; set; }
-    public decimal TARE_WT { get; set; }
-    public decimal NET_WT { get; set; }
-    public decimal HMT { get; set; }
-
-    public decimal TXT_LADLEFILLINGRATE { get; set; }
-}
-
-
-[HttpPost]
-public ActionResult CalculateLadle(LadleModel model)
-{
-    try
-    {
-        decimal v_Pouring_rate = 0;
-        int v_lfe_time;
-        DateTime v_timestamp;
-
-        // ✅ Convert DATE
-        DateTime baseDate = DateTime.Parse(model.TXTDT);
-
-        // ✅ Convert TIME (SAFE for AM/PM or 24-hour)
-        DateTime startTime = DateTime.Parse(model.LADLE_FLST_TIME);
-        DateTime endTime = DateTime.Parse(model.LADLE_FLEND_TIME);
-
-        v_lfe_time = endTime.Hour;
-
-        // ==============================
-        // SHIFT LOGIC (Oracle Converted)
-        // ==============================
-        if (v_lfe_time >= 6 && v_lfe_time < 14)
+ [HttpPost]
+        public ActionResult CalculateLadle(Granshot model)
         {
-            if (model.TXTSHIFT == "C")
-                v_timestamp = baseDate.AddDays(1);
-            else
-                v_timestamp = baseDate;
+            try
+            {
+                decimal v_Pouring_rate = 0;
+                int v_lfe_time;
+                DateTime v_timestamp;                
+                DateTime baseDate = DateTime.Parse(model.lsSelectedFDate);                
+                DateTime startTime = DateTime.Parse(model.LADLE_FLST_TIME);
+                DateTime endTime = DateTime.Parse(model.LADLE_FLEND_TIME);
+                v_lfe_time = endTime.Hour;                
+                if (v_lfe_time >= 6 && v_lfe_time < 14)
+                {
+                    if (model.ddlshift == "C")
+                        v_timestamp = baseDate.AddDays(1);
+                    else
+                        v_timestamp = baseDate;
+                }
+                else if (v_lfe_time >= 14 && v_lfe_time < 22)
+                {
+                    v_timestamp = baseDate;
+                }
+                else if (v_lfe_time >= 22)
+                {
+                    v_timestamp = baseDate;
+                }
+                else
+                {
+                    v_timestamp = baseDate.AddDays(1);
+                }
+
+                model.GROSS_WT = GetGrossWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+                model.TARE_WT = GetTareWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+                model.NET_WT = GetNetWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+                model.HMT = GetHmt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+                var minutes = (endTime - startTime).TotalMinutes;
+
+                if (minutes > 0)
+                    model.POURING_RATE = model.NET_WT / (decimal)minutes;
+                else
+                    model.POURING_RATE = 0;
+
+                v_Pouring_rate = model.POURING_RATE;
+
+                return Json(new
+                {
+                    success = true,
+                    data = model
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
-        else if (v_lfe_time >= 14 && v_lfe_time < 22)
-        {
-            v_timestamp = baseDate;
-        }
-        else if (v_lfe_time >= 22)
-        {
-            v_timestamp = baseDate;
-        }
-        else
-        {
-            v_timestamp = baseDate.AddDays(1);
-        }
-
-        // ==============================
-        // CALL YOUR DB FUNCTIONS
-        // ==============================
-        model.GROSS_WT = GetGrossWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
-        model.TARE_WT = GetTareWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
-        model.NET_WT = GetNetWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
-        model.HMT = GetHmt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
-
-        // ==============================
-        // FILLING RATE
-        // ==============================
-        var minutes = (endTime - startTime).TotalMinutes;
-
-        if (minutes > 0)
-            model.TXT_LADLEFILLINGRATE = model.NET_WT / (decimal)minutes;
-        else
-            model.TXT_LADLEFILLINGRATE = 0;
-
-        v_Pouring_rate = model.TXT_LADLEFILLINGRATE;
-
-        return Json(new
-        {
-            success = true,
-            data = model
-        });
-    }
-    catch (Exception ex)
-    {
-        return Json(new
-        {
-            success = false,
-            message = ex.Message
-        });
-    }
-}
-
-private decimal GetGrossWt(string trpNo, DateTime date, DateTime time, string from)
-{
-    return 0; // Replace Oracle call
-}
-
-private decimal GetTareWt(string trpNo, DateTime date, DateTime time, string from)
-{
-    return 0;
-}
-
-private decimal GetNetWt(string trpNo, DateTime date, DateTime time, string from)
-{
-    return 0;
-}
-
-private decimal GetHmt(string trpNo, DateTime date, DateTime time, string from)
-{
-    return 0;
-}
-<td>
+         function BindTable(data) {            
+            $("#tblBody").empty();
+            var totalRows = 15;
+            var dataCount = data.length;
+            if (dataCount > 0) {
+                $.each(data, function (i, item) {
+                    var row = `<tr>
+                <td><input type="text" class="table-input" value="${item.CAST_NO || ''}"readonly></td>
+                <td>
+                <input type="time" class ="table-input" value="${item.CAST_ST_TIME || ''}">
+                </td>
+                <td><input type="time" class="table-input" value="${item.CAST_END_TIME || ''}"></td>
+                <td><input type="text" class="table-input" value="${item.TRP_NO || ''}"></td>
+                <td><input type="time" class="table-input" value="${item.LADLE_FLST_TIME || ''}"></td>
+                <td><input type="time" class="table-input" value="${item.LADLE_FLEND_TIME || ''}"></td>
+                <td>
                     <select class ="table-input arrivedFrom">
                         <option value=""></option>
                         <option value="C" ${item.ARRIVED_FROM === 'C' ? 'selected': ''}>C</option>
@@ -124,3 +84,92 @@ private decimal GetHmt(string trpNo, DateTime date, DateTime time, string from)
                         <option value="F" ${item.ARRIVED_FROM === 'I' ? 'selected': ''}>I</option>
                     </select>
                </td>
+               console.log(item.ARRIVED_FROM);
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input"  value="${item.GROSS_WT || ''}"readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" value="${item.TARE_WT || ''}"readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" value="${item.NET_WT || ''}"readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" value="${item.POURING_RATE || ''}"readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" value="${item.HMT || ''}"readonly></td>
+                <td><input type="text" class ="table-input" value="${item.REASON_POURING || ''}"></td>
+                <td class="seqNoCol"><input type="hidden" class ="table-input seqNo" value="${item.SEQ_NO || ''}"readonly></td>
+                <td><button type="button" class ="btnDelete">Delete</button></td>
+            </tr>`;
+
+                    $("#tblBody").append(row);
+                });
+
+                
+                for (var i = dataCount; i < totalRows; i++) {
+
+                    var blankRow = `<tr>
+                <td><input type="text" class ="table-input" readonly></td>
+                <td><input type="time"  class ="table-input"></td>
+                <td><input type="time"  class ="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="time"  class ="table-input"></td>
+                <td><input type="time"  class ="table-input"></td>
+
+                <td>
+                    <select class ="table-input arrivedFrom">                    
+                        <option value=""></option>
+                        <option value="C">C</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="F">G</option>
+                        <option value="F">H</option>
+                        <option value="F">I</option>
+                    </select>
+                </td>
+
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td><input type="text" class ="table-input"></td>
+                <td class ="seqNoCol"><input type="hidden" class ="table-input seqNo" readonly></td>
+                <td><button type="button" class="btnDelete">Delete</button></td>
+            </tr>`;
+
+                    $("#tblBody").append(blankRow);
+                }
+            }
+            else {
+
+               
+                for (var i = 0; i < totalRows; i++) {
+
+                    var blankRow = `<tr>
+                <td><input type="text" class ="table-input" readonly></td>
+                <td><input type="time" class ="table-input"></td>
+                <td><input type="time" class ="table-input"></td>
+                <td><input type="text" class="table-input"></td>
+                <td><input type="time" class ="table-input"></td>
+                <td><input type="time" class ="table-input"></td>
+
+                <td>
+                    <select class ="table-input arrivedFrom">                    
+                        <option value=""></option>
+                        <option value="C">C</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="F">G</option>
+                        <option value="F">H</option>
+                        <option value="F">I</option>
+                    </select>
+                </td>
+
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td style="background-color:#c0f9fa;"><input type="text" class ="table-input" readonly></td>
+                <td><input type="text" class="table-input"></td>
+                <td class ="seqNoCol"><input type="hidden" class ="table-input seqNo" readonly></td>
+                <td><button type="button" class="btnDelete">Delete</button></td>
+            </tr>`;
+
+                    $("#tblBody").append(blankRow);
+                }
+            }
+        }
