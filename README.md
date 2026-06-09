@@ -1,53 +1,115 @@
-function SaveData() {
+[HttpPost]
+public JsonResult Save(GranshotViewModel model)
+{
+    try
+    {
+        string conStr = ConfigurationManager
+            .ConnectionStrings["OracleDb"]
+            .ConnectionString;
 
-    var details = [];
+        using (OracleConnection con = new OracleConnection(conStr))
+        {
+            con.Open();
 
-    $("#tblBody tr").each(function () {
+            foreach (var item in model.Details)
+            {
+                DateTime castStart =
+                    GetActualDateTime(
+                        model.ProductionDate,
+                        model.Shift,
+                        item.CAST_ST_TIME);
 
-        var castNo = $(this).find("td:eq(0) input").val();
+                DateTime castEnd =
+                    GetActualDateTime(
+                        model.ProductionDate,
+                        model.Shift,
+                        item.CAST_END_TIME);
 
-        if (castNo != "") {
+                DateTime ladleStart =
+                    GetActualDateTime(
+                        model.ProductionDate,
+                        model.Shift,
+                        item.LADLE_FLST_TIME);
 
-            details.push({
-                CAST_NO: castNo,
-                CAST_ST_TIME: $(this).find("td:eq(1) input").val(),
-                CAST_END_TIME: $(this).find("td:eq(2) input").val(),
-                TRP_NO: $(this).find("td:eq(3) input").val(),
-                LADLE_FLST_TIME: $(this).find("td:eq(4) input").val(),
-                LADLE_FLEND_TIME: $(this).find("td:eq(5) input").val(),
-                ARRIVED_FROM: $(this).find(".arrivedFrom").val(),
-                GROSS_WT: $(this).find("td:eq(7) input").val(),
-                TARE_WT: $(this).find("td:eq(8) input").val(),
-                NET_WT: $(this).find("td:eq(9) input").val(),
-                POURING_RATE: $(this).find("td:eq(10) input").val(),
-                HMT: $(this).find("td:eq(11) input").val(),
-                REASON_POURING: $(this).find("td:eq(12) input").val()
-            });
-        }
-    });
+                DateTime ladleEnd =
+                    GetActualDateTime(
+                        model.ProductionDate,
+                        model.Shift,
+                        item.LADLE_FLEND_TIME);
 
-    var model = {
-        ProductionDate: $("#hiddenDate").val(),
-        Shift: $("#ddlshift").val(),
-        Details: details
-    };
+                string sql = @"
+                INSERT INTO T_GRANSHOT
+                (
+                    PROD_DATE,
+                    SHIFT_CODE,
+                    CAST_NO,
+                    CAST_ST_TIME,
+                    CAST_END_TIME,
+                    TRP_NO,
+                    LADLE_FLST_TIME,
+                    LADLE_FLEND_TIME,
+                    ARRIVED_FROM,
+                    GROSS_WT,
+                    TARE_WT,
+                    NET_WT,
+                    POURING_RATE,
+                    HMT,
+                    REASON_POURING
+                )
+                VALUES
+                (
+                    :PROD_DATE,
+                    :SHIFT_CODE,
+                    :CAST_NO,
+                    :CAST_ST_TIME,
+                    :CAST_END_TIME,
+                    :TRP_NO,
+                    :LADLE_FLST_TIME,
+                    :LADLE_FLEND_TIME,
+                    :ARRIVED_FROM,
+                    :GROSS_WT,
+                    :TARE_WT,
+                    :NET_WT,
+                    :POURING_RATE,
+                    :HMT,
+                    :REASON_POURING
+                )";
 
-    $.ajax({
-        url: '/Granshot/Save',
-        type: 'POST',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(model),
-        success: function (response) {
+                using (OracleCommand cmd = new OracleCommand(sql, con))
+                {
+                    cmd.Parameters.Add("PROD_DATE", OracleDbType.Date).Value = model.ProductionDate;
+                    cmd.Parameters.Add("SHIFT_CODE", OracleDbType.Varchar2).Value = model.Shift;
+                    cmd.Parameters.Add("CAST_NO", OracleDbType.Varchar2).Value = item.CAST_NO;
+                    cmd.Parameters.Add("CAST_ST_TIME", OracleDbType.TimeStamp).Value = castStart;
+                    cmd.Parameters.Add("CAST_END_TIME", OracleDbType.TimeStamp).Value = castEnd;
+                    cmd.Parameters.Add("TRP_NO", OracleDbType.Varchar2).Value = item.TRP_NO;
+                    cmd.Parameters.Add("LADLE_FLST_TIME", OracleDbType.TimeStamp).Value = ladleStart;
+                    cmd.Parameters.Add("LADLE_FLEND_TIME", OracleDbType.TimeStamp).Value = ladleEnd;
+                    cmd.Parameters.Add("ARRIVED_FROM", OracleDbType.Varchar2).Value = item.ARRIVED_FROM;
+                    cmd.Parameters.Add("GROSS_WT", OracleDbType.Decimal).Value = item.GROSS_WT;
+                    cmd.Parameters.Add("TARE_WT", OracleDbType.Decimal).Value = item.TARE_WT;
+                    cmd.Parameters.Add("NET_WT", OracleDbType.Decimal).Value = item.NET_WT;
+                    cmd.Parameters.Add("POURING_RATE", OracleDbType.Decimal).Value = item.POURING_RATE;
+                    cmd.Parameters.Add("HMT", OracleDbType.Int32).Value = item.HMT;
+                    cmd.Parameters.Add("REASON_POURING", OracleDbType.Varchar2).Value = item.REASON_POURING;
 
-            if (response.success) {
-                alert(response.message);
+                    cmd.ExecuteNonQuery();
+                }
             }
-            else {
-                alert(response.message);
-            }
-        },
-        error: function () {
-            alert("Error occurred");
         }
-    });
+
+        return Json(new
+        {
+            success = true,
+            message = "Data Saved Successfully"
+        });
+    }
+    catch (Exception ex)
+    {
+        return Json(new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
 }
