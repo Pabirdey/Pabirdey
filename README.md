@@ -1,48 +1,29 @@
-$("#tblBody tr").each(function () {
+public JsonResult GetNextCastNo()
+{
+    int castNo = 0;
+    int seqNo = 0;
 
-    var castNoTextbox = $(this).find("td:eq(0) input");
+    string sql = @"SELECT NVL(MAX(CAST_NO),0)+1 CAST_NO,
+                          NVL(MAX(SEQ_NO),0)+1 SEQ_NO
+                   FROM IMTG.T_GRANSHOT_DETAILS";
 
-    if ($.trim(castNoTextbox.val()) === "") {
+    using (OracleConnection con = new OracleConnection(conStr))
+    {
+        con.Open();
 
-        castNoTextbox.val(castNo);
+        OracleCommand cmd = new OracleCommand(sql, con);
+        OracleDataReader dr = cmd.ExecuteReader();
 
-        $(this).find("td:eq(13) input").val(seqNo);
-
-        $(this).find("td:eq(1) input").focus();
-
-        isRowFound = true;
-        return false;
+        if (dr.Read())
+        {
+            castNo = Convert.ToInt32(dr["CAST_NO"]);
+            seqNo = Convert.ToInt32(dr["SEQ_NO"]);
+        }
     }
-});
-var newRow = `
-<tr>
-    <td><input type="text" class="table-input" value="${castNo}"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
 
-    <td>
-        <select class="table-input arrivedFrom">
-            <option value=""></option>
-            <option value="C">C</option>
-            <option value="E">E</option>
-            <option value="F">F</option>
-            <option value="G">G</option>
-            <option value="H">H</option>
-            <option value="I">I</option>
-        </select>
-    </td>
-
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-    <td><input type="text" class="table-input"></td>
-
-    <td><input type="text" class="table-input" value="${seqNo}"></td>
-
-    <td><button type="button" class="btnDelete">Delete</button></td>
-</tr>`;
+    return Json(new
+    {
+        CAST_NO = castNo,
+        SEQ_NO = seqNo
+    }, JsonRequestBehavior.AllowGet);
+}
