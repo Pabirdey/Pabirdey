@@ -113,3 +113,14 @@ private decimal GetHmt(string trpNo, DateTime date, DateTime time, string from)
 {
     return 0;
 }
+<td>
+                    <select class ="table-input arrivedFrom">
+                        <option value=""></option>
+                        <option value="C" ${item.ARRIVED_FROM === 'C' ? 'selected': ''}>C</option>
+                        <option value="E" ${item.ARRIVED_FROM === 'E' ? 'selected': ''}>E</option>
+                        <option value="F" ${item.ARRIVED_FROM === 'F' ? 'selected': ''}>F</option>
+                        <option value="C" ${item.ARRIVED_FROM === 'G' ? 'selected': ''}>G</option>
+                        <option value="E" ${item.ARRIVED_FROM === 'H' ? 'selected': ''}>H</option>
+                        <option value="F" ${item.ARRIVED_FROM === 'I' ? 'selected': ''}>I</option>
+                    </select>
+               </td>
