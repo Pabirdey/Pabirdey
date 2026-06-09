@@ -1,84 +1,115 @@
-BEGIN
+public class LadleModel
+{
+    public string LADLE_FLST_TIME { get; set; }   // "14:30"
+    public string LADLE_FLEND_TIME { get; set; }  // "15:45"
+    public string TXTDT { get; set; }             // "2026-06-08"
+    public string TXTSHIFT { get; set; }
 
-    FOR k IN (
-        SELECT
-            DATE_TIME,
-            FUR_NAME,
-            SAMPLE_ID,
+    public string TRP_NO { get; set; }
+    public string ARRIVED_FROM { get; set; }
 
-            AVG(DECODE(S, 0, NULL, S)) S,
-            AVG(DECODE(C, 0, NULL, C)) C,
-            AVG(DECODE(MN, 0, NULL, MN)) MN,
-            AVG(DECODE(P, 0, NULL, P)) P,
-            AVG(DECODE(SI, 0, NULL, SI)) SI,
-            AVG(DECODE(AL, 0, NULL, AL)) AL,
-            AVG(DECODE(CU, 0, NULL, CU)) CU,
-            AVG(DECODE(CR, 0, NULL, CR)) CR,
-            AVG(DECODE(NICKEL, 0, NULL, NICKEL)) NICKEL,
-            AVG(DECODE(MO, 0, NULL, MO)) MO,
-            AVG(DECODE(V, 0, NULL, V)) V,
-            AVG(DECODE(NB, 0, NULL, NB)) NB,
-            AVG(DECODE(TI, 0, NULL, TI)) TI,
-            AVG(DECODE(B, 0, NULL, B)) B,
-            AVG(DECODE(W, 0, NULL, W)) W,
-            AVG(DECODE(CO, 0, NULL, CO)) CO,
-            AVG(DECODE(MG, 0, NULL, MG)) MG,
-            AVG(DECODE(FE, 0, NULL, FE)) FE,
-            AVG(DECODE(SN, 0, NULL, SN)) SN,
-            AVG(DECODE(SB, 0, NULL, SB)) SB,
-            AVG(DECODE(PB, 0, NULL, PB)) PB,
-            AVG(DECODE(BI, 0, NULL, BI)) BI,
-            AVG(DECODE(SE, 0, NULL, SE)) SE,
-            AVG(DECODE(CE, 0, NULL, CE)) CE,
-            AVG(DECODE(LA, 0, NULL, LA)) LA,
-            AVG(DECODE(TE, 0, NULL, TE)) TE
+    public decimal GROSS_WT { get; set; }
+    public decimal TARE_WT { get; set; }
+    public decimal NET_WT { get; set; }
+    public decimal HMT { get; set; }
 
-        FROM TMET.T_TSMD_BF_HOT_METAL_ANAL
-        WHERE DATE_TIME >= vStdate
-          AND REGEXP_LIKE(SAMPLE_ID, '(R|T)$')
+    public decimal TXT_LADLEFILLINGRATE { get; set; }
+}
 
-        GROUP BY DATE_TIME, FUR_NAME, SAMPLE_ID
-        ORDER BY DATE_TIME, FUR_NAME, SAMPLE_ID
-    )
 
-    LOOP
+[HttpPost]
+public ActionResult CalculateLadle(LadleModel model)
+{
+    try
+    {
+        decimal v_Pouring_rate = 0;
+        int v_lfe_time;
+        DateTime v_timestamp;
 
-        UPDATE TMET.T_TSMD_BF_HOT_METAL_ANAL_DAILY
-        SET
-            S = k.S,
-            C = k.C,
-            MN = k.MN,
-            P = k.P,
-            SI = k.SI,
-            AL = k.AL,
-            CU = k.CU,
-            CR = k.CR,
-            NICKEL = k.NICKEL,
-            MO = k.MO,
-            V = k.V,
-            NB = k.NB,
-            TI = k.TI,
-            B = k.B,
-            W = k.W,
-            CO = k.CO,
-            MG = k.MG,
-            FE = k.FE,
-            SN = k.SN,
-            SB = k.SB,
-            PB = k.PB,
-            BI = k.BI,
-            SE = k.SE,
-            CE = k.CE,
-            LA = k.LA,
-            TE = k.TE
+        // ✅ Convert DATE
+        DateTime baseDate = DateTime.Parse(model.TXTDT);
 
-        WHERE FUR_NAME = k.FUR_NAME
-          AND DATE_TIME >= TRUNC(k.DATE_TIME - 6/24) + 6/24
-          AND DATE_TIME <  TRUNC(k.DATE_TIME - 6/24) + 1 + 6/24;
+        // ✅ Convert TIME (SAFE for AM/PM or 24-hour)
+        DateTime startTime = DateTime.Parse(model.LADLE_FLST_TIME);
+        DateTime endTime = DateTime.Parse(model.LADLE_FLEND_TIME);
 
-    END LOOP;
+        v_lfe_time = endTime.Hour;
 
-    COMMIT;
+        // ==============================
+        // SHIFT LOGIC (Oracle Converted)
+        // ==============================
+        if (v_lfe_time >= 6 && v_lfe_time < 14)
+        {
+            if (model.TXTSHIFT == "C")
+                v_timestamp = baseDate.AddDays(1);
+            else
+                v_timestamp = baseDate;
+        }
+        else if (v_lfe_time >= 14 && v_lfe_time < 22)
+        {
+            v_timestamp = baseDate;
+        }
+        else if (v_lfe_time >= 22)
+        {
+            v_timestamp = baseDate;
+        }
+        else
+        {
+            v_timestamp = baseDate.AddDays(1);
+        }
 
-END;
-/
+        // ==============================
+        // CALL YOUR DB FUNCTIONS
+        // ==============================
+        model.GROSS_WT = GetGrossWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+        model.TARE_WT = GetTareWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+        model.NET_WT = GetNetWt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+        model.HMT = GetHmt(model.TRP_NO, v_timestamp, endTime, model.ARRIVED_FROM);
+
+        // ==============================
+        // FILLING RATE
+        // ==============================
+        var minutes = (endTime - startTime).TotalMinutes;
+
+        if (minutes > 0)
+            model.TXT_LADLEFILLINGRATE = model.NET_WT / (decimal)minutes;
+        else
+            model.TXT_LADLEFILLINGRATE = 0;
+
+        v_Pouring_rate = model.TXT_LADLEFILLINGRATE;
+
+        return Json(new
+        {
+            success = true,
+            data = model
+        });
+    }
+    catch (Exception ex)
+    {
+        return Json(new
+        {
+            success = false,
+            message = ex.Message
+        });
+    }
+}
+
+private decimal GetGrossWt(string trpNo, DateTime date, DateTime time, string from)
+{
+    return 0; // Replace Oracle call
+}
+
+private decimal GetTareWt(string trpNo, DateTime date, DateTime time, string from)
+{
+    return 0;
+}
+
+private decimal GetNetWt(string trpNo, DateTime date, DateTime time, string from)
+{
+    return 0;
+}
+
+private decimal GetHmt(string trpNo, DateTime date, DateTime time, string from)
+{
+    return 0;
+}
