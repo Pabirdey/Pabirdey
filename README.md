@@ -1,1 +1,2 @@
-style="background-color:#c0f9fa;"
+SELECT REGEXP_SUBSTR('AD38630R1', '[A-Z][0-9]?$', 1, 1) AS suffix
+FROM dual;
