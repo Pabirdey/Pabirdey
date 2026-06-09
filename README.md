@@ -1,22 +1,24 @@
-$("#tblBody tr").each(function () {
+function CheckDateTime() {
 
-    var castStart  = $(this).find(".castStart").val();
-    var castEnd    = $(this).find(".castEnd").val();
-    var ladleStart = $(this).find(".ladleStart").val();
-    var ladleEnd   = $(this).find(".ladleEnd").val();
+    $("#tblBody tr").each(function () {
 
-    var castStartDT  = castStart  ? GetDateTime(castStart) : null;
-    var castEndDT    = castEnd    ? GetDateTime(castEnd) : null;
-    var ladleStartDT = ladleStart ? GetDateTime(ladleStart) : null;
-    var ladleEndDT   = ladleEnd   ? GetDateTime(ladleEnd) : null;
+        var castStart = $(this).find(".castStart").val();
+        var castEnd = $(this).find(".castEnd").val();
+        var ladleStart = $(this).find(".ladleStart").val();
+        var ladleEnd = $(this).find(".ladleEnd").val();
 
-    console.log(castStartDT);
-    console.log(castEndDT);
-    console.log(ladleStartDT);
-    console.log(ladleEndDT);
+        var castStartDT = castStart ? GetDateTime(castStart) : null;
+        var castEndDT = castEnd ? GetDateTime(castEnd) : null;
+        var ladleStartDT = ladleStart ? GetDateTime(ladleStart) : null;
+        var ladleEndDT = ladleEnd ? GetDateTime(ladleEnd) : null;
 
-});
+        console.log(castStartDT);
+        console.log(castEndDT);
+        console.log(ladleStartDT);
+        console.log(ladleEndDT);
 
+    });
+}
 <tr>
     <td><input type="time" class="castStart"></td>
     <td><input type="time" class="castEnd"></td>
