@@ -1,73 +1,33 @@
-function GenerateNewCast() {
+function GetDateTime(timeStr) {
 
-    $.ajax({
-        url: '/Granshot/GetNextCastNo',
-        type: 'GET',
-        success: function (data) {
+    var shift = $("#ddlShift").val();
+    var dateStr = $("#txtDate").val();
 
-            var castNo = data.CAST_NO;
-            var seqNo = data.SEQ_NO;
+    var dt = new Date(dateStr);
 
-            var isRowFound = false;
+    // Example: "11:20 PM"
+    var parts = timeStr.split(' ');
 
-            $("#tblBody tr").each(function () {
+    var timePart = parts[0];
+    var ampm = parts[1];
 
-                var castNoTextbox = $(this).find("td:eq(0) input");
+    var arr = timePart.split(':');
 
-                if ($.trim(castNoTextbox.val()) === "") {
+    var hh = parseInt(arr[0]);
+    var mm = parseInt(arr[1]);
 
-                    castNoTextbox.val(castNo);
+    // Convert to 24 hour
+    if (ampm === "PM" && hh < 12)
+        hh += 12;
 
-                    $(this).find("td:eq(13) input").val(seqNo);
+    if (ampm === "AM" && hh === 12)
+        hh = 0;
 
-                    $(this).find("td:eq(1) input").focus();
+    // Shift C logic
+    if (shift === "C" && hh < 6)
+        dt.setDate(dt.getDate() + 1);
 
-                    isRowFound = true;
+    dt.setHours(hh, mm, 0, 0);
 
-                    return false;
-                }
-            });
-
-            if (!isRowFound) {
-
-                var newRow = `
-                <tr>
-                    <td><input type="text" class="table-input" value="${castNo}"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-
-                    <td>
-                        <select class="table-input arrivedFrom">
-                            <option value=""></option>
-                            <option value="C">C</option>
-                            <option value="E">E</option>
-                            <option value="F">F</option>
-                            <option value="G">G</option>
-                            <option value="H">H</option>
-                            <option value="I">I</option>
-                        </select>
-                    </td>
-
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-                    <td><input type="text" class="table-input"></td>
-
-                    <td><input type="text" class="table-input" value="${seqNo}"></td>
-
-                    <td><button type="button" class="btnDelete">Delete</button></td>
-                </tr>`;
-
-                $("#tblBody").append(newRow);
-            }
-        },
-        error: function () {
-            alert("Unable to generate Cast No.");
-        }
-    });
+    return dt;
 }
