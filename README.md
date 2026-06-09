@@ -1,7 +1,44 @@
- private decimal GetTareWt(string trpNo, DateTime date, DateTime time, string from)
+private decimal GetTareWt(string trpNo, DateTime date, DateTime time, string from)
+{
+    decimal tareWt = 0;
+
+    string constr = ConfigurationManager.ConnectionStrings["OracleDbContext"].ConnectionString;
+
+    using (OracleConnection con = new OracleConnection(constr))
+    {
+        con.Open();
+
+        string sql = @"
+            SELECT NVL(TARE_WT,0)
+            FROM Demo.T_LADLE_DETAILS
+            WHERE FUR_NAME = :FUR_NAME
+              AND TRP_NO = :TRP_NO
+              AND LADLE_FLEND_TIME =
+              (
+                  SELECT MAX(LADLE_FLEND_TIME)
+                  FROM Demo.T_LADLE_DETAILS
+                  WHERE FUR_NAME = :FUR_NAME
+                    AND TRP_NO = :TRP_NO
+                    AND LADLE_FLEND_TIME <= :END_TIME
+              )";
+
+        using (OracleCommand cmd = new OracleCommand(sql, con))
         {
-            Select TARE_WT into vTARE_WT From Demo.T_LADLE_DETAILS where FUR_NAME=vFUR and 
-   TRP_NO=vTRPNO and  LADLE_FLEND_TIME=(Select Max(LADLE_FLEND_TIME) From  Demo.T_LADLE_DETAILS   where FUR_NAME=vFUR and TRP_NO=vTRPNO
-   and LADLE_FLEND_TIME<=to_date(to_CHAR(vDATE,'DD-MON-YYYY')||to_char(vTime,'HH24:MI'),'DD-MON-YYYY HH24:MI'));         
-    Return vTARE_WT; 
+            cmd.Parameters.Add("FUR_NAME", OracleDbType.Varchar2).Value = from;
+            cmd.Parameters.Add("TRP_NO", OracleDbType.Varchar2).Value = trpNo;
+
+            DateTime endDateTime = date.Date.Add(time.TimeOfDay);
+
+            cmd.Parameters.Add("END_TIME", OracleDbType.Date).Value = endDateTime;
+
+            object result = cmd.ExecuteScalar();
+
+            if (result != null && result != DBNull.Value)
+            {
+                tareWt = Convert.ToDecimal(result);
+            }
         }
+    }
+
+    return tareWt;
+}
