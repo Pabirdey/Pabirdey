@@ -33,7 +33,7 @@ public JsonResult Save_Granshot_Details(GranshotViewModel model)
                         item.LADLE_FLEND_TIME);
 
                 string sql = @"
-                INSERT INTO T_GRANSHOT
+                INSERT INTO T_GRANSHOT_DETAILS
                 (
                     PROD_DATE,
                     SHIFT_CODE,
