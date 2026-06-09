@@ -198,3 +198,17 @@ public ActionResult Save(GranshotViewModel model)
         message = "Data Saved Successfully"
     });
 }
+private DateTime GetActualDateTime(DateTime productionDate,
+                                   string shift,
+                                   string timeValue)
+{
+    DateTime actualDate = productionDate.Date.Add(
+        DateTime.Parse(timeValue).TimeOfDay);
+
+    if (shift == "C" && actualDate.Hour < 7)
+    {
+        actualDate = actualDate.AddDays(1);
+    }
+
+    return actualDate;
+}
