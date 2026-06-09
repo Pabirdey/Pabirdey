@@ -1,29 +1,61 @@
-public JsonResult GetNextCastNo()
-{
-    int castNo = 0;
-    int seqNo = 0;
+ function GenerateNewCast() {
+            $.ajax({
+                url: '/Granshot/GetNextCastNo',
+                type: 'GET',
+                success: function (castNo) {
+                    var isRowFound = false;
+                    $("#tblBody tr").each(function () {
+                        var castNoTextbox = $(this).find("td:eq(0) input");
+                        if ($.trim(castNoTextbox.val()) === "") {
+                            // Fill Cast No in first empty row
+                            castNoTextbox.val(castNo);
+                            $(this).find("td:eq(13) input").val(seqNo);
+                            // Optional: focus next column
+                            $(this).find("td:eq(1) input").focus();
+                            isRowFound = true;
+                            return false; // break loop
+                        }
+                    });
 
-    string sql = @"SELECT NVL(MAX(CAST_NO),0)+1 CAST_NO,
-                          NVL(MAX(SEQ_NO),0)+1 SEQ_NO
-                   FROM IMTG.T_GRANSHOT_DETAILS";
+                    // If no empty row exists then create a new row
+                    if (!isRowFound) {
 
-    using (OracleConnection con = new OracleConnection(conStr))
-    {
-        con.Open();
+                        var newRow = `
+                <tr>
+                    <td><input type="text" class="table-input" value="${castNo}"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
 
-        OracleCommand cmd = new OracleCommand(sql, con);
-        OracleDataReader dr = cmd.ExecuteReader();
+                    <td>
+                        <select class="table-input arrivedFrom">
+                            <option value=""></option>
+                            <option value="C">C</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                            <option value="G">G</option>
+                            <option value="H">H</option>
+                            <option value="I">I</option>
+                        </select>
+                    </td>
 
-        if (dr.Read())
-        {
-            castNo = Convert.ToInt32(dr["CAST_NO"]);
-            seqNo = Convert.ToInt32(dr["SEQ_NO"]);
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class="table-input"></td>
+                    <td><input type="text" class ="table-input" value="${seqNo}"></td>
+                    <td><button type="button" class="btnDelete">Delete</button></td>
+                </tr>`;
+
+                        $("#tblBody").append(newRow);
+                    }
+                },
+                error: function () {
+                    alert("Unable to generate Cast No.");
+                }
+            });
         }
-    }
-
-    return Json(new
-    {
-        CAST_NO = castNo,
-        SEQ_NO = seqNo
-    }, JsonRequestBehavior.AllowGet);
-}
