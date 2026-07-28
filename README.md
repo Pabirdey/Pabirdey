@@ -1,2 +1,2 @@
-$("#NO_TP").prop("readonly", true);
-                $("#NO_SLAG_LADLE").prop("readonly", true);
+$("#NO_TP").css("display", "none");
+$("#NO_SLAG_LADLE").css("display", "none");
