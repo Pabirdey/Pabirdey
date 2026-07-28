@@ -1,44 +1,65 @@
- [HttpPost]
-        public JsonResult BFProdProcedure(DateTime p_date, string p_furnace)
+[HttpPost]
+public JsonResult BFProdProcedure(DateTime p_date, string p_furnace)
+{
+    try
+    {
+        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
         {
-            try
-            {
-                using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-                {
-                    con.Open();
+            con.Open();
 
-                    using (OracleCommand cmd = new OracleCommand("DEMO.PKG_BF_THEORETICAL_CALC.DailyConsRates", con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.Add("vDte", OracleDbType.Date).Value = p_date;
-                        cmd.Parameters.Add("vFur", OracleDbType.Varchar2).Value = p_furnace;                        
-                        cmd.ExecuteNonQuery();                        
-                    }                  
-                }
-                return Json(new { status = true, message = "Calculated Over!" });
-            }
-            catch (Exception ex)
+            using (OracleCommand cmd = new OracleCommand("DEMO.PKG_BF_THEORETICAL_CALC.DailyConsRates", con))
             {
-                return Json(new { status = false, message = ex.Message });
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add("vDte", OracleDbType.Date).Value = p_date;
+                cmd.Parameters.Add("vFur", OracleDbType.Varchar2).Value = p_furnace;
+
+                cmd.ExecuteNonQuery();
             }
         }
-         function BFProdProcedure() {
-        var furnaces = ["C","D", "E", "F"];        
-        furnaces.forEach(function (furnace) {
-            $.ajax({
-                url: '/BF_Production/BFProdProcedure',
-                type: 'POST',
-                data: {
-                    p_date: lsSelectedFDate,
-                    p_furnace: furnace
-                },
-                success: function (res) {
-                    alert("Calculated Over!");
-                },
-                error: function () {
-                    alert(res.message);
-                }
-            });
 
+        return Json(new
+        {
+            status = true,
+            message = "Calculated Over!"
         });
     }
+    catch (Exception ex)
+    {
+        return Json(new
+        {
+            status = false,
+            message = ex.Message
+        });
+    }
+}
+function BFProdProcedure() {
+    var furnaces = ["C", "D", "E", "F"];
+    var completed = 0;
+    var message = "";
+
+    furnaces.forEach(function (furnace) {
+
+        $.ajax({
+            url: '/BF_Production/BFProdProcedure',
+            type: 'POST',
+            data: {
+                p_date: lsSelectedFDate,
+                p_furnace: furnace
+            },
+            success: function (res) {
+
+                completed++;
+                message = res.message;
+
+                if (completed === furnaces.length) {
+                    alert(message);   // Shows "Calculated Over!" only once
+                }
+            },
+            error: function (xhr) {
+                alert("Calculation failed.");
+            }
+        });
+
+    });
+}
