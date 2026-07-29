@@ -1,84 +1,23 @@
- $.ajax({
-                url: '/BF_Production/SaveBFProdData',
-                type: 'POST',
-                data: JSON.stringify(modelList),
-                contentType: 'application/json; charset=utf-8',
-                success: function (res) {
-                    if (res.success) {
-                        SaveDEMOBFProdData(modelList);
-                    } else {
-                        alert(res.message);
-                    }
-                },
-                error: function () {
-                    alert("Server Error");
-                }
-            });
-             function SaveDEMOBFProdData(modelList) {
-        $.ajax({
-            url: '/BF_Production/SaveDEMOBFProdData',
-            type: 'POST',
-            data: JSON.stringify(modelList),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (res) {
-                if (res.success) {
-                    //alert("BF Prod Save Data Successfully");
-                    Save_A_FBF_LadleData(modelList);                    
-                }
-                else {
-                    alert(res.message);
-                }
-            },
+success: function (res) {
+    if (res.success) {
 
-            error: function (xhr) {
-                alert("Server Error");
-                console.log(xhr.responseText);
-            }
-        });
-    }
-    function Save_GBF_LadleData(modelList) {
-        $.ajax({
-            url: '/BF_Production/Save_GBF_LadleData',
-            type: 'POST',
-            data: JSON.stringify(modelList),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (res) {
-                if (res.success) {
-                    alert("BF Prod Save Data Successfully");
-                }
-                else {
-                    alert(res.message);
-                }
-            },
+        if (bf === "BFCTRL") {
+            SaveDEMOBFProdData(modelList);
+        }
+        else if (bf === "GBFCTRL") {
+            Save_GBF_LadleData(modelList);
+        }
+        else if (bf === "HBFCTRL") {
+            Save_HBF_LadleData(modelList);   // If you have this method
+        }
+        else if (bf === "IBFCTRL") {
+            Save_IBF_LadleData(modelList);   // If you have this method
+        }
+        else {
+            alert("BF Prod Save Data Successfully");
+        }
 
-            error: function (xhr) {
-                alert("Server Error");
-                console.log(xhr.responseText);
-            }
-        });
+    } else {
+        alert(res.message);
     }
-    function Save_A_FBF_LadleData(modelList) {
-        $.ajax({
-            url: '/BF_Production/Save_A_F_BF_LadleData',
-            type: 'POST',
-            data: JSON.stringify(modelList),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (res) {
-                if (res.success) {
-                    //alert("BF Prod Save Data Successfully");
-                    Save_GBF_LadleData(modelList);
-                }
-                else {
-                    alert(res.message);
-                }
-            },
-
-            error: function (xhr) {
-                alert("Server Error");
-                console.log(xhr.responseText);
-            }
-        });
-    }
+}
