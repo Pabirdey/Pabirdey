@@ -1,188 +1,154 @@
-[HttpPost]
-public JsonResult CalculateHMTPOT(DateTime productionDate)
-{
-    try
-    {
-        using (OracleConnection con = new OracleConnection(iMonitorWebUtils.msConRWString))
-        {
-            con.Open();
-
-            using (OracleTransaction trans = con.BeginTransaction())
-            {
-                try
-                {
-                    decimal? vTotalTP = null;
-                    decimal? vTotalOT = null;
-                    decimal? vTotProdTP = null;
-                    decimal? vTotProdOT = null;
-                    decimal? vHMT_TP = null;
-                    decimal? vHMT_OT = null;
-
-                    // Get TP and OT
-                    try
-                    {
-                        string sql = @"SELECT NOOFTP, NOOFOT
-                                       FROM DEMO.T_LADLE
-                                       WHERE DATE_TIME = :P_DATE
-                                       AND PLANT = 'A-F'";
-
-                        using (OracleCommand cmd = new OracleCommand(sql, con))
-                        {
-                            cmd.Transaction = trans;
-                            cmd.Parameters.Add(":P_DATE", OracleDbType.Date).Value = productionDate;
-
-                            using (OracleDataReader dr = cmd.ExecuteReader())
-                            {
-                                if (dr.Read())
-                                {
-                                    vTotalTP = dr.IsDBNull(0) ? (decimal?)null : Convert.ToDecimal(dr[0]);
-                                    vTotalOT = dr.IsDBNull(1) ? (decimal?)null : Convert.ToDecimal(dr[1]);
-                                }
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        vTotalTP = null;
-                        vTotalOT = null;
-                    }
-
-                    // Total Production TP
-                    try
-                    {
-                        string sql = @"SELECT SUM(NET_WT)
-                                       FROM DEMO.T_LADLE_DETAILS
-                                       WHERE TIMESTAMP = :P_DATE
-                                       AND TRP_NO < 52";
-
-                        using (OracleCommand cmd = new OracleCommand(sql, con))
-                        {
-                            cmd.Transaction = trans;
-                            cmd.Parameters.Add(":P_DATE", OracleDbType.Date).Value = productionDate;
-
-                            object result = cmd.ExecuteScalar();
-                            if (result != DBNull.Value && result != null)
-                                vTotProdTP = Convert.ToDecimal(result);
-                        }
-                    }
-                    catch
-                    {
-                        vTotProdTP = null;
-                    }
-
-                    // HM Tons Per TP
-                    try
-                    {
-                        if (vTotalTP.HasValue && vTotalTP.Value != 0 &&
-                            vTotProdTP.HasValue)
-                        {
-                            vHMT_TP = Math.Round(vTotProdTP.Value / vTotalTP.Value, 2);
-                        }
-                    }
-                    catch
-                    {
-                        vHMT_TP = null;
-                    }
-
-                    // Total Production OT
-                    try
-                    {
-                        string sql = @"SELECT SUM(NET_WT)
-                                       FROM DEMO.T_LADLE_DETAILS
-                                       WHERE TIMESTAMP = :P_DATE
-                                       AND TRP_NO > 51";
-
-                        using (OracleCommand cmd = new OracleCommand(sql, con))
-                        {
-                            cmd.Transaction = trans;
-                            cmd.Parameters.Add(":P_DATE", OracleDbType.Date).Value = productionDate;
-
-                            object result = cmd.ExecuteScalar();
-                            if (result != DBNull.Value && result != null)
-                                vTotProdOT = Convert.ToDecimal(result);
-                        }
-                    }
-                    catch
-                    {
-                        vTotProdOT = null;
-                    }
-
-                    // HM Tons Per OT
-                    try
-                    {
-                        if (vTotalOT.HasValue && vTotalOT.Value != 0 &&
-                            vTotProdOT.HasValue)
-                        {
-                            vHMT_OT = Math.Round(vTotProdOT.Value / vTotalOT.Value, 2);
-                        }
-                    }
-                    catch
-                    {
-                        vHMT_OT = null;
-                    }
-
-                    // Update T_LADLE
-                    string updateSql = @"UPDATE DEMO.T_LADLE
-                                         SET HM_TONS_PER_OT = :P_OT,
-                                             HM_TONS_PER_TP = :P_TP
-                                         WHERE DATE_TIME = :P_DATE
-                                         AND PLANT = 'A-F'";
-
-                    using (OracleCommand cmd = new OracleCommand(updateSql, con))
-                    {
-                        cmd.Transaction = trans;
-                        cmd.Parameters.Add(":P_OT", OracleDbType.Decimal).Value = (object)vHMT_OT ?? DBNull.Value;
-                        cmd.Parameters.Add(":P_TP", OracleDbType.Decimal).Value = (object)vHMT_TP ?? DBNull.Value;
-                        cmd.Parameters.Add(":P_DATE", OracleDbType.Date).Value = productionDate;
-
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    // Call Procedure
-                    try
-                    {
-                        using (OracleCommand cmd = new OracleCommand("DEMO.PROC_LADLE_TODATE", con))
-                        {
-                            cmd.Transaction = trans;
-                            cmd.CommandType = CommandType.StoredProcedure;
-
-                            cmd.Parameters.Add("P_DATE", OracleDbType.Date).Value = productionDate;
-
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                    catch
-                    {
-                        // Ignore procedure errors
-                    }
-
-                    trans.Commit();
-
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Calculation completed successfully."
-                    });
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-
-                    return Json(new
-                    {
-                        success = false,
-                        message = ex.Message
-                    });
-                }
-            }
+ let urlBF = '@urlBF';
+        debugger;
+    var bf = '@ViewBag.bf';
+    if (bf !== "") {
+        switch (bf) {
+            case 'BFCTRL':               
+                $(".reported_G").prop("readonly", true);
+                $(".reported_H").prop("readonly", true);
+                $(".reported_I").prop("readonly", true);
+                $(".NO_TP_SLAG").show();
+                $(".LD_A_F").show();
+                $(".LD_G").hide();                
+                $(".btn-box-wrapper").show();
+                $(".CallProcedure").show();
+                $(".RawMatCons").show();
+                $(".Backbtn").show();
+                break;
+            case 'GBFCTRL':                
+                $(".reported_C").prop("readonly", true);
+                $(".reported_D").prop("readonly", true);
+                $(".reported_E").prop("readonly", true);
+                $(".reported_F").prop("readonly", true);
+                $(".reported_H").prop("readonly", true);
+                $(".reported_I").prop("readonly", true);
+                $(".NO_TP_SLAG").hide();
+                $(".LD_A_F").hide();
+                $(".LD_G").hide();
+                $(".btn-box-wrapper").show();
+                $(".CallProcedure").hide();
+                $(".RawMatCons").hide();
+                $(".Backbtn").show();
+                break;
+            case 'HBFCTRL':                
+                $(".reported_C").prop("readonly", true);
+                $(".reported_D").prop("readonly", true);
+                $(".reported_E").prop("readonly", true);
+                $(".reported_F").prop("readonly", true);
+                $(".reported_G").prop("readonly", true);
+                $(".reported_I").prop("readonly", true);
+                $(".NO_TP_SLAG").hide();
+                $(".LD_A_F").hide();
+                $(".LD_G").hide();
+                $(".btn-box-wrapper").show();
+                $(".CallProcedure").hide();
+                $(".RawMatCons").hide();
+                $(".Backbtn").show();
+                break;
+            case 'IBFCTRL':               
+                $(".reported_C").prop("readonly", true);
+                $(".reported_D").prop("readonly", true);
+                $(".reported_E").prop("readonly", true);
+                $(".reported_F").prop("readonly", true);
+                $(".reported_G").prop("readonly", true);
+                $(".reported_H").prop("readonly", true);
+                $(".NO_TP_SLAG").hide();
+                $(".LD_A_F").hide();
+                $(".LD_G").hide();
+                $(".btn-box-wrapper").show();
+                $(".CallProcedure").hide();
+                $(".RawMatCons").hide();
+                $(".Backbtn").show();
+                break;
+            default:                
+                $(".reported_C").prop("readonly", true);
+                $(".reported_D").prop("readonly", true);
+                $(".reported_E").prop("readonly", true);
+                $(".reported_F").prop("readonly", true);
+                $(".reported_G").prop("readonly", true);
+                $(".reported_H").prop("readonly", true);
+                $(".NO_TP_SLAG").hide();
+                $(".LD_A_F").hide();
+                $(".LD_G").hide();
+                $(".SabeBFProd").hide();                
+                $(".CallProcedure").hide();
+                $(".RawMatCons").hide();
+                $(".Backbtn").show();
+                break;
         }
-    }
-    catch (Exception ex)
-    {
-        return Json(new
-        {
-            success = false,
-            message = ex.Message
+         function SaveBFProdData() {
+        var modelList = [];      
+        var furnaces1 = ["C","D", "E", "F","A-F"];
+        for (var i = 0; i < furnaces1.length; i++) {
+            var f = furnaces1[i];
+            var model = {
+                FURNACE: $("#FURNACE_" + f).val(),
+                ACTUAL: Math.round(parseFloat($("#ACTUAL_" + f).val()) || 0),
+                REPORTED: Math.round(parseFloat($("#REPORTED_" + f).val()) || 0),
+                BALANCE: Math.round(parseFloat($("#BALANCE_" + f).val()) || 0),
+                LD1Tons: Math.round(parseFloat($("#TXT_LD1_TONS").val()) || 0),
+                LD2Tons: Math.round(parseFloat($("#TXT_LD2_TONS").val()) || 0),
+                LD3Tons: Math.round(parseFloat($("#TXT_LD3_TONS").val()) || 0),
+                MRDTPTons: Math.round(parseFloat($("#TXT_MRDTP_TONS").val()) || 0),
+                NoOfTP: Math.round(parseFloat($("#NO_TP").val()) || 0),
+                ACT_LD1_TONS: Math.round(parseFloat($("#TXTCTOFLD1TONS").val()) || 0),
+                ACT_LD2_TONS: Math.round(parseFloat($("#TXTCTOFLD2TONS").val()) || 0),
+                ACT_LD3_TONS: Math.round(parseFloat($("#TXTCTOFLD3TONS").val()) || 0),
+                ACT_MRD_TP_TONS: Math.round(parseFloat($("#TXTCTOFMRDTPTONS").val()) || 0),
+                PROD_DATE: lsSelectedFDate
+            };
+            modelList.push(model);
+        }
+        
+        var furnaces2 = ["G", "H", "I"];
+        for (var j = 0; j < furnaces2.length; j++) {
+            var f = furnaces2[j];
+            var model = {
+                FURNACE: $("#TXT_FURNACE_" + f).val(),
+                ACTUAL: Math.round(parseFloat($("#TXT_ACTUAL_" + f).val()) || 0),
+                REPORTED: Math.round(parseFloat($("#TXT_RPT_" + f).val()) || 0),
+                BALANCE: Math.round(parseFloat($("#TXT_BAL_" + f).val()) || 0),
+                LD1_TONS_G: Math.round(parseFloat($("#TXT_LD1_TONS_G").val()) || 0),
+                LD2_TONS_G: Math.round(parseFloat($("#TXT_LD2_TONS_G").val()) || 0),
+                LD3_TONS_G: Math.round(parseFloat($("#TXT_LD3_TONS_G").val()) || 0),
+                MRDTP_TONS_G: Math.round(parseFloat($("#TXT_MRDTP_TONS_G").val()) || 0),
+                LD1_TONS_ACTUAL_G: Math.round(parseFloat($("#TXTGBFLD1TONS").val()) || 0),
+                LD2_TONS_ACTUAL_G: Math.round(parseFloat($("#TXTGBFLD2TONS").val()) || 0),
+                LD3_TONS_ACTUAL_G: Math.round(parseFloat($("#TXTGBFLD3TONS").val()) || 0),
+                MRDTP_TONS_ACTUAL_G: Math.round(parseFloat($("#TXTGBFMRDTPTONS").val()) || 0),                
+                PROD_DATE: lsSelectedFDate
+            };
+
+            modelList.push(model);
+        }
+
+        console.log(modelList);
+
+
+        // ================= FIRST SAVE =================
+
+        $.ajax({
+            url: '/BF_Production/SaveBFProdData',
+            type: 'POST',
+            data: JSON.stringify(modelList),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (res) {
+                if (res.success) {
+                    // ================= SECOND SAVE =================
+                    SaveDEMOBFProdData(modelList);
+
+                }
+                else {
+                    alert(res.message);
+                }
+            },
+
+            error: function (xhr) {
+
+                alert("Server Error");
+
+                console.log(xhr.responseText);
+            }
         });
     }
-}
