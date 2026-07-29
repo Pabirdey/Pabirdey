@@ -1,63 +1,51 @@
-if (!recordFound)
-{
-    string detailQuery = "";
-
-    if (furnace == "A-F")
-    {
-        detailQuery = @"
-            SELECT
-                NVL(SUM(CASE WHEN DESTINATION='LD1' THEN NET_WT ELSE 0 END),0) LD1,
-                NVL(SUM(CASE WHEN DESTINATION='LD2' THEN NET_WT ELSE 0 END),0) LD2,
-                NVL(SUM(CASE WHEN DESTINATION='LD3' THEN NET_WT ELSE 0 END),0) LD3,
-                NVL(SUM(CASE WHEN DESTINATION='MRD' THEN NET_WT ELSE 0 END),0) MRD,
-                NVL(SUM(CASE WHEN TRP_NO <= 50 AND RET_FLAG='N' THEN FILL_STATUS ELSE 0 END),0) NOOFTP
-            FROM DEMO.T_LADLE_DETAILS
-            WHERE LADLE_FLEND_TIME >= :fromDate
-              AND LADLE_FLEND_TIME < :toDate
-              AND FUR_NAME IN ('C','D','E','F')";
-    }
-    else
-    {
-        detailQuery = @"
-            SELECT
-                NVL(SUM(CASE WHEN DESTINATION='LD1' THEN NET_WT ELSE 0 END),0) LD1,
-                NVL(SUM(CASE WHEN DESTINATION='LD2' THEN NET_WT ELSE 0 END),0) LD2,
-                NVL(SUM(CASE WHEN DESTINATION='LD3' THEN NET_WT ELSE 0 END),0) LD3,
-                NVL(SUM(CASE WHEN DESTINATION='MRD' THEN NET_WT ELSE 0 END),0) MRD,
-                NVL(SUM(CASE WHEN TRP_NO <= 50 AND RET_FLAG='N' THEN FILL_STATUS ELSE 0 END),0) NOOFTP
-            FROM DEMO.T_LADLE_DETAILS
-            WHERE LADLE_FLEND_TIME >= :fromDate
-              AND LADLE_FLEND_TIME < :toDate
-              AND FUR_NAME = :furnace";
-    }
-
-    using (OracleCommand cmd = new OracleCommand(detailQuery, con))
-    {
-        cmd.BindByName = true;
-
-        cmd.Parameters.Add("fromDate", OracleDbType.Date).Value = dt.AddHours(6);
-        cmd.Parameters.Add("toDate", OracleDbType.Date).Value = dt.AddDays(1).AddHours(6);
-
-        if (furnace != "A-F")
-        {
-            cmd.Parameters.Add("furnace", OracleDbType.Varchar2).Value = furnace;
-        }
-
-        using (OracleDataReader dr = cmd.ExecuteReader())
-        {
-            if (dr.Read())
-            {
-                ld1 = dr["LD1"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD1"]);
-                ld2 = dr["LD2"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD2"]);
-                ld3 = dr["LD3"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["LD3"]);
-                mrd = dr["MRD"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["MRD"]);
-                nooftp = dr["NOOFTP"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["NOOFTP"]);
-
-                ld1Act = ld1;
-                ld2Act = ld2;
-                ld3Act = ld3;
-                mrdAct = mrd;
-            }
-        }
-    }
-}
+	
+    Begin
+    select nooftp,noofot into vTotalTP, vTotalOT from demo.t_ladle where date_time=:BLK_CONTROL.DATE_TIME and Plant='A-F';
+			Exception
+  			When Others Then
+       		vTotalTP:=Null;
+       		vTotalOT:=Null;
+			End;
+            
+            	Begin
+			
+  			Select sum(Net_Wt) into vTotProdTP From Demo.T_Ladle_Details Where Timestamp=:BLK_CONTROL.DATE_TIME and Trp_No<52;  			
+  					 
+			Exception
+	 			When Others Then
+       		vTotProdTP:=Null;
+			End;
+            
+            	begin			
+				vHMT_TP:=Round((vTotProdTP/vTotalTP),2);
+			exception
+				when others then
+					vHMT_TP:=null;
+			end;
+            
+            	Begin
+			
+  			Select sum(Net_Wt) into vTotProdOT From Demo.T_Ladle_Details Where Timestamp=:BLK_CONTROL.DATE_TIME and Trp_No>51;
+  					 
+			Exception
+	 			When Others Then
+       		vTotProdOT:=Null;
+			End;
+			
+            
+            	begin			
+				vHMT_OT:=Round((vTotProdOT/vTotalOT),2);
+			exception
+				when others then
+					vHMT_OT:=null;
+			end;
+            
+            	 update demo.t_ladle set HM_TONS_PER_OT=vHMT_OT, HM_TONS_PER_TP=vHMT_TP where date_time=:BLK_CONTROL.DATE_TIME and Plant='A-F';     
+			COMMIT;
+			
+			Begin
+						demo.proc_ladle_todate(:BLK_CONTROL.DATE_TIME_PROD_C);
+			exception
+				when others then
+					Null;
+			End;
