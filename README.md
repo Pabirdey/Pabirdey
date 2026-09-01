@@ -1,24 +1,81 @@
-cmd.Parameters.Add(":CLOSURE_MODE",
-    row["CLOSURE_MODE"] == DBNull.Value ? (object)DBNull.Value : row["CLOSURE_MODE"]);
+using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
+using Oracle.ManagedDataAccess.Client;
 
-cmd.Parameters.Add(":CLAY_QUANTITY",
-    row["CLAY_QUANTITY"] == DBNull.Value ? (object)DBNull.Value : row["CLAY_QUANTITY"]);
+public class TLCController : Controller
+{
+    [HttpGet]
+    public ActionResult Index()
+    {
+        return View();
+    }
 
-cmd.Parameters.Add(":CLAY_QTY_USED",
-    row["CLAY_QTY_USED"] == DBNull.Value ? (object)DBNull.Value : row["CLAY_QTY_USED"]);
 
+    [HttpGet]
+    public JsonResult GetTLCMaster()
+    {
+        List<TlcMasterModel> list = new List<TlcMasterModel>();
 
-cmd.Parameters.Add(new OracleParameter(":CLOSURE_MODE",
-    row["CLOSURE_MODE"] == DBNull.Value
-        ? (object)DBNull.Value
-        : row["CLOSURE_MODE"]));
+        try
+        {
+            using (OracleConnection con =
+                new OracleConnection(iMonitorWebUtils.msConRWString))
+            {
+                con.Open();
 
-cmd.Parameters.Add(new OracleParameter(":CLAY_QUANTITY",
-    row["CLAY_QUANTITY"] == DBNull.Value
-        ? (object)DBNull.Value
-        : row["CLAY_QUANTITY"]));
+                string query = @"
+                    SELECT TLC_NO,
+                           MATURITY_LIFE,
+                           TLC_SIZE
+                    FROM T_TLC_MASTER
+                    ORDER BY TLC_NO";
 
-cmd.Parameters.Add(new OracleParameter(":CLAY_QTY_USED",
-    row["CLAY_QTY_USED"] == DBNull.Value
-        ? (object)DBNull.Value
-        : row["CLAY_QTY_USED"]));
+                using (OracleCommand cmd =
+                    new OracleCommand(query, con))
+                {
+                    using (OracleDataReader dr =
+                        cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            TlcMasterModel model =
+                                new TlcMasterModel();
+
+                            model.TLC_NO =
+                                dr["TLC_NO"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["TLC_NO"]);
+
+                            model.MATURITY_LIFE =
+                                dr["MATURITY_LIFE"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(dr["MATURITY_LIFE"]);
+
+                            model.TLC_SIZE =
+                                dr["TLC_SIZE"] == DBNull.Value
+                                ? ""
+                                : dr["TLC_SIZE"].ToString();
+
+                            list.Add(model);
+                        }
+                    }
+                }
+            }
+
+            return Json(new
+            {
+                success = true,
+                data = list
+            }, JsonRequestBehavior.AllowGet);
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message
+            }, JsonRequestBehavior.AllowGet);
+        }
+    }
+}
