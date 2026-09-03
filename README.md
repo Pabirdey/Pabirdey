@@ -73,7 +73,23 @@ public JsonResult GET_TLC_DAILY_REPORT(DateTime vdate)
         }
 
         return Json(new
-    private List<TLCDailyReport> GetTLCDetails(
+        {
+            success = true,
+            data = list
+        }, JsonRequestBehavior.AllowGet);
+    }
+    catch (Exception ex)
+    {
+        return Json(new
+        {
+            success = false,
+            message = ex.Message
+        }, JsonRequestBehavior.AllowGet);
+    }
+}
+
+
+private List<TLCDailyReport> GetTLCDetails(
     OracleConnection con,
     DateTime vdate,
     int vTrp_No)
@@ -208,17 +224,6 @@ public JsonResult GET_TLC_DAILY_REPORT(DateTime vdate)
     }
 
     return list;
-}    {
-            success = true,
-            data = list
-        }, JsonRequestBehavior.AllowGet);
-    }
-    catch (Exception ex)
-    {
-        return Json(new
-        {
-            success = false,
-            message = ex.Message
-        }, JsonRequestBehavior.AllowGet);
-    }
 }
+
+
