@@ -1,6 +1,1 @@
-<td>
-    <input type="text"
-           class="table-input"
-           value="${item.TLC_MATURITY_PERC == null ? '' : Number(item.TLC_MATURITY_PERC).toFixed(2)}"
-           readonly />
-</td>
+sqlstr = "select max(timestamp) timestamp from t_thermal_imaging where timestamp>='" & vStDate & "' and timestamp<'" & vtrvdate & "'  and TLC_NO_THERMAL_IMAGING=" & vTrp_No & ""
