@@ -1,9 +1,15 @@
-If CDate(vttimestamp) >= CDate(vfr_date) Then
-                Sheets("Report").Cells(i, 7) = CDate(vtrvdate) - CDate(vttimestamp) - 1
-          Else
-                Sheets("Report").Cells(i, 7) = ""
-                If vttimestamp <> "" Then
-                    Sheets("Report").Cells(i, 7) = 0
-                End If
-          End If
-finalDate
+decimal? ThermalValue = null;
+
+if (MaxThermalTimestamp.HasValue)
+{
+    DateTime vttimestamp = MaxThermalTimestamp.Value;
+
+    if (vttimestamp >= vfr_date)
+    {
+        ThermalValue = (decimal)(finalDate - vttimestamp).TotalDays - 1;
+    }
+    else
+    {
+        ThermalValue = 0;
+    }
+}
