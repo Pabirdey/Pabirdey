@@ -1,16 +1,15 @@
 decimal? ThermalValue = null;
 
-if (MaxThermalTimestamp.HasValue)
-{
-    DateTime vttimestamp = MaxThermalTimestamp.Value;
+                        if (MaxThermalTimestamp.HasValue)
+                        {
+                            DateTime vttimestamp = MaxThermalTimestamp.Value;
 
-    if (vttimestamp >= vfr_date)
-    {
-        ThermalValue =
-            (decimal)(finalDate - vttimestamp).TotalDays - 1;
-    }
-    else
-    {
-        ThermalValue = 0;
-    }
-}
+                            if (vttimestamp >= vfr_date)
+                            {
+                                ThermalValue = (vdate_Trunc- vttimestamp);
+                            }
+                            else
+                            {
+                                ThermalValue = 0;
+                            }
+                        }
