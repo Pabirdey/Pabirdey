@@ -1,15 +1,1 @@
-decimal? ThermalValue = null;
-
-if (MaxThermalTimestamp.HasValue)
-{
-    DateTime vttimestamp = MaxThermalTimestamp.Value;
-
-    if (vttimestamp >= vfr_date)
-    {
-        ThermalValue = (decimal)(vdate_Trunc - vttimestamp).TotalDays - 1;
-    }
-    else
-    {
-        ThermalValue = 0;
-    }
-}
+<td><input type="text" class ="table-input" value="${item.TLC_THERMAL_VALUE||''}" readonly</td>
