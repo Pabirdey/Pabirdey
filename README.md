@@ -1,1 +1,9 @@
-<td><input type="text" class="table-input" value="${item.TLC_IR_SCAN ?? 0}" readonly></td>
+int Tlc_repair = 0;
+                        if(vTrp_No>=7 && vTrp_No<= 37)
+                        {
+                            datetime? finalDate = null;
+                            ThermalImage = null;
+                            FurCircuit = null;
+                            if(vTrp_No>0 && finalDate>0 && ThermalImage>0 && FurCircuit>0)
+
+                        }
