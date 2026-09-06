@@ -6,3 +6,4 @@ If CDate(vttimestamp) >= CDate(vfr_date) Then
                     Sheets("Report").Cells(i, 7) = 0
                 End If
           End If
+finalDate
