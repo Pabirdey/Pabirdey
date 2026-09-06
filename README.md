@@ -6,7 +6,8 @@ if (MaxThermalTimestamp.HasValue)
 
     if (vttimestamp >= vfr_date)
     {
-        ThermalValue = (decimal)(finalDate - vttimestamp).TotalDays - 1;
+        ThermalValue =
+            (decimal)(finalDate - vttimestamp).TotalDays - 1;
     }
     else
     {
