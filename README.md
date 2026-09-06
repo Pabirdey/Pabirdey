@@ -1,9 +1,10 @@
-.blue-bg {
-    background-color: blue !important;
-    color: white;
-}
-
-.green-bg {
-    background-color: green !important;
-    color: white;
-}
+ if (totalRunningHr == 0)
+                        {
+                            runningHrDisplay = "RELINE";
+                            return
+                        }
+                        else
+                        {
+                            runningHrDisplay =totalRunningHr.ToString();
+                              maturityPerc = (((decimal)totalRunningHr / vMaturity_Life) * 100);                            
+                        }
