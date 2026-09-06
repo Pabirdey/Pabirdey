@@ -1,22 +1,22 @@
-<td>
-    <input type="text"
-           class="table-input"
-           value="${item.TLC_FINAL_DATE ? new Date(parseInt(item.TLC_FINAL_DATE.replace('/Date(', '').replace(')/', ''))).toLocaleDateString('en-GB') : ''}"
-           readonly>
-</td>
+while (dr.Read())
+                    {
+                        TLCDailyReport model = new TLCDailyReport();                       
+                        model.TLC_NO =dr["TLC_NO"] == DBNull.Value ? 0: Convert.ToInt32(dr["TLC_NO"]);                        
+                        DateTime? tlcStartDate =dr["TLC_ST_DATE"] == DBNull.Value? (DateTime?)null: Convert.ToDateTime(dr["TLC_ST_DATE"]);                        
+                        DateTime? tlcEndDate =dr["TLC_END_DATE"] == DBNull.Value? (DateTime?)null: Convert.ToDateTime(dr["TLC_END_DATE"]);                        
+                        DateTime? finalDate;
+                        if (tlcEndDate.HasValue)
+                        {                            
+                            finalDate = tlcEndDate;
+                        }
+                        else
+                        {                         
+                            finalDate = tlcStartDate;
+                        }
+                        model.TLC_ST_DATE = tlcStartDate;
+                        model.TLC_END_DATE = tlcEndDate;                        
+                        model.TLC_FINAL_DATE = finalDate;                                                
+                        list.Add(model);
+                    }
 
-function formatDate(jsonDate) {
-    if (!jsonDate) return '';
-
-    var timestamp = parseInt(jsonDate.replace('/Date(', '').replace(')/', ''));
-    var date = new Date(timestamp);
-
-    return date.toLocaleDateString('en-GB');
-}
-
-<td>
-    <input type="text"
-           class="table-input"
-           value="${formatDate(item.TLC_FINAL_DATE)}"
-           readonly>
-</td>
+                    
