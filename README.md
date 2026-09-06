@@ -1,16 +1,1 @@
- int FurFaceValue;
-                            if (maturityPerc == 0)
-                            {
-                                FurFaceValue = 3;
-                            }
-                            else if (totalRunningHr > 1450 &&(
-                                     FurCircuit = 'G' ||
-                                     FurCircuit = 'H' ||
-                                     FurCircuit = 'I'))
-                            {
-                                FurFaceValue = 1;
-                            }
-                            else
-                            {
-                                FurFaceValue = 2;
-                            }
+  <td><input type="text" class ="table-input" value="${item.TLC_FUR_FACE ||''}" readonly</td>
