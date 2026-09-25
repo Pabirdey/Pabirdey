@@ -2,18 +2,13 @@ CREATE OR REPLACE PROCEDURE PROC_TSM_SP1_PROD_DAILY
 AS
     vMaxdate   DATE;
     v_Sql      VARCHAR2(32667);
+
 BEGIN
 
     -- =========================================================
-    -- NLS DATE FORMAT
+    -- STEP 1 : GET LAST PROCESSED DATE
     -- =========================================================
-    EXECUTE IMMEDIATE
-        'ALTER SESSION SET NLS_DATE_FORMAT = ''DD-MON-YYYY HH24:MI:SS''';
 
-
-    -- =========================================================
-    -- GET LAST PROCESSED DATE
-    -- =========================================================
     SELECT MAX(TIMESTAMP) - 7
     INTO vMaxdate
     FROM TEST.T_TSBSL_SN_PROD_DAILY
@@ -21,16 +16,23 @@ BEGIN
 
 
     -- =========================================================
-    -- FIRST TIME EXECUTION
+    -- STEP 2 : FIRST TIME EXECUTION
     -- =========================================================
+
     IF vMaxdate IS NULL THEN
-        vMaxdate := TO_DATE('01-APR-2026', 'DD-MON-YYYY');
+
+        vMaxdate := TO_DATE(
+                        '01-APR-2026',
+                        'DD-MON-YYYY'
+                    );
+
     END IF;
 
 
     -- =========================================================
-    -- TAG MASTER LOOP
+    -- STEP 3 : TAG MASTER LOOP
     -- =========================================================
+
     FOR k IN
     (
         SELECT
@@ -49,8 +51,9 @@ BEGIN
         BEGIN
 
             -- =================================================
-            -- RAW DATA LOOP
+            -- STEP 4 : RAW DATA LOOP
             -- =================================================
+
             FOR t IN
             (
                 SELECT
@@ -71,56 +74,88 @@ BEGIN
                 BEGIN
 
                     -- =========================================
-                    -- DYNAMIC MERGE
+                    -- STEP 5 :
+                    -- MERGE ONLY SOURCE + TIMESTAMP
                     -- =========================================
 
                     v_Sql :=
-                        'MERGE INTO TEST.T_TSBSL_SN_PROD_DAILY d
+                        'MERGE INTO TEST.T_TSBSL_SN_PROD_DAILY D
                          USING
                          (
                              SELECT
                                  :1 AS SOURCE,
-                                 :2 AS TIMESTAMP,
-                                 :3 AS COLUMN_VALUE
+                                 :2 AS TIMESTAMP
                              FROM DUAL
-                         ) s
+                         ) S
                          ON
                          (
-                             d.SOURCE = s.SOURCE
-                             AND d.TIMESTAMP = s.TIMESTAMP
+                             D.SOURCE = S.SOURCE
+                             AND D.TIMESTAMP = S.TIMESTAMP
                          )
-                         WHEN MATCHED THEN
-                             UPDATE SET d.' || k.DEST_COLUMN || ' = s.COLUMN_VALUE
                          WHEN NOT MATCHED THEN
                              INSERT
                              (
                                  SOURCE,
-                                 TIMESTAMP,
-                                 ' || k.DEST_COLUMN || '
+                                 TIMESTAMP
                              )
                              VALUES
                              (
-                                 s.SOURCE,
-                                 s.TIMESTAMP,
-                                 s.COLUMN_VALUE
+                                 S.SOURCE,
+                                 S.TIMESTAMP
                              )';
 
 
                     EXECUTE IMMEDIATE v_Sql
                         USING
                             'SP1',
-                            t.DATE_TIME,
-                            t.COLUMN_VALUE;
+                            t.DATE_TIME;
+
+
+                    -- =========================================
+                    -- STEP 6 :
+                    -- UPDATE DYNAMIC DESTINATION COLUMN
+                    -- =========================================
+
+                    v_Sql :=
+                        'UPDATE TEST.T_TSBSL_SN_PROD_DAILY
+                         SET ' || k.DEST_COLUMN || ' = :1
+                         WHERE SOURCE = :2
+                           AND TIMESTAMP = :3';
+
+
+                    EXECUTE IMMEDIATE v_Sql
+                        USING
+                            t.COLUMN_VALUE,
+                            'SP1',
+                            t.DATE_TIME;
 
 
                 EXCEPTION
+
                     WHEN OTHERS THEN
 
                         DBMS_OUTPUT.PUT_LINE(
-                            'SL_NO = ' || k.SL_NO ||
-                            ' | COLUMN = ' || k.DEST_COLUMN ||
-                            ' | DATE = ' || t.DATE_TIME ||
-                            ' | ERROR = ' || SQLERRM
+                            '-----------------------------------'
+                        );
+
+                        DBMS_OUTPUT.PUT_LINE(
+                            'SL_NO       : ' || k.SL_NO
+                        );
+
+                        DBMS_OUTPUT.PUT_LINE(
+                            'DEST_COLUMN : ' || k.DEST_COLUMN
+                        );
+
+                        DBMS_OUTPUT.PUT_LINE(
+                            'DATE_TIME   : ' || t.DATE_TIME
+                        );
+
+                        DBMS_OUTPUT.PUT_LINE(
+                            'ERROR       : ' || SQLERRM
+                        );
+
+                        DBMS_OUTPUT.PUT_LINE(
+                            '-----------------------------------'
                         );
 
                 END;
@@ -129,11 +164,23 @@ BEGIN
 
 
         EXCEPTION
+
             WHEN OTHERS THEN
 
                 DBMS_OUTPUT.PUT_LINE(
-                    'TAG SL_NO = ' || k.SL_NO ||
-                    ' | ERROR = ' || SQLERRM
+                    'TAG MASTER ERROR'
+                );
+
+                DBMS_OUTPUT.PUT_LINE(
+                    'SL_NO = ' || k.SL_NO
+                );
+
+                DBMS_OUTPUT.PUT_LINE(
+                    'DEST_COLUMN = ' || k.DEST_COLUMN
+                );
+
+                DBMS_OUTPUT.PUT_LINE(
+                    'ERROR = ' || SQLERRM
                 );
 
         END;
@@ -142,18 +189,20 @@ BEGIN
 
 
     -- =========================================================
-    -- COMMIT
+    -- STEP 7 : COMMIT
     -- =========================================================
+
     COMMIT;
 
 
 EXCEPTION
+
     WHEN OTHERS THEN
 
         ROLLBACK;
 
         DBMS_OUTPUT.PUT_LINE(
-            'MAIN ERROR = ' || SQLERRM
+            'MAIN PROCEDURE ERROR = ' || SQLERRM
         );
 
 END;
